@@ -1,11 +1,190 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Document</title>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Faculty Research & Workload Management System (FRWS)</title>
+  <link rel="stylesheet" href="style.css">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Sarabun:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
 </head>
 <body>
-    <a href="/public/index.html">Go to Teacher Page</a>
+
+  <!-- Header -->
+  <header class="header">
+    <div class="header-left">
+      <img src="/public/assets/Emblem_of_Thammasat_University.svg.webp" alt="TU Logo" class="header-logo">
+      <h1 class="header-title">
+        Faculty Research<br>& Workload Management System (FRWS)
+      </h1>
+    </div>
+    
+    <!-- ซ่อน Search Bar ชั่วคราวเนื่องจากเกิน Scope
+    <form class="header-search" id="search-form" onsubmit="handleSearch(event)">
+      <input 
+        type="text" 
+        id="search-input" 
+        placeholder="ค้นหาชื่ออาจารย์ ,งานวิจัย ,คำสำคัญ ...." 
+        autocomplete="off"
+      >
+      <button type="submit"><i class="fa fa-search"></i></button>
+    </form>
+    -->
+
+    <div class="header-user">
+      <i class="fa fa-user-circle"></i>
+    </div>
+  </header>
+
+  <!-- Navigation Bar -->
+  <nav class="navbar">
+    <button class="nav-tab active" id="tab-publications" onclick="switchTab('publications')">Publications</button>
+    <button class="nav-tab" id="tab-authors" onclick="switchTab('authors')">Authors</button>
+  </nav>
+
+  <!-- Main Content Layout -->
+  <main class="main-container">
+    <!-- ซ่อน Sidebar ชั่วคราวเนื่องจากเกิน Scope
+    <aside class="sidebar"></aside>
+    -->
+
+    <!-- Content Area -->
+    <section class="content-area">
+      <!-- Cards List Container -->
+      <div id="cards-container" class="cards-list"></div>
+
+      <!-- Pagination -->
+      <div id="pagination" class="pagination"></div>
+    </section>
+  </main>
+
+  <script>
+    // Mock Data
+    const mockPublications = [
+      {
+        id: 1,
+        title: "A new mobile application to reduce anxiety in pediatric patients before bone marrow aspiration procedures",
+        type: "Article",
+        date: "October 01 2018",
+        source: "publications.aap.org",
+        category: "Hospital",
+        authors: ["P Rattanatamrong", "U Anurathapan"]
+      },
+      {
+        id: 2,
+        title: "A new mobile application to reduce anxiety in pediatric patients before bone marrow aspiration procedures",
+        type: "Article",
+        date: "October 01 2018",
+        source: "publications.aap.org",
+        category: "Hospital",
+        authors: ["P Rattanatamrong", "U Anurathapan"]
+      }
+    ];
+
+    const mockAuthors = [
+      {
+        id: 1,
+        name: "Prapaporn Rattanatamrong",
+        institution: "Thammasat University",
+        department: "Computer Science",
+        img: "/public/assets/user.png"
+      },
+      {
+        id: 2,
+        name: "Prapaporn Rattanatamrong",
+        institution: "Thammasat University",
+        department: "Computer Science",
+        img: "/public/assets/user.png"
+      }
+    ];
+
+    let currentTab = 'publications';
+    let currentPage = 1;
+    const ITEMS_PER_PAGE = 10;
+
+    function switchTab(tab) {
+      currentTab = tab;
+      currentPage = 1;
+
+      document.getElementById('tab-publications').classList.toggle('active', tab === 'publications');
+      document.getElementById('tab-authors').classList.toggle('active', tab === 'authors');
+
+      renderContent();
+    }
+
+    function renderContent() {
+      const container = document.getElementById('cards-container');
+      const data = currentTab === 'publications' ? mockPublications : mockAuthors;
+
+      const totalPages = Math.ceil(data.length / ITEMS_PER_PAGE) || 1;
+      const startIndex = (currentPage - 1) * ITEMS_PER_PAGE;
+      const paginatedData = data.slice(startIndex, startIndex + ITEMS_PER_PAGE);
+
+      let html = '';
+
+      if (currentTab === 'publications') {
+        paginatedData.forEach(item => {
+          html += `
+            <div class="card card-pub">
+              <h3 class="card-pub-title">${item.title}</h3>
+              <div class="card-pub-meta">
+                <span class="badge-article">${item.type}</span>
+                <span class="meta-info">${item.date} &bull; ${item.source} &bull; ${item.category}</span>
+              </div>
+              <div class="card-pub-authors">
+                ${item.authors.map(a => `<span class="author-item"><i class="fa fa-user-circle-o"></i> ${a}</span>`).join('')}
+              </div>
+            </div>
+          `;
+        });
+      } else {
+        paginatedData.forEach(item => {
+          html += `
+            <div class="card card-author">
+              <div class="author-avatar">
+                <i class="fa fa-user-circle"></i>
+              </div>
+              <div class="author-info">
+                <h3>
+                  <a href="teacher.html?id=${item.id}" class="author-link">${item.name}</a>
+                </h3>
+                <p class="label">Institution</p>
+                <p class="value">${item.institution}</p>
+                <p class="label">Department</p>
+                <p class="value">${item.department}</p>
+              </div>
+              <div class="author-action">
+                <a href="teacher.html?id=${item.id}" class="btn-profile">View Profile</a>
+              </div>
+            </div>
+          `;
+        });
+      }
+
+      container.innerHTML = html;
+      renderPagination(totalPages);
+    }
+
+    function renderPagination(totalPages) {
+      const pagEl = document.getElementById('pagination');
+      let html = `<button class="pag-btn" ${currentPage === 1 ? 'disabled' : ''} onclick="changePage(${currentPage - 1})">&lt;</button>`;
+
+      for (let i = 1; i <= totalPages; i++) {
+        html += `<button class="pag-btn ${i === currentPage ? 'active' : ''}" onclick="changePage(${i})">${i}</button>`;
+      }
+
+      html += `<button class="pag-btn" ${currentPage === totalPages ? 'disabled' : ''} onclick="changePage(${currentPage + 1})">&gt;</button>`;
+      pagEl.innerHTML = html;
+    }
+
+    function changePage(page) {
+      currentPage = page;
+      renderContent();
+    }
+
+    document.addEventListener('DOMContentLoaded', renderContent);
+  </script>
 </body>
 </html>
