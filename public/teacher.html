@@ -68,13 +68,16 @@
               class="w-24 h-24 mr-4"
             />
             <div class="flex flex-col justify-center">
-              <p class="text-lg font-bold">Prapaporn Rattanatamrong</p>
-              <p class="text-gray-600 text-sm">
-                Computer Science, Thammasat University
+              <!-- 📌 ใส่ ID รองรับข้อมูล Dynamic -->
+              <p id="teacher-name-en" class="text-lg font-bold">
+                กำลังโหลดข้อมูล...
               </p>
-              <p class="mt-auto text-xs font-semibold text-gray-800">
-                Data Engineering &nbsp; Data Platforms &nbsp; Cloud and Edge
-                Computing &nbsp; Distributed Systems
+              <p
+                id="teacher-name-th"
+                class="text-sm font-semibold text-gray-700"
+              ></p>
+              <p id="teacher-faculty" class="text-gray-600 text-sm">
+                Thammasat University
               </p>
             </div>
           </div>
@@ -83,65 +86,11 @@
         <!-- section publications -->
         <section id="Publications" class="p-8">
           <h2 class="text-xl font-bold p-2">PUBLICATIONS</h2>
-          <!-- card -->
           <div
+            id="publication-container"
             class="bg-white p-6 rounded-lg shadow-md w-2/3 divide-y divide-gray-300"
           >
-            <!-- first data -->
-            <div class="pb-4">
-              <h4 class="text-lg font-bold text-gray-900 mb-2">
-                A new mobile application to reduce anxiety in pediatric patients
-                before bone marrow aspiration procedures
-              </h4>
-              <div class="flex items-center gap-2 text-xs mb-3">
-                <span
-                  class="bg-red-800 text-white px-3 py-1 rounded font-semibold"
-                  >Article</span
-                >
-                <span class="text-gray-500"
-                  >October 01 2018 • publications.aap.org • Hospital</span
-                >
-                <a
-                  href="#"
-                  class="ml-auto text-blue-600 font-bold hover:underline"
-                  >View</a
-                >
-              </div>
-              <div class="flex gap-4 text-xs text-gray-500">
-                <span
-                  ><i class="fa fa-user-circle-o"></i> P Rattanatamrong</span
-                >
-                <span><i class="fa fa-user-circle-o"></i> U Anurathapan</span>
-              </div>
-            </div>
-
-            <!-- second data -->
-            <div class="pt-4">
-              <h4 class="text-lg font-bold text-gray-900 mb-2">
-                A new mobile application to reduce anxiety in pediatric patients
-                before bone marrow aspiration procedures
-              </h4>
-              <div class="flex items-center gap-2 text-xs mb-3">
-                <span
-                  class="bg-red-800 text-white px-3 py-1 rounded font-semibold"
-                  >Article</span
-                >
-                <span class="text-gray-500"
-                  >October 01 2018 • publications.aap.org • Hospital</span
-                >
-                <a
-                  href="#"
-                  class="ml-auto text-blue-600 font-bold hover:underline"
-                  >View</a
-                >
-              </div>
-              <div class="flex gap-4 text-xs text-gray-500">
-                <span
-                  ><i class="fa fa-user-circle-o"></i> P Rattanatamrong</span
-                >
-                <span><i class="fa fa-user-circle-o"></i> U Anurathapan</span>
-              </div>
-            </div>
+            <p class="text-gray-500 py-4">กำลังโหลดผลงานวิจัย...</p>
           </div>
         </section>
 
@@ -152,21 +101,175 @@
           <div
             class="bg-white p-6 rounded-lg shadow-md w-2/3 flex flex-col space-y-3 text-sm"
           >
+            <!-- อาคาร / ที่อยู่ -->
             <div class="flex items-center gap-2">
-              <i class="fa fa-building-o text-gray-600"></i>
-              <span>อาคาร LC-2 ชั้น 2 ห้อง 210</span>
+              <i class="fa fa-building-o text-gray-600 w-5 text-center"></i>
+              <span id="teacher-address">กำลังโหลดข้อมูล...</span>
             </div>
+            <!-- เบอร์โทรศัพท์ -->
             <div class="flex items-center gap-2">
-              <i class="fa fa-phone text-gray-600"></i>
-              <span>0-2986-9256 ต่อ 225</span>
+              <i class="fa fa-phone text-gray-600 w-5 text-center"></i>
+              <span id="teacher-phone">กำลังโหลดข้อมูล...</span>
             </div>
+            <!-- อีเมล -->
             <div class="flex items-center gap-2">
-              <i class="fa fa-envelope text-gray-600"></i>
-              <span>rattanat@tu.ac.th</span>
+              <i class="fa fa-envelope text-gray-600 w-5 text-center"></i>
+              <span id="teacher-email">กำลังโหลดข้อมูล...</span>
             </div>
           </div>
         </section>
       </div>
     </div>
+
+    <!-- 📌 โหลด Supabase SDK -->
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+
+    <script>
+      const SUPABASE_URL = "https://svijmtiaeormkmdtmbud.supabase.co";
+      const SUPABASE_KEY = "sb_publishable_e6LgiJKOQeA6VXi5Ng_JGg_Q8aKNDLD";
+
+      const supabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+      const urlParams = new URLSearchParams(window.location.search);
+      const teacherId = urlParams.get("id");
+
+      async function loadTeacherProfile() {
+        const nameEnElem = document.getElementById("teacher-name-en");
+        const pubContainer = document.getElementById("publication-container");
+
+        if (!teacherId) {
+          nameEnElem.innerText = "กรุณาระบุ id อาจารย์ใน URL (เช่น ?id=xxx)";
+          pubContainer.innerHTML =
+            '<p class="text-red-500 py-4">ไม่พบ Parameters id</p>';
+          return;
+        }
+
+        const { data: teacher, error } = await supabaseClient
+          .from("teachers")
+          .select(
+            `
+        *,
+        teacher_publications (
+          author_position,
+          publications (*)
+        )
+      `,
+          )
+          .eq("id", teacherId)
+          .single();
+
+        if (error || !teacher) {
+          console.error("Supabase Error:", error);
+          nameEnElem.innerText = `ไม่พบข้อมูลอาจารย์ (ID: ${teacherId})`;
+          nameEnElem.classList.add("text-red-600");
+          pubContainer.innerHTML = `<p class="text-red-500 py-4">เกิดข้อผิดพลาด: ${error ? error.message : "ไม่พบข้อมูล"}</p>`;
+          return;
+        }
+
+        // 1. แสดงผลข้อมูลโปรไฟล์อาจารย์
+        document.title = `${teacher.first_name_th || ""} ${teacher.last_name_th || ""} (${teacher.first_name_en || ""} ${teacher.last_name_en || ""})`;
+        nameEnElem.innerText = `${teacher.first_name_en || ""} ${teacher.last_name_en || ""}`;
+        document.getElementById("teacher-name-th").innerText =
+          `${teacher.first_name_th || ""} ${teacher.last_name_th || ""}`;
+        document.getElementById("teacher-faculty").innerText =
+          `${teacher.faculty_en || teacher.faculty_th || ""}, Thammasat University`;
+
+        // 2. แสดงผลข้อมูลติดต่อ (ใส่ Fallback ป้องกัน undefined)
+        document.getElementById("teacher-address").innerText =
+          teacher.office_location ||
+          teacher.address ||
+          "คณะวิทยาศาสตร์และเทคโนโลยี มหาวิทยาลัยธรรมศาสตร์";
+        document.getElementById("teacher-phone").innerText =
+          teacher.phone || teacher.tel || "-";
+        document.getElementById("teacher-email").innerText =
+          teacher.email || "-";
+
+        // 3. แสดงผลรายการงานวิจัย
+        const pubLinks = teacher.teacher_publications || [];
+        if (pubLinks.length === 0) {
+          pubContainer.innerHTML =
+            '<p class="text-gray-500 py-4">ไม่พบข้อมูลงานวิจัย</p>';
+          return;
+        }
+
+        pubContainer.innerHTML = pubLinks
+          .map((item, index) => {
+            const pub = item.publications;
+            if (!pub) return "";
+
+            const pyClass = index === 0 ? "pb-4" : "pt-4";
+            const pubType = pub.work_type
+              ? pub.work_type.toUpperCase()
+              : "ARTICLE";
+            const pubDate =
+              pub.publication_date || pub.publication_year || "N/A";
+            const pubSource = pub.source_name || "Unknown Source";
+
+            let authorsHTML = "";
+            let rawAuthors = pub.authors || pub.author_names;
+
+            if (rawAuthors && rawAuthors !== "N/A") {
+              let authorArray = rawAuthors
+                .split(",")
+                .map((name) => name.trim());
+              let isCut = false;
+
+              // หากมีเกิน 5 คน ให้ตัดเหลือ 5 คนแรกเพื่อความสวยงาม
+              if (authorArray.length > 5) {
+                authorArray = authorArray.slice(0, 5);
+                isCut = true;
+              }
+
+              // วนลูปสร้างไอคอนหน้าชื่อทุกคน
+              authorsHTML = authorArray
+                .map(
+                  (name) =>
+                    `<span class="inline-flex items-center gap-1"><i class="fa fa-user-circle-o text-gray-500"></i>${name}</span>`,
+                )
+                .join('<span class="text-gray-300">,</span> ');
+
+              if (isCut) {
+                authorsHTML +=
+                  ' <span class="text-gray-500 font-semibold">et al.</span>';
+              }
+            } else {
+              // Fallback กรณีไม่มีข้อมูล
+              const fallbackName = `${teacher.first_name_en ? teacher.first_name_en.charAt(0) + "." : ""} ${teacher.last_name_en || ""}`;
+              authorsHTML = `<span class="inline-flex items-center gap-1"><i class="fa fa-user-circle-o text-gray-500"></i>${fallbackName}</span>`;
+            }
+
+            return `
+        <div class="${pyClass}">
+          <h4 class="text-lg font-bold text-gray-900 mb-2">
+            ${pub.title}
+          </h4>
+          <div class="flex items-center gap-2 text-xs mb-3">
+            <span class="bg-red-800 text-white px-3 py-1 rounded font-semibold">
+              ${pubType}
+            </span>
+            <span class="text-gray-500">
+              ${pubDate} • ${pubSource} • Citations: ${pub.citation_count || 0}
+            </span>
+            ${
+              pub.official_url
+                ? `
+              <a href="${pub.official_url}" target="_blank" class="ml-auto text-blue-600 font-bold hover:underline">
+                View
+              </a>
+            `
+                : ""
+            }
+          </div>
+          <!-- 📌 2. แสดงผลไอคอนผู้แต่งรายคน -->
+          <div class="flex flex-wrap items-center gap-x-2 gap-y-1 text-xs text-gray-600">
+            ${authorsHTML}
+          </div>
+        </div>
+      `;
+          })
+          .join("");
+      }
+
+      loadTeacherProfile();
+    </script>
   </body>
 </html>
