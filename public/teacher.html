@@ -1,105 +1,113 @@
-<!doctype html>
-<html lang="en" class="scroll-smooth">
+<!DOCTYPE html>
+<html lang="en">
 
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Faculty Research & Workload Management System</title>
-  <link rel="stylesheet" href="style.css" />
-  <link rel="preconnect" href="https://fonts.googleapis.com" />
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-  <link href="https://fonts.googleapis.com/css2?family=Sarabun:wght@300;400;500;600;700&display=swap"
-    rel="stylesheet" />
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css" />
-  <script src="https://cdn.tailwindcss.com"></script>
-  <!-- โหลด Supabase SDK -->
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Teacher Profile - FRWS</title>
+  <link rel="stylesheet" href="style.css">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Sarabun:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <style>
+    .teacher-page-container {
+      max-width: 900px;
+      margin: 30px auto;
+      padding: 0 20px;
+      display: block !important;
+    }
+
+    .profile-card {
+      background: #fff;
+      border-radius: 8px;
+      padding: 24px;
+      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+      display: flex !important;
+      flex-direction: row !important;
+      align-items: center;
+      gap: 24px;
+      margin-bottom: 24px;
+    }
+
+    .section-title {
+      font-size: 1.1rem;
+      font-weight: 700;
+      color: #333;
+      margin: 24px 0 12px 0;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+
+    .info-card {
+      background: #fff;
+      border-radius: 8px;
+      padding: 20px;
+      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+      margin-bottom: 20px;
+    }
+
+    .navbar a,
+    .navbar .nav-tab {
+      text-decoration: none !important;
+    }
+  </style>
 </head>
 
 <body>
-  <div class="bg-gray-100 min-h-screen pb-12">
-    <!-- Header -->
-    <header class="bg-red-800">
-      <div class="flex items-center gap-2">
-        <div class="w-12 h-12 m-4 mr-2 ml-8">
-          <img src="/public/assets/Emblem_of_Thammasat_University.svg.webp" alt="Logo" />
-        </div>
-        <div class="text-white text-base font-bold">
-          <h1>
-            Faculty Research <br />
-            & Workload Management System (FRWS)
-          </h1>
-        </div>
+
+  <!-- Header -->
+  <header class="header">
+    <div class="header-left">
+      <img src="/public/assets/Emblem_of_Thammasat_University.svg.webp" alt="TU Logo" class="header-logo">
+      <h1 class="header-title">
+        Faculty Research<br>& Workload Management System (FRWS)
+      </h1>
+    </div>
+  </header>
+
+  <!-- Navigation Bar -->
+  <nav class="navbar">
+    <a href="index.html" class="nav-tab">Publications</a>
+    <a href="index.html" class="nav-tab active">Faculty Members</a>
+  </nav>
+
+  <!-- Main Container -->
+  <div class="teacher-page-container">
+    <a href="index.html"
+      style="color: #800000; text-decoration: none; font-weight: 600; display: inline-block; margin-bottom: 20px;">
+      &larr; Back to Home
+    </a>
+
+    <!-- ABOUT SECTION -->
+    <div class="section-title">About</div>
+    <div class="profile-card" id="teacher-profile-card">
+      <div style="font-size: 64px; color: #444; display: flex; align-items: center;">
+        <i class="fa fa-user-circle"></i>
       </div>
-    </header>
-
-    <!-- Nav bar -->
-    <nav class="bg-white shadow-md sticky top-0 z-10">
-      <ul class="flex justify-center space-x-10 py-2 text-lg font-bold">
-        <li><a href="#about" class="hover:text-red-800">About</a></li>
-        <li>
-          <a href="#Publications" class="hover:text-red-800">Publication</a>
-        </li>
-        <li><a href="#contact" class="hover:text-red-800">Contact</a></li>
-      </ul>
-    </nav>
-
-    <!-- Main Content -->
-    <div class="container mx-auto flex flex-col items-center">
-      <!-- Back button -->
-      <div class="w-2/3 mt-4">
-        <a href="index.html" class="text-blue-600 font-bold hover:underline">&larr; Back to Home</a>
+      <div>
+        <h2 id="t-name-en" style="margin: 0 0 6px 0; font-size: 1.35rem; color: #111;">กำลังโหลดข้อมูลอาจารย์...</h2>
+        <p id="t-name-th" style="margin: 0 0 8px 0; color: #666; font-size: 1rem;"></p>
+        <p id="t-faculty" style="margin: 0; color: #444; font-size: 0.95rem; font-weight: 500;"></p>
+        <p id="t-department" style="margin: 4px 0 0 0; color: #777; font-size: 0.9rem;"></p>
       </div>
+    </div>
 
-      <!-- section about -->
-      <section id="about" class="p-4 w-full flex flex-col items-center">
-        <div class="w-2/3">
-          <h2 class="text-xl font-bold py-2">ABOUT</h2>
-        </div>
-        <div class="flex bg-white p-6 rounded-lg shadow-md w-2/3">
-          <img src="/public/assets/user.png" alt="User" class="w-24 h-24 mr-4" />
-          <div class="flex flex-col justify-center">
-            <p id="teacher-name-en" class="text-lg font-bold">
-              กำลังโหลดข้อมูล...
-            </p>
-            <p id="teacher-name-th" class="text-sm font-semibold text-gray-700"></p>
-            <p id="teacher-faculty" class="text-gray-600 text-sm">
-              Thammasat University
-            </p>
-          </div>
-        </div>
-      </section>
+    <!-- PUBLICATIONS SECTION -->
+    <div class="section-title">Publications</div>
+    <div id="teacher-publications-list">
+      <div class="info-card" style="text-align: center; color: #666;">
+        กำลังโหลดรายการงานวิจัย...
+      </div>
+    </div>
 
-      <!-- section publications -->
-      <section id="Publications" class="p-4 w-full flex flex-col items-center">
-        <div class="w-2/3">
-          <h2 class="text-xl font-bold py-2">PUBLICATIONS</h2>
-        </div>
-        <div id="publication-container" class="bg-white p-6 rounded-lg shadow-md w-2/3 divide-y divide-gray-300">
-          <p class="text-gray-500 py-4">กำลังโหลดผลงานวิจัย...</p>
-        </div>
-      </section>
-
-      <!-- contact -->
-      <section id="contact" class="p-4 w-full flex flex-col items-center">
-        <div class="w-2/3">
-          <h2 class="text-xl font-bold py-2">CONTACT</h2>
-        </div>
-        <div class="bg-white p-6 rounded-lg shadow-md w-2/3 flex flex-col space-y-3 text-sm">
-          <div class="flex items-center gap-2">
-            <i class="fa fa-building-o text-gray-600 w-5 text-center"></i>
-            <span id="teacher-address">กำลังโหลดข้อมูล...</span>
-          </div>
-          <div class="flex items-center gap-2">
-            <i class="fa fa-phone text-gray-600 w-5 text-center"></i>
-            <span id="teacher-phone">กำลังโหลดข้อมูล...</span>
-          </div>
-          <div class="flex items-center gap-2">
-            <i class="fa fa-envelope text-gray-600 w-5 text-center"></i>
-            <span id="teacher-email">กำลังโหลดข้อมูล...</span>
-          </div>
-        </div>
-      </section>
+    <!-- CONTACT SECTION -->
+    <div class="section-title">Contact</div>
+    <div class="info-card" style="line-height: 2;">
+      <div id="t-email"><i class="fa fa-envelope-o" style="width: 24px; color: #800000;"></i> -</div>
+      <div id="t-office"><i class="fa fa-building-o" style="width: 24px; color: #800000;"></i> Faculty of Science and
+        Technology, Thammasat University</div>
     </div>
   </div>
 
@@ -109,7 +117,7 @@
     const supabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
 
     const urlParams = new URLSearchParams(window.location.search);
-    const teacherId = urlParams.get("id");
+    const teacherId = urlParams.get('id');
 
     let teacherLookupList = [];
 
@@ -118,6 +126,28 @@
         .toLowerCase()
         .replace(/^(assoc\.?|asst\.?|prof\.?|dr\.?|mr\.?|mrs\.?|ms\.?)\s+/i, '')
         .replace(/[^a-z0-9]/g, '');
+    }
+
+    async function loadTeacherMap() {
+      if (teacherLookupList.length > 0) return;
+      const { data } = await supabaseClient
+        .from('teachers')
+        .select('*');
+
+      if (data) {
+        teacherLookupList = data.map(t => {
+          const fn = t.first_name_en || '';
+          const ln = t.last_name_en || '';
+          const rawFull = `${fn} ${ln}`.trim() || t.name || '';
+          return {
+            id: t.id,
+            firstClean: cleanStr(fn),
+            lastClean: cleanStr(ln),
+            fullClean: cleanStr(rawFull),
+            rawFull: rawFull
+          };
+        });
+      }
     }
 
     function findTeacherMatch(rawName) {
@@ -151,148 +181,158 @@
       const cleaned = fullName.trim().replace(/^(Assoc\.?|Asst\.?|Prof\.?|Dr\.?|Mr\.?|Mrs\.?|Ms\.?)\s+/i, '');
       const parts = cleaned.split(/\s+/);
       if (parts.length === 1) return parts[0];
-      const firstName = parts[0];
-      const lastName = parts[parts.length - 1];
-      return `${firstName} ${lastName.charAt(0).toUpperCase()}.`;
+      return `${parts[0]} ${parts[parts.length - 1].charAt(0).toUpperCase()}.`;
     }
 
-    function renderAuthorSpan(rawName) {
+    function renderAuthorBadge(rawName) {
       const shortName = formatShortName(rawName);
       const matchedTeacher = findTeacherMatch(rawName);
 
       if (matchedTeacher) {
-        return `<a href="teacher.html?id=${matchedTeacher.id}" title="${rawName} (อาจารย์ มธ. - คลิกดูผลงาน)" class="inline-flex items-center gap-1 font-semibold text-gray-900 underline decoration-red-800 underline-offset-2 hover:text-red-800 transition-colors"><i class="fa fa-user-circle text-red-800"></i>${shortName}</a>`;
+        return `<a href="teacher.html?id=${matchedTeacher.id}" title="${rawName} (อาจารย์ มธ. - คลิกดูผลงาน)" class="author-item" style="text-decoration: underline; text-decoration-color: #800000; text-underline-offset: 3px; color: #1a1a1a; font-weight: 600; cursor: pointer; margin-right: 8px;"><i class="fa fa-user-circle" style="color: #800000;"></i> ${shortName}</a>`;
       }
-      return `<span title="${rawName}" class="inline-flex items-center gap-1 text-gray-600 cursor-help"><i class="fa fa-user-circle-o text-gray-400"></i>${shortName}</span>`;
+      return `<span title="${rawName}" class="author-item" style="cursor: help; color: #555; margin-right: 8px;"><i class="fa fa-user-circle-o" style="color: #888;"></i> ${shortName}</span>`;
     }
 
-    function formatAuthorsTeacher(rawAuthors, pubId) {
+    function formatAuthors(rawAuthors, pubId) {
       if (!rawAuthors || rawAuthors === "N/A") {
-        return '<span class="text-gray-500">Unknown Author</span>';
+        return '<span class="author-item"><i class="fa fa-user-circle-o"></i> Unknown Author</span>';
       }
 
       let authorArray = Array.isArray(rawAuthors)
         ? rawAuthors
-        : rawAuthors.split(',').map(n => n.trim()).filter(Boolean);
+        : rawAuthors.split(',').map(name => name.trim()).filter(Boolean);
 
       if (authorArray.length <= 5) {
-        return authorArray.map(renderAuthorSpan).join('<span class="text-gray-300 mx-1">,</span> ');
+        return authorArray.map(renderAuthorBadge).join(' ');
       }
 
-      const visibleAuthors = authorArray.slice(0, 5).map(renderAuthorSpan).join('<span class="text-gray-300 mx-1">,</span> ');
-      const hiddenAuthors = authorArray.slice(5).map(renderAuthorSpan).join('<span class="text-gray-300 mx-1">,</span> ');
+      const visible = authorArray.slice(0, 5).map(renderAuthorBadge).join(' ');
+      const hidden = authorArray.slice(5).map(renderAuthorBadge).join(' ');
 
       return `
-          ${visibleAuthors}
-          <button type="button" onclick="document.getElementById('hidden-authors-t-${pubId}').classList.toggle('hidden'); this.classList.add('hidden');" class="text-red-800 font-bold ml-1 hover:underline cursor-pointer">
-            et al.
-          </button>
-          <span id="hidden-authors-t-${pubId}" class="hidden">
-            <span class="text-gray-300 mx-1">,</span> ${hiddenAuthors}
-          </span>
-        `;
+        ${visible}
+        <button type="button" onclick="document.getElementById('hidden-authors-t-${pubId}').style.display = 'inline'; this.style.display = 'none';" style="background: none; border: none; color: #800000; font-weight: bold; cursor: pointer; padding: 0 4px; font-size: inherit;">et al.</button>
+        <span id="hidden-authors-t-${pubId}" style="display: none;">${hidden}</span>
+      `;
     }
 
-    async function loadTeacherProfile() {
-      const nameEnElem = document.getElementById("teacher-name-en");
-      const pubContainer = document.getElementById("publication-container");
-
+    async function loadTeacherData() {
       if (!teacherId) {
-        nameEnElem.innerText = "กรุณาระบุ id อาจารย์ใน URL (เช่น ?id=xxx)";
-        pubContainer.innerHTML = '<p class="text-red-500 py-4">ไม่พบ Parameters id</p>';
+        document.getElementById('t-name-en').innerText = 'ไม่พบรหัสอาจารย์ใน URL';
+        document.getElementById('teacher-publications-list').innerHTML = '<div class="info-card" style="text-align: center; color: #666;">กรุณาเลือกอาจารย์จากหน้าหลัก</div>';
         return;
       }
 
-      // โหลดรายชื่ออาจารย์ทั้งหมดสำหรับทำ Name Matching
-      const { data: allTeachers } = await supabaseClient
-        .from("teachers")
-        .select("*");
+      await loadTeacherMap();
 
-      if (allTeachers) {
-        teacherLookupList = allTeachers.map(t => {
-          const fn = t.first_name_en || '';
-          const ln = t.last_name_en || '';
-          const rawFull = `${fn} ${ln}`.trim() || t.name || '';
-          return {
-            id: t.id,
-            firstClean: cleanStr(fn),
-            lastClean: cleanStr(ln),
-            fullClean: cleanStr(rawFull),
-            rawFull: rawFull
-          };
-        });
-      }
-
-      // ดึงข้อมูลโปรไฟล์อาจารย์และผลงาน
+      // 1. ดึงข้อมูลอาจารย์
       const { data: teacher, error } = await supabaseClient
-        .from("teachers")
-        .select(`
-            *,
-            teacher_publications (
-              author_position,
-              publications (*)
-            )
-          `)
-        .eq("id", teacherId)
+        .from('teachers')
+        .select('*')
+        .eq('id', teacherId)
         .single();
 
       if (error || !teacher) {
-        nameEnElem.innerText = `ไม่พบข้อมูลอาจารย์ (ID: ${teacherId})`;
-        pubContainer.innerHTML = `<p class="text-red-500 py-4">ไม่พบข้อมูล</p>`;
+        document.getElementById('t-name-en').innerText = 'ไม่พบข้อมูลอาจารย์ในระบบ';
         return;
       }
 
-      // 1. ส่วน Profile
-      const nameEn = `${teacher.first_name_en || ""} ${teacher.last_name_en || ""}`.trim();
-      document.title = `${nameEn} - FRWS`;
-      nameEnElem.innerText = nameEn;
-      document.getElementById("teacher-name-th").innerText = `${teacher.first_name_th || ""} ${teacher.last_name_th || ""}`;
-      document.getElementById("teacher-faculty").innerText = `${teacher.faculty_en || teacher.faculty_th || ""}, Thammasat University`;
+      const nameEn = `${teacher.first_name_en || ''} ${teacher.last_name_en || ''}`.trim() || teacher.name || 'Unknown Name';
+      const nameTh = `${teacher.first_name_th || ''} ${teacher.last_name_th || ''}`.trim();
+      const faculty = teacher.faculty_en || teacher.faculty_th || teacher.faculty || 'Thammasat University';
+      const department = teacher.department_en || teacher.department_th || teacher.department;
 
-      // 2. ส่วน Contact
-      document.getElementById("teacher-address").innerText = teacher.office_location || teacher.address || "คณะวิทยาศาสตร์และเทคโนโลยี มหาวิทยาลัยธรรมศาสตร์";
-      document.getElementById("teacher-phone").innerText = teacher.phone || teacher.tel || "-";
-      document.getElementById("teacher-email").innerText = teacher.email || "-";
-
-      // 3. ส่วน Publications
-      const pubLinks = teacher.teacher_publications || [];
-      if (pubLinks.length === 0) {
-        pubContainer.innerHTML = '<p class="text-gray-500 py-4">ไม่พบข้อมูลงานวิจัย</p>';
-        return;
+      document.getElementById('t-name-en').innerText = nameEn.toUpperCase();
+      document.getElementById('t-name-th').innerText = nameTh;
+      document.getElementById('t-faculty').innerText = faculty;
+      if (department) {
+        document.getElementById('t-department').innerText = `Department: ${department}`;
       }
 
-      pubContainer.innerHTML = pubLinks
-        .map((item, index) => {
-          const pub = item.publications;
-          if (!pub) return "";
+      if (teacher.email) {
+        document.getElementById('t-email').innerHTML = `<i class="fa fa-envelope-o" style="width: 24px; color: #800000;"></i> <a href="mailto:${teacher.email}" style="color: #800000; text-decoration: none;">${teacher.email}</a>`;
+      }
 
-          const pyClass = index === 0 ? "pb-4" : "pt-4";
-          const pubType = (pub.work_type || "ARTICLE").toUpperCase();
-          const pubDate = pub.publication_date || pub.publication_year || "N/A";
-          const pubSource = pub.source_name || "Unknown Source";
-          const paperUrl = pub.official_url || pub.doi_url || pub.doi || pub.url || "";
-          const authorsHTML = formatAuthorsTeacher(pub.authors || pub.author_names, pub.id || index);
+      // 2. ดึงจากตารางเชื่อม teacher_publications
+      const { data: relations } = await supabaseClient
+        .from('teacher_publications')
+        .select(`publications (*)`)
+        .eq('teacher_id', teacherId);
 
-          return `
-              <div class="${pyClass}">
-                <h4 class="text-lg font-bold text-gray-900 mb-2">
-                  ${paperUrl ? `<a href="${paperUrl}" target="_blank" rel="noopener noreferrer" class="hover:underline">${pub.title}</a>` : pub.title}
-                </h4>
-                <div class="flex items-center gap-2 text-xs mb-3">
-                  <span class="bg-red-800 text-white px-3 py-1 rounded font-semibold">${pubType}</span>
-                  <span class="text-gray-500">${pubDate} • ${pubSource} • Citations: ${pub.citation_count || 0}</span>
-                  ${paperUrl ? `<a href="${paperUrl}" target="_blank" rel="noopener noreferrer" class="ml-auto text-blue-600 font-bold hover:underline">View</a>` : ""}
-                </div>
-                <div class="flex flex-wrap items-center gap-x-2 gap-y-1 text-xs leading-relaxed">
-                  ${authorsHTML}
-                </div>
-              </div>
-            `;
-        })
-        .join("");
+      let pubs = [];
+      if (relations && relations.length > 0) {
+        pubs = relations.map(r => r.publications).filter(Boolean);
+      }
+
+      // 3. Fallback: ถ้ายังไม่มีในตารางเชื่อม ให้ค้นหาจากรายชื่องานวิจัย
+      if (pubs.length === 0) {
+        const { data: allPubs } = await supabaseClient
+          .from('publications')
+          .select('*')
+          .limit(500);
+
+        if (allPubs && allPubs.length > 0) {
+          pubs = allPubs.filter(p => {
+            const authors = Array.isArray(p.authors) ? p.authors : (p.authors || '').split(',');
+            return authors.some(authorName => {
+              const matched = findTeacherMatch(authorName);
+              return matched && String(matched.id) === String(teacherId);
+            });
+          });
+        }
+      }
+
+      renderPubList(pubs);
     }
 
-    loadTeacherProfile();
+    function renderPubList(pubs) {
+      const container = document.getElementById('teacher-publications-list');
+      if (!pubs || pubs.length === 0) {
+        container.innerHTML = `
+          <div class="info-card" style="text-align: center; color: #666;">
+            ไม่พบข้อมูลงานวิจัย
+          </div>
+        `;
+        return;
+      }
+
+      let html = '';
+      pubs.forEach((pub, idx) => {
+        const title = pub.title || "Untitled Paper";
+        const paperUrl = pub.official_url || pub.doi_url || pub.doi || pub.url || pub.link || '';
+        const pubType = pub.work_type ? pub.work_type.toUpperCase() : "ARTICLE";
+        const pubDate = pub.publication_date || pub.publication_year || "Unknown Date";
+        const hostDomain = paperUrl ? new URL(paperUrl.startsWith('http') ? paperUrl : 'https://' + paperUrl).hostname.replace(/^www\./, '') : '';
+        const sourceName = pub.source_name || pub.publisher || '';
+
+        let metaParts = [pubDate];
+        if (hostDomain) metaParts.push(`<a href="${paperUrl}" target="_blank" rel="noopener noreferrer" style="color: inherit; text-decoration: underline;">${hostDomain}</a>`);
+        if (sourceName && sourceName !== hostDomain) metaParts.push(sourceName);
+
+        html += `
+          <div class="info-card" style="margin-bottom: 16px;">
+            <h3 style="margin: 0 0 8px 0; font-size: 1.1rem; line-height: 1.4;">
+              ${paperUrl
+            ? `<a href="${paperUrl}" target="_blank" rel="noopener noreferrer" style="color: #222; text-decoration: none;">${title}</a>`
+            : title
+          }
+            </h3>
+            <div style="font-size: 0.85rem; color: #666; margin-bottom: 8px;">
+              <span class="badge-article">${pubType}</span>
+              <span>${metaParts.join(' &bull; ')}</span>
+            </div>
+            <div style="line-height: 1.8;">
+              ${formatAuthors(pub.authors || pub.author_names, pub.id || idx)}
+            </div>
+          </div>
+        `;
+      });
+
+      container.innerHTML = html;
+    }
+
+    document.addEventListener('DOMContentLoaded', loadTeacherData);
   </script>
 </body>
 

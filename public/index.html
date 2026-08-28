@@ -26,9 +26,10 @@
   </header>
 
   <!-- Navigation Bar -->
+  <!-- แถบ Navbar ด้านบน -->
   <nav class="navbar">
     <button class="nav-tab active" id="tab-publications" onclick="switchTab('publications')">Publications</button>
-    <button class="nav-tab" id="tab-authors" onclick="switchTab('authors')">Authors</button>
+    <button class="nav-tab" id="tab-authors" onclick="switchTab('authors')">Faculty Members</button>
   </nav>
 
   <!-- Main Content Layout -->
@@ -50,10 +51,8 @@
     let currentPage = 1;
     const ITEMS_PER_PAGE = 10;
 
-    // โครงสร้างเก็บข้อมูลอาจารย์สำหรับค้นหาขั้นสูง
     let teacherLookupList = [];
 
-    // ทำความสะอาดข้อความ ตัดตัวอักขระพิเศษ
     function cleanStr(str) {
       return (str || '')
         .toLowerCase()
@@ -61,7 +60,6 @@
         .replace(/[^a-z0-9]/g, '');
     }
 
-    // ฟังก์ชันค้นหาอาจารย์แบบยืดหยุ่น (รองรับทุกสไตล์การเขียนชื่อ)
     function findTeacherMatch(rawName) {
       if (!rawName || teacherLookupList.length === 0) return null;
 
@@ -72,18 +70,14 @@
       let lastPart = cleanStr(parts[parts.length - 1]);
 
       for (const t of teacherLookupList) {
-        // 1. ตรงกันแบบเป๊ะๆ
         if (t.fullClean && (t.fullClean === rawClean || rawClean.includes(t.fullClean) || t.fullClean.includes(rawClean))) {
           return t;
         }
 
-        // 2. เทียบ First Name + Last Name Initial (เช่น Benjarat T. -> Benjarat + T)
         if (parts.length >= 2) {
-          // กรณีตัวแรกเป็นชื่อเต็ม ตัวหลังเป็นตัวย่อนามสกุล
           if (t.firstClean === firstPart && (t.lastClean.startsWith(lastPart) || lastPart.startsWith(t.lastClean.charAt(0)))) {
             return t;
           }
-          // กรณีตัวแรกเป็นตัวย่อชื่อ ตัวหลังเป็นนามสกุลเต็ม
           if (t.lastClean === lastPart && (t.firstClean.startsWith(firstPart) || firstPart.startsWith(t.firstClean.charAt(0)))) {
             return t;
           }
@@ -109,7 +103,6 @@
       return pub.official_url || pub.doi_url || pub.doi || pub.url || pub.link || '';
     }
 
-    // ฟังก์ชันจัดรูปแบบชื่อ: นามสกุลย่อ เช่น Benjarat Tulyanitikul -> Benjarat T.
     function formatShortName(fullName) {
       if (!fullName) return "";
       const cleaned = fullName.trim().replace(/^(Assoc\.?|Asst\.?|Prof\.?|Dr\.?|Mr\.?|Mrs\.?|Ms\.?)\s+/i, '');
@@ -120,18 +113,16 @@
       return `${firstName} ${lastName.charAt(0).toUpperCase()}.`;
     }
 
-    // เรนเดอร์ชื่อผู้แต่ง: ถ้าเป็นอาจารย์ มธ. ให้มีขีดเส้นใต้ + ลิงก์ไป teacher.html
     function renderAuthorBadge(rawName) {
       const shortName = formatShortName(rawName);
       const matchedTeacher = findTeacherMatch(rawName);
 
       if (matchedTeacher) {
-        return `<a href="teacher.html?id=${matchedTeacher.id}" title="${rawName} (อาจารย์ มธ. - คลิกดูผลงาน)" class="author-item" style="text-decoration: underline; text-decoration-color: #800000; text-underline-offset: 3px; color: #1a1a1a; font-weight: 600; cursor: pointer;"><i class="fa fa-user-circle text-red-800" style="color: #800000;"></i> ${shortName}</a>`;
+        return `<a href="teacher.html?id=${matchedTeacher.id}" title="${rawName} (อาจารย์ มธ. - คลิกดูผลงาน)" class="author-item" style="text-decoration: underline; text-decoration-color: #800000; text-underline-offset: 3px; color: #1a1a1a; font-weight: 600; cursor: pointer;"><i class="fa fa-user-circle" style="color: #800000;"></i> ${shortName}</a>`;
       }
       return `<span title="${rawName}" class="author-item" style="cursor: help; color: #555;"><i class="fa fa-user-circle-o" style="color: #888;"></i> ${shortName}</span>`;
     }
 
-    // จัดการแถบผู้แต่ง + ปุ่ม et al.
     function formatAuthors(rawAuthors, pubId) {
       if (!rawAuthors || rawAuthors === "N/A") {
         return '<span class="author-item"><i class="fa fa-user-circle-o"></i> Unknown Author</span>';
@@ -217,6 +208,7 @@
           const { data, count, error } = await supabaseClient
             .from('teachers')
             .select('*', { count: 'exact' })
+            .not('first_name_th', 'ilike', '%ACCOUNT%')
             .order('first_name_en', { ascending: true })
             .range(from, to);
 
@@ -291,12 +283,27 @@
         return;
       }
 
+      const validTeachers = teachers.filter(t => {
+        const rawName = `${t.first_name_th || ''} ${t.first_name_en || ''} ${t.name || ''}`;
+        return !rawName.toLowerCase().includes('account') && !rawName.includes('กลาง');
+      });
+
+      if (validTeachers.length === 0) {
+        container.innerHTML = '<p style="text-align: center; color: #666;">ไม่พบข้อมูลอาจารย์</p>';
+        return;
+      }
+
       let html = '';
-      teachers.forEach(teacher => {
+      validTeachers.forEach(teacher => {
         const teacherId = teacher.id;
-        const nameEn = `${teacher.first_name_en || ''} ${teacher.last_name_en || ''}`.trim() || teacher.name || 'Unknown Name';
-        const department = teacher.department || teacher.department_en || teacher.department_th || 'Computer Science';
-        const faculty = teacher.faculty_en || teacher.faculty_th || 'Faculty of Science and Technology';
+
+        const nameEn = `${teacher.first_name_en || ''} ${teacher.last_name_en || ''}`.trim()
+          || `${teacher.first_name_th || ''} ${teacher.last_name_th || ''}`.trim()
+          || teacher.name
+          || 'Unknown Name';
+
+        const faculty = teacher.faculty_en || teacher.faculty_th || teacher.faculty || teacher.institution || 'Thammasat University';
+        const department = teacher.department_en || teacher.department_th || teacher.department || '-';
 
         html += `
           <div class="card card-author">
