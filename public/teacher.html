@@ -1,275 +1,299 @@
 <!doctype html>
 <html lang="en" class="scroll-smooth">
-  <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Faculty Research & Workload Management System</title>
-    <link rel="stylesheet" href="style.css" />
-    <link rel="preconnect" href="https://fonts.googleapis.com" />
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-    <link
-      href="https://fonts.googleapis.com/css2?family=Sarabun:wght@300;400;500;600;700&display=swap"
-      rel="stylesheet"
-    />
-    <link
-      rel="stylesheet"
-      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css"
-    />
-    <script src="https://cdn.tailwindcss.com"></script>
-  </head>
-  <body>
-    <div class="bg-gray-100 min-h-screen pb-12">
-      <!-- Header -->
-      <header class="bg-red-800">
-        <div class="flex items-center gap-2">
-          <div class="w-12 h-12 m-4 mr-2 ml-8">
-            <img
-              src="/public/assets/Emblem_of_Thammasat_University.svg.webp"
-              alt="Logo"
-            />
-          </div>
-          <div class="text-white text-base font-bold">
-            <h1>
-              Faculty Research <br />
-              & Workload Management System (FRWS)
-            </h1>
-          </div>
+
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Faculty Research & Workload Management System</title>
+  <link rel="stylesheet" href="style.css" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Sarabun:wght@300;400;500;600;700&display=swap"
+    rel="stylesheet" />
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css" />
+  <script src="https://cdn.tailwindcss.com"></script>
+  <!-- โหลด Supabase SDK -->
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+</head>
+
+<body>
+  <div class="bg-gray-100 min-h-screen pb-12">
+    <!-- Header -->
+    <header class="bg-red-800">
+      <div class="flex items-center gap-2">
+        <div class="w-12 h-12 m-4 mr-2 ml-8">
+          <img src="/public/assets/Emblem_of_Thammasat_University.svg.webp" alt="Logo" />
         </div>
-      </header>
-
-      <!-- Nav bar -->
-      <nav class="bg-white shadow-md sticky top-0 z-10">
-        <ul class="flex justify-center space-x-10 py-2 text-lg font-bold">
-          <li><a href="#about" class="hover:text-red-800">About</a></li>
-          <li>
-            <a href="#Publications" class="hover:text-red-800">Publication</a>
-          </li>
-          <li><a href="#contact" class="hover:text-red-800">Contact</a></li>
-        </ul>
-      </nav>
-
-      <!-- Main Content -->
-      <div class="container mx-auto flex flex-col">
-        <!-- back page -->
-        <a
-          href="/public/index.html"
-          class="text-blue-600 font-bold hover:underline p-4 pb-0 w-fit"
-          >Back to Home</a
-        >
-
-        <!-- section about -->
-        <section id="about" class="p-8">
-          <h2 class="text-xl font-bold p-2">ABOUT</h2>
-          <!-- card -->
-          <div class="flex bg-white p-6 rounded-lg shadow-md w-2/3">
-            <img
-              src="/public/assets/user.png"
-              alt="Logo"
-              class="w-24 h-24 mr-4"
-            />
-            <div class="flex flex-col justify-center">
-              <!-- 📌 ใส่ ID รองรับข้อมูล Dynamic -->
-              <p id="teacher-name-en" class="text-lg font-bold">
-                กำลังโหลดข้อมูล...
-              </p>
-              <p
-                id="teacher-name-th"
-                class="text-sm font-semibold text-gray-700"
-              ></p>
-              <p id="teacher-faculty" class="text-gray-600 text-sm">
-                Thammasat University
-              </p>
-            </div>
-          </div>
-        </section>
-
-        <!-- section publications -->
-        <section id="Publications" class="p-8">
-          <h2 class="text-xl font-bold p-2">PUBLICATIONS</h2>
-          <div
-            id="publication-container"
-            class="bg-white p-6 rounded-lg shadow-md w-2/3 divide-y divide-gray-300"
-          >
-            <p class="text-gray-500 py-4">กำลังโหลดผลงานวิจัย...</p>
-          </div>
-        </section>
-
-        <!-- contact -->
-        <section id="contact" class="p-8">
-          <h2 class="text-xl font-bold p-2">CONTACT</h2>
-          <!-- card -->
-          <div
-            class="bg-white p-6 rounded-lg shadow-md w-2/3 flex flex-col space-y-3 text-sm"
-          >
-            <!-- อาคาร / ที่อยู่ -->
-            <div class="flex items-center gap-2">
-              <i class="fa fa-building-o text-gray-600 w-5 text-center"></i>
-              <span id="teacher-address">กำลังโหลดข้อมูล...</span>
-            </div>
-            <!-- เบอร์โทรศัพท์ -->
-            <div class="flex items-center gap-2">
-              <i class="fa fa-phone text-gray-600 w-5 text-center"></i>
-              <span id="teacher-phone">กำลังโหลดข้อมูล...</span>
-            </div>
-            <!-- อีเมล -->
-            <div class="flex items-center gap-2">
-              <i class="fa fa-envelope text-gray-600 w-5 text-center"></i>
-              <span id="teacher-email">กำลังโหลดข้อมูล...</span>
-            </div>
-          </div>
-        </section>
+        <div class="text-white text-base font-bold">
+          <h1>
+            Faculty Research <br />
+            & Workload Management System (FRWS)
+          </h1>
+        </div>
       </div>
-    </div>
+    </header>
 
-    <!-- 📌 โหลด Supabase SDK -->
-    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <!-- Nav bar -->
+    <nav class="bg-white shadow-md sticky top-0 z-10">
+      <ul class="flex justify-center space-x-10 py-2 text-lg font-bold">
+        <li><a href="#about" class="hover:text-red-800">About</a></li>
+        <li>
+          <a href="#Publications" class="hover:text-red-800">Publication</a>
+        </li>
+        <li><a href="#contact" class="hover:text-red-800">Contact</a></li>
+      </ul>
+    </nav>
 
-    <script>
-      const SUPABASE_URL = "https://svijmtiaeormkmdtmbud.supabase.co";
-      const SUPABASE_KEY = "sb_publishable_e6LgiJKOQeA6VXi5Ng_JGg_Q8aKNDLD";
+    <!-- Main Content -->
+    <div class="container mx-auto flex flex-col items-center">
+      <!-- Back button -->
+      <div class="w-2/3 mt-4">
+        <a href="index.html" class="text-blue-600 font-bold hover:underline">&larr; Back to Home</a>
+      </div>
 
-      const supabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
-      const urlParams = new URLSearchParams(window.location.search);
-      const teacherId = urlParams.get("id");
-
-      async function loadTeacherProfile() {
-        const nameEnElem = document.getElementById("teacher-name-en");
-        const pubContainer = document.getElementById("publication-container");
-
-        if (!teacherId) {
-          nameEnElem.innerText = "กรุณาระบุ id อาจารย์ใน URL (เช่น ?id=xxx)";
-          pubContainer.innerHTML =
-            '<p class="text-red-500 py-4">ไม่พบ Parameters id</p>';
-          return;
-        }
-
-        const { data: teacher, error } = await supabaseClient
-          .from("teachers")
-          .select(
-            `
-        *,
-        teacher_publications (
-          author_position,
-          publications (*)
-        )
-      `,
-          )
-          .eq("id", teacherId)
-          .single();
-
-        if (error || !teacher) {
-          console.error("Supabase Error:", error);
-          nameEnElem.innerText = `ไม่พบข้อมูลอาจารย์ (ID: ${teacherId})`;
-          nameEnElem.classList.add("text-red-600");
-          pubContainer.innerHTML = `<p class="text-red-500 py-4">เกิดข้อผิดพลาด: ${error ? error.message : "ไม่พบข้อมูล"}</p>`;
-          return;
-        }
-
-        // 1. แสดงผลข้อมูลโปรไฟล์อาจารย์
-        document.title = `${teacher.first_name_th || ""} ${teacher.last_name_th || ""} (${teacher.first_name_en || ""} ${teacher.last_name_en || ""})`;
-        nameEnElem.innerText = `${teacher.first_name_en || ""} ${teacher.last_name_en || ""}`;
-        document.getElementById("teacher-name-th").innerText =
-          `${teacher.first_name_th || ""} ${teacher.last_name_th || ""}`;
-        document.getElementById("teacher-faculty").innerText =
-          `${teacher.faculty_en || teacher.faculty_th || ""}, Thammasat University`;
-
-        // 2. แสดงผลข้อมูลติดต่อ (ใส่ Fallback ป้องกัน undefined)
-        document.getElementById("teacher-address").innerText =
-          teacher.office_location ||
-          teacher.address ||
-          "คณะวิทยาศาสตร์และเทคโนโลยี มหาวิทยาลัยธรรมศาสตร์";
-        document.getElementById("teacher-phone").innerText =
-          teacher.phone || teacher.tel || "-";
-        document.getElementById("teacher-email").innerText =
-          teacher.email || "-";
-
-        // 3. แสดงผลรายการงานวิจัย
-        const pubLinks = teacher.teacher_publications || [];
-        if (pubLinks.length === 0) {
-          pubContainer.innerHTML =
-            '<p class="text-gray-500 py-4">ไม่พบข้อมูลงานวิจัย</p>';
-          return;
-        }
-
-        pubContainer.innerHTML = pubLinks
-          .map((item, index) => {
-            const pub = item.publications;
-            if (!pub) return "";
-
-            const pyClass = index === 0 ? "pb-4" : "pt-4";
-            const pubType = pub.work_type
-              ? pub.work_type.toUpperCase()
-              : "ARTICLE";
-            const pubDate =
-              pub.publication_date || pub.publication_year || "N/A";
-            const pubSource = pub.source_name || "Unknown Source";
-
-            let authorsHTML = "";
-            let rawAuthors = pub.authors || pub.author_names;
-
-            if (rawAuthors && rawAuthors !== "N/A") {
-              let authorArray = rawAuthors
-                .split(",")
-                .map((name) => name.trim());
-              let isCut = false;
-
-              // หากมีเกิน 5 คน ให้ตัดเหลือ 5 คนแรกเพื่อความสวยงาม
-              if (authorArray.length > 5) {
-                authorArray = authorArray.slice(0, 5);
-                isCut = true;
-              }
-
-              // วนลูปสร้างไอคอนหน้าชื่อทุกคน
-              authorsHTML = authorArray
-                .map(
-                  (name) =>
-                    `<span class="inline-flex items-center gap-1"><i class="fa fa-user-circle-o text-gray-500"></i>${name}</span>`,
-                )
-                .join('<span class="text-gray-300">,</span> ');
-
-              if (isCut) {
-                authorsHTML +=
-                  ' <span class="text-gray-500 font-semibold">et al.</span>';
-              }
-            } else {
-              // Fallback กรณีไม่มีข้อมูล
-              const fallbackName = `${teacher.first_name_en ? teacher.first_name_en.charAt(0) + "." : ""} ${teacher.last_name_en || ""}`;
-              authorsHTML = `<span class="inline-flex items-center gap-1"><i class="fa fa-user-circle-o text-gray-500"></i>${fallbackName}</span>`;
-            }
-
-            return `
-        <div class="${pyClass}">
-          <h4 class="text-lg font-bold text-gray-900 mb-2">
-            ${pub.title}
-          </h4>
-          <div class="flex items-center gap-2 text-xs mb-3">
-            <span class="bg-red-800 text-white px-3 py-1 rounded font-semibold">
-              ${pubType}
-            </span>
-            <span class="text-gray-500">
-              ${pubDate} • ${pubSource} • Citations: ${pub.citation_count || 0}
-            </span>
-            ${
-              pub.official_url
-                ? `
-              <a href="${pub.official_url}" target="_blank" class="ml-auto text-blue-600 font-bold hover:underline">
-                View
-              </a>
-            `
-                : ""
-            }
-          </div>
-          <!-- 📌 2. แสดงผลไอคอนผู้แต่งรายคน -->
-          <div class="flex flex-wrap items-center gap-x-2 gap-y-1 text-xs text-gray-600">
-            ${authorsHTML}
+      <!-- section about -->
+      <section id="about" class="p-4 w-full flex flex-col items-center">
+        <div class="w-2/3">
+          <h2 class="text-xl font-bold py-2">ABOUT</h2>
+        </div>
+        <div class="flex bg-white p-6 rounded-lg shadow-md w-2/3">
+          <img src="/public/assets/user.png" alt="User" class="w-24 h-24 mr-4" />
+          <div class="flex flex-col justify-center">
+            <p id="teacher-name-en" class="text-lg font-bold">
+              กำลังโหลดข้อมูล...
+            </p>
+            <p id="teacher-name-th" class="text-sm font-semibold text-gray-700"></p>
+            <p id="teacher-faculty" class="text-gray-600 text-sm">
+              Thammasat University
+            </p>
           </div>
         </div>
-      `;
-          })
-          .join("");
+      </section>
+
+      <!-- section publications -->
+      <section id="Publications" class="p-4 w-full flex flex-col items-center">
+        <div class="w-2/3">
+          <h2 class="text-xl font-bold py-2">PUBLICATIONS</h2>
+        </div>
+        <div id="publication-container" class="bg-white p-6 rounded-lg shadow-md w-2/3 divide-y divide-gray-300">
+          <p class="text-gray-500 py-4">กำลังโหลดผลงานวิจัย...</p>
+        </div>
+      </section>
+
+      <!-- contact -->
+      <section id="contact" class="p-4 w-full flex flex-col items-center">
+        <div class="w-2/3">
+          <h2 class="text-xl font-bold py-2">CONTACT</h2>
+        </div>
+        <div class="bg-white p-6 rounded-lg shadow-md w-2/3 flex flex-col space-y-3 text-sm">
+          <div class="flex items-center gap-2">
+            <i class="fa fa-building-o text-gray-600 w-5 text-center"></i>
+            <span id="teacher-address">กำลังโหลดข้อมูล...</span>
+          </div>
+          <div class="flex items-center gap-2">
+            <i class="fa fa-phone text-gray-600 w-5 text-center"></i>
+            <span id="teacher-phone">กำลังโหลดข้อมูล...</span>
+          </div>
+          <div class="flex items-center gap-2">
+            <i class="fa fa-envelope text-gray-600 w-5 text-center"></i>
+            <span id="teacher-email">กำลังโหลดข้อมูล...</span>
+          </div>
+        </div>
+      </section>
+    </div>
+  </div>
+
+  <script>
+    const SUPABASE_URL = "https://svijmtiaeormkmdtmbud.supabase.co";
+    const SUPABASE_KEY = "sb_publishable_e6LgiJKOQeA6VXi5Ng_JGg_Q8aKNDLD";
+    const supabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+
+    const urlParams = new URLSearchParams(window.location.search);
+    const teacherId = urlParams.get("id");
+
+    let teacherLookupList = [];
+
+    function cleanStr(str) {
+      return (str || '')
+        .toLowerCase()
+        .replace(/^(assoc\.?|asst\.?|prof\.?|dr\.?|mr\.?|mrs\.?|ms\.?)\s+/i, '')
+        .replace(/[^a-z0-9]/g, '');
+    }
+
+    function findTeacherMatch(rawName) {
+      if (!rawName || teacherLookupList.length === 0) return null;
+
+      const rawClean = cleanStr(rawName);
+      const parts = rawName.trim().replace(/^(Assoc\.?|Asst\.?|Prof\.?|Dr\.?|Mr\.?|Mrs\.?|Ms\.?)\s+/i, '').split(/\s+/);
+
+      let firstPart = cleanStr(parts[0]);
+      let lastPart = cleanStr(parts[parts.length - 1]);
+
+      for (const t of teacherLookupList) {
+        if (t.fullClean && (t.fullClean === rawClean || rawClean.includes(t.fullClean) || t.fullClean.includes(rawClean))) {
+          return t;
+        }
+
+        if (parts.length >= 2) {
+          if (t.firstClean === firstPart && (t.lastClean.startsWith(lastPart) || lastPart.startsWith(t.lastClean.charAt(0)))) {
+            return t;
+          }
+          if (t.lastClean === lastPart && (t.firstClean.startsWith(firstPart) || firstPart.startsWith(t.firstClean.charAt(0)))) {
+            return t;
+          }
+        }
+      }
+      return null;
+    }
+
+    function formatShortName(fullName) {
+      if (!fullName) return "";
+      const cleaned = fullName.trim().replace(/^(Assoc\.?|Asst\.?|Prof\.?|Dr\.?|Mr\.?|Mrs\.?|Ms\.?)\s+/i, '');
+      const parts = cleaned.split(/\s+/);
+      if (parts.length === 1) return parts[0];
+      const firstName = parts[0];
+      const lastName = parts[parts.length - 1];
+      return `${firstName} ${lastName.charAt(0).toUpperCase()}.`;
+    }
+
+    function renderAuthorSpan(rawName) {
+      const shortName = formatShortName(rawName);
+      const matchedTeacher = findTeacherMatch(rawName);
+
+      if (matchedTeacher) {
+        return `<a href="teacher.html?id=${matchedTeacher.id}" title="${rawName} (อาจารย์ มธ. - คลิกดูผลงาน)" class="inline-flex items-center gap-1 font-semibold text-gray-900 underline decoration-red-800 underline-offset-2 hover:text-red-800 transition-colors"><i class="fa fa-user-circle text-red-800"></i>${shortName}</a>`;
+      }
+      return `<span title="${rawName}" class="inline-flex items-center gap-1 text-gray-600 cursor-help"><i class="fa fa-user-circle-o text-gray-400"></i>${shortName}</span>`;
+    }
+
+    function formatAuthorsTeacher(rawAuthors, pubId) {
+      if (!rawAuthors || rawAuthors === "N/A") {
+        return '<span class="text-gray-500">Unknown Author</span>';
       }
 
-      loadTeacherProfile();
-    </script>
-  </body>
+      let authorArray = Array.isArray(rawAuthors)
+        ? rawAuthors
+        : rawAuthors.split(',').map(n => n.trim()).filter(Boolean);
+
+      if (authorArray.length <= 5) {
+        return authorArray.map(renderAuthorSpan).join('<span class="text-gray-300 mx-1">,</span> ');
+      }
+
+      const visibleAuthors = authorArray.slice(0, 5).map(renderAuthorSpan).join('<span class="text-gray-300 mx-1">,</span> ');
+      const hiddenAuthors = authorArray.slice(5).map(renderAuthorSpan).join('<span class="text-gray-300 mx-1">,</span> ');
+
+      return `
+          ${visibleAuthors}
+          <button type="button" onclick="document.getElementById('hidden-authors-t-${pubId}').classList.toggle('hidden'); this.classList.add('hidden');" class="text-red-800 font-bold ml-1 hover:underline cursor-pointer">
+            et al.
+          </button>
+          <span id="hidden-authors-t-${pubId}" class="hidden">
+            <span class="text-gray-300 mx-1">,</span> ${hiddenAuthors}
+          </span>
+        `;
+    }
+
+    async function loadTeacherProfile() {
+      const nameEnElem = document.getElementById("teacher-name-en");
+      const pubContainer = document.getElementById("publication-container");
+
+      if (!teacherId) {
+        nameEnElem.innerText = "กรุณาระบุ id อาจารย์ใน URL (เช่น ?id=xxx)";
+        pubContainer.innerHTML = '<p class="text-red-500 py-4">ไม่พบ Parameters id</p>';
+        return;
+      }
+
+      // โหลดรายชื่ออาจารย์ทั้งหมดสำหรับทำ Name Matching
+      const { data: allTeachers } = await supabaseClient
+        .from("teachers")
+        .select("*");
+
+      if (allTeachers) {
+        teacherLookupList = allTeachers.map(t => {
+          const fn = t.first_name_en || '';
+          const ln = t.last_name_en || '';
+          const rawFull = `${fn} ${ln}`.trim() || t.name || '';
+          return {
+            id: t.id,
+            firstClean: cleanStr(fn),
+            lastClean: cleanStr(ln),
+            fullClean: cleanStr(rawFull),
+            rawFull: rawFull
+          };
+        });
+      }
+
+      // ดึงข้อมูลโปรไฟล์อาจารย์และผลงาน
+      const { data: teacher, error } = await supabaseClient
+        .from("teachers")
+        .select(`
+            *,
+            teacher_publications (
+              author_position,
+              publications (*)
+            )
+          `)
+        .eq("id", teacherId)
+        .single();
+
+      if (error || !teacher) {
+        nameEnElem.innerText = `ไม่พบข้อมูลอาจารย์ (ID: ${teacherId})`;
+        pubContainer.innerHTML = `<p class="text-red-500 py-4">ไม่พบข้อมูล</p>`;
+        return;
+      }
+
+      // 1. ส่วน Profile
+      const nameEn = `${teacher.first_name_en || ""} ${teacher.last_name_en || ""}`.trim();
+      document.title = `${nameEn} - FRWS`;
+      nameEnElem.innerText = nameEn;
+      document.getElementById("teacher-name-th").innerText = `${teacher.first_name_th || ""} ${teacher.last_name_th || ""}`;
+      document.getElementById("teacher-faculty").innerText = `${teacher.faculty_en || teacher.faculty_th || ""}, Thammasat University`;
+
+      // 2. ส่วน Contact
+      document.getElementById("teacher-address").innerText = teacher.office_location || teacher.address || "คณะวิทยาศาสตร์และเทคโนโลยี มหาวิทยาลัยธรรมศาสตร์";
+      document.getElementById("teacher-phone").innerText = teacher.phone || teacher.tel || "-";
+      document.getElementById("teacher-email").innerText = teacher.email || "-";
+
+      // 3. ส่วน Publications
+      const pubLinks = teacher.teacher_publications || [];
+      if (pubLinks.length === 0) {
+        pubContainer.innerHTML = '<p class="text-gray-500 py-4">ไม่พบข้อมูลงานวิจัย</p>';
+        return;
+      }
+
+      pubContainer.innerHTML = pubLinks
+        .map((item, index) => {
+          const pub = item.publications;
+          if (!pub) return "";
+
+          const pyClass = index === 0 ? "pb-4" : "pt-4";
+          const pubType = (pub.work_type || "ARTICLE").toUpperCase();
+          const pubDate = pub.publication_date || pub.publication_year || "N/A";
+          const pubSource = pub.source_name || "Unknown Source";
+          const paperUrl = pub.official_url || pub.doi_url || pub.doi || pub.url || "";
+          const authorsHTML = formatAuthorsTeacher(pub.authors || pub.author_names, pub.id || index);
+
+          return `
+              <div class="${pyClass}">
+                <h4 class="text-lg font-bold text-gray-900 mb-2">
+                  ${paperUrl ? `<a href="${paperUrl}" target="_blank" rel="noopener noreferrer" class="hover:underline">${pub.title}</a>` : pub.title}
+                </h4>
+                <div class="flex items-center gap-2 text-xs mb-3">
+                  <span class="bg-red-800 text-white px-3 py-1 rounded font-semibold">${pubType}</span>
+                  <span class="text-gray-500">${pubDate} • ${pubSource} • Citations: ${pub.citation_count || 0}</span>
+                  ${paperUrl ? `<a href="${paperUrl}" target="_blank" rel="noopener noreferrer" class="ml-auto text-blue-600 font-bold hover:underline">View</a>` : ""}
+                </div>
+                <div class="flex flex-wrap items-center gap-x-2 gap-y-1 text-xs leading-relaxed">
+                  ${authorsHTML}
+                </div>
+              </div>
+            `;
+        })
+        .join("");
+    }
+
+    loadTeacherProfile();
+  </script>
+</body>
+
 </html>
