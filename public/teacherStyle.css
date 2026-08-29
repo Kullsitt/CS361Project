@@ -1,0 +1,73 @@
+.teacher-page-container {
+  max-width: 900px;
+  margin: 30px auto;
+  padding: 0 20px;
+  display: block !important;
+}
+
+.profile-card {
+  background: #fff;
+  border-radius: 8px;
+  padding: 24px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+  display: flex !important;
+  flex-direction: row !important;
+  align-items: center;
+  gap: 24px;
+  margin-bottom: 24px;
+}
+
+.navbar {
+  position: sticky;
+  top: 0;
+  z-index: 1000;
+  /* ให้แสดงอยู่ชั้นบนสุดเสมอ */
+  background-color: #fff;
+  /* กำหนดสีพื้นหลังเพื่อบังเนื้อหาด้านล่างเวลาสกอร์ล */
+}
+
+.section-title {
+  font-size: 1.1rem;
+  font-weight: 700;
+  color: #333;
+  margin: 24px 0 12px 0;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.info-card {
+  background: #fff;
+  border-radius: 8px;
+  padding: 20px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+  margin-bottom: 20px;
+}
+
+.navbar a,
+.navbar .nav-tab {
+  text-decoration: none !important;
+}
+
+/* 🎨 CSS จัดแถวแนวนอนสำหรับ Authors */
+.authors-container {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px;
+  margin-top: 6px;
+}
+
+.author-item {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  font-size: 0.9rem;
+  white-space: nowrap;
+}
+
+.hidden-authors {
+  display: none;
+  align-items: center;
+  gap: 8px;
+  flex-wrap: wrap;
+}
