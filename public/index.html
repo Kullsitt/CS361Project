@@ -11,6 +11,31 @@
   <link href="https://fonts.googleapis.com/css2?family=Sarabun:wght@300;400;500;600;700&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <style>
+    /* 🎨 CSS จัดแถวแนวนอนสำหรับ Authors */
+    .authors-container {
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      gap: 8px;
+      margin-top: 6px;
+    }
+
+    .author-item {
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+      font-size: 0.9rem;
+      white-space: nowrap;
+    }
+
+    .hidden-authors {
+      display: none;
+      align-items: center;
+      gap: 8px;
+      flex-wrap: wrap;
+    }
+  </style>
 </head>
 
 <body>
@@ -118,14 +143,14 @@
       const matchedTeacher = findTeacherMatch(rawName);
 
       if (matchedTeacher) {
-        return `<a href="teacher.html?id=${matchedTeacher.id}" title="${rawName} (อาจารย์ มธ. - คลิกดูผลงาน)" class="author-item" style="text-decoration: underline; text-decoration-color: #800000; text-underline-offset: 3px; color: #1a1a1a; font-weight: 600; cursor: pointer;"><i class="fa fa-user-circle" style="color: #800000;"></i> ${shortName}</a>`;
+        return `<a href="teacher.html?id=${matchedTeacher.id}" title="${rawName} (อาจารย์ มธ. - คลิกดูผลงาน)" class="author-item" style="text-decoration: underline; text-decoration-color: #800000; text-underline-offset: 3px; color: #1a1a1a; font-weight: 600; cursor: pointer;"><i class="fa fa-user-circle" style="color: #800000;"></i>${shortName}</a>`;
       }
-      return `<span title="${rawName}" class="author-item" style="cursor: help; color: #555;"><i class="fa fa-user-circle-o" style="color: #888;"></i> ${shortName}</span>`;
+      return `<span title="${rawName}" class="author-item" style="cursor: help; color: #555;"><i class="fa fa-user-circle-o" style="color: #888;"></i>${shortName}</span>`;
     }
 
     function formatAuthors(rawAuthors, pubId) {
       if (!rawAuthors || rawAuthors === "N/A") {
-        return '<span class="author-item"><i class="fa fa-user-circle-o"></i> Unknown Author</span>';
+        return '<div class="authors-container"><span class="author-item"><i class="fa fa-user-circle-o"></i> Unknown Author</span></div>';
       }
 
       let authorArray = Array.isArray(rawAuthors)
@@ -133,16 +158,18 @@
         : rawAuthors.split(',').map(name => name.trim()).filter(Boolean);
 
       if (authorArray.length <= 5) {
-        return authorArray.map(renderAuthorBadge).join(' ');
+        return `<div class="authors-container">${authorArray.map(renderAuthorBadge).join('')}</div>`;
       }
 
-      const visible = authorArray.slice(0, 5).map(renderAuthorBadge).join(' ');
-      const hidden = authorArray.slice(5).map(renderAuthorBadge).join(' ');
+      const visible = authorArray.slice(0, 5).map(renderAuthorBadge).join('');
+      const hidden = authorArray.slice(5).map(renderAuthorBadge).join('');
 
       return `
-        ${visible}
-        <button type="button" onclick="document.getElementById('hidden-authors-idx-${pubId}').style.display = 'inline'; this.style.display = 'none';" style="background: none; border: none; color: #800000; font-weight: bold; cursor: pointer; padding: 0 4px; font-size: inherit;">et al.</button>
-        <span id="hidden-authors-idx-${pubId}" style="display: none;">${hidden}</span>
+        <div class="authors-container">
+          ${visible}
+          <button type="button" onclick="document.getElementById('hidden-authors-idx-${pubId}').style.display = 'inline-flex'; this.style.display = 'none';" style="background: none; border: none; color: #800000; font-weight: bold; cursor: pointer; padding: 0 4px; font-size: inherit;">et al.</button>
+          <span id="hidden-authors-idx-${pubId}" class="hidden-authors">${hidden}</span>
+        </div>
       `;
     }
 
@@ -266,9 +293,7 @@
               <span class="badge-article">${pubType}</span>
               <span class="meta-info">${metaInfoHTML}</span>
             </div>
-            <div class="card-pub-authors" style="line-height: 1.8;">
-              ${authorsHTML}
-            </div>
+            ${authorsHTML}
           </div>
         `;
       });
