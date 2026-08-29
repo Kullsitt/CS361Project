@@ -26,7 +26,6 @@
   </header>
 
   <!-- Navigation Bar -->
-  <!-- แถบ Navbar ด้านบน -->
   <nav class="navbar">
     <button class="nav-tab active" id="tab-publications" onclick="switchTab('publications')">Publications</button>
     <button class="nav-tab" id="tab-authors" onclick="switchTab('authors')">Faculty Members</button>
@@ -52,6 +51,11 @@
     const ITEMS_PER_PAGE = 10;
 
     let teacherLookupList = [];
+    let isTeacherMapLoaded = false;
+    let pubCountMap = {};
+
+    // ตัวแปรใหม่ เก็บแคชรายชื่ออาจารย์เพื่อความเร็ว
+    let cachedAllTeachers = null;
 
     function cleanStr(str) {
       return (str || '')
@@ -73,7 +77,6 @@
         if (t.fullClean && (t.fullClean === rawClean || rawClean.includes(t.fullClean) || t.fullClean.includes(rawClean))) {
           return t;
         }
-
         if (parts.length >= 2) {
           if (t.firstClean === firstPart && (t.lastClean.startsWith(lastPart) || lastPart.startsWith(t.lastClean.charAt(0)))) {
             return t;
@@ -150,43 +153,65 @@
       if (currentTab === tab) return;
       currentTab = tab;
       currentPage = 1;
-
       document.getElementById('tab-publications').classList.toggle('active', tab === 'publications');
       document.getElementById('tab-authors').classList.toggle('active', tab === 'authors');
-
       fetchData();
     }
 
     async function loadTeacherMap() {
-      if (teacherLookupList.length > 0) return;
-      const { data } = await supabaseClient
-        .from('teachers')
-        .select('*');
+      if (isTeacherMapLoaded) return;
+      isTeacherMapLoaded = true;
+      try {
+        const { data } = await supabaseClient
+          .from('teachers')
+          .select('id, first_name_en, last_name_en, name')
+          .limit(4000);
 
-      if (data) {
-        teacherLookupList = data.map(t => {
-          const fn = t.first_name_en || '';
-          const ln = t.last_name_en || '';
-          const rawFull = `${fn} ${ln}`.trim() || t.name || '';
-          return {
-            id: t.id,
-            firstClean: cleanStr(fn),
-            lastClean: cleanStr(ln),
-            fullClean: cleanStr(rawFull),
-            rawFull: rawFull
-          };
-        });
-      }
+        if (data) {
+          teacherLookupList = data.map(t => {
+            const fn = t.first_name_en || '';
+            const ln = t.last_name_en || '';
+            const rawFull = `${fn} ${ln}`.trim() || t.name || '';
+            return {
+              id: t.id,
+              firstClean: cleanStr(fn),
+              lastClean: cleanStr(ln),
+              fullClean: cleanStr(rawFull),
+              rawFull: rawFull
+            };
+          });
+          if (currentTab === 'publications') {
+            const pubElements = document.querySelectorAll('.card-pub');
+            if (pubElements.length > 0 && window.currentPubData) {
+              renderPublications(window.currentPubData);
+            }
+          }
+        }
+      } catch (e) { }
+    }
+
+    async function fetchCountsForPage(teacherIds) {
+      if (!teacherIds || teacherIds.length === 0) return;
+      try {
+        const { data } = await supabaseClient
+          .from('teacher_publications')
+          .select('teacher_id')
+          .in('teacher_id', teacherIds);
+
+        if (data) {
+          data.forEach(r => {
+            pubCountMap[r.teacher_id] = (pubCountMap[r.teacher_id] || 0) + 1;
+          });
+        }
+      } catch (e) { }
     }
 
     async function fetchData() {
       const container = document.getElementById('cards-container');
       container.innerHTML = '<p style="text-align: center; color: #666; padding: 20px;">กำลังโหลดข้อมูล...</p>';
 
-      await loadTeacherMap();
-
       const from = (currentPage - 1) * ITEMS_PER_PAGE;
-      const to = from + ITEMS_PER_PAGE - 1;
+      const to = from + ITEMS_PER_PAGE;
 
       try {
         if (currentTab === 'publications') {
@@ -194,31 +219,77 @@
             .from('publications')
             .select('*', { count: 'exact' })
             .order('publication_date', { ascending: false, nullsFirst: false })
-            .range(from, to);
+            .range(from, from + ITEMS_PER_PAGE - 1);
 
           if (error) {
             container.innerHTML = '<p style="color: red; text-align: center;">เกิดข้อผิดพลาดในการโหลดข้อมูล</p>';
             return;
           }
 
+          window.currentPubData = data;
           renderPublications(data);
           renderPagination(count || 0);
+          loadTeacherMap();
 
         } else {
-          const { data, count, error } = await supabaseClient
-            .from('teachers')
-            .select('*', { count: 'exact' })
-            .not('first_name_th', 'ilike', '%ACCOUNT%')
-            .order('first_name_en', { ascending: true })
-            .range(from, to);
+          // ดึงข้อมูลอาจารย์แบบทะลุ Limit 1,000 แถวด้วย Batch Fetching
+          if (!cachedAllTeachers) {
+            let allRecords = [];
+            let start = 0;
+            const batchSize = 1000;
+            let hasMore = true;
 
-          if (error) {
-            container.innerHTML = '<p style="color: red; text-align: center;">เกิดข้อผิดพลาดในการโหลดข้อมูลอาจารย์</p>';
-            return;
+            while (hasMore) {
+              const { data, error } = await supabaseClient
+                .from('teachers')
+                .select('*')
+                .range(start, start + batchSize - 1);
+
+              if (error) {
+                container.innerHTML = '<p style="color: red; text-align: center;">เกิดข้อผิดพลาดในการโหลดข้อมูลอาจารย์</p>';
+                return;
+              }
+
+              if (data && data.length > 0) {
+                allRecords = allRecords.concat(data);
+                start += batchSize;
+                if (data.length < batchSize) {
+                  hasMore = false;
+                }
+              } else {
+                hasMore = false;
+              }
+            }
+
+            // กรอง ACCOUNT และจัดลำดับ: ก-ฮ ขึ้นก่อน ตามด้วย A-Z
+            cachedAllTeachers = allRecords.filter(t => {
+              const raw = `${t.first_name_en || ''} ${t.first_name_th || ''} ${t.name || ''}`.toUpperCase();
+              return !raw.includes('ACCOUNT') && !raw.includes('กลาง');
+            }).sort((a, b) => {
+              const thA = (a.first_name_th || '').trim();
+              const thB = (b.first_name_th || '').trim();
+              const enA = (a.first_name_en || '').trim();
+              const enB = (b.first_name_en || '').trim();
+
+              const isThaiA = thA.length > 0 && thA.charCodeAt(0) >= 0x0E00 && thA.charCodeAt(0) <= 0x0E7F;
+              const isThaiB = thB.length > 0 && thB.charCodeAt(0) >= 0x0E00 && thB.charCodeAt(0) <= 0x0E7F;
+
+              if (isThaiA && !isThaiB) return -1;
+              if (!isThaiA && isThaiB) return 1;
+
+              if (isThaiA && isThaiB) return thA.localeCompare(thB, 'th');
+              return enA.localeCompare(enB, 'en');
+            });
           }
 
-          renderAuthors(data);
-          renderPagination(count || 0);
+          const totalItems = cachedAllTeachers.length;
+          const pageData = cachedAllTeachers.slice(from, to);
+
+          const pageIds = pageData.map(t => t.id);
+          await fetchCountsForPage(pageIds);
+
+          renderAuthors(pageData);
+          renderPagination(totalItems);
         }
       } catch (err) {
         container.innerHTML = '<p style="color: red; text-align: center;">เกิดข้อผิดพลาดในการเชื่อมต่อ</p>';
@@ -272,7 +343,6 @@
           </div>
         `;
       });
-
       container.innerHTML = html;
     }
 
@@ -283,27 +353,31 @@
         return;
       }
 
-      const validTeachers = teachers.filter(t => {
-        const rawName = `${t.first_name_th || ''} ${t.first_name_en || ''} ${t.name || ''}`;
-        return !rawName.toLowerCase().includes('account') && !rawName.includes('กลาง');
-      });
-
-      if (validTeachers.length === 0) {
-        container.innerHTML = '<p style="text-align: center; color: #666;">ไม่พบข้อมูลอาจารย์</p>';
-        return;
-      }
-
       let html = '';
-      validTeachers.forEach(teacher => {
+      teachers.forEach(teacher => {
+        const nameTh = `${teacher.first_name_th || ''} ${teacher.last_name_th || ''}`.trim();
+        const nameEn = `${teacher.first_name_en || ''} ${teacher.last_name_en || ''}`.trim();
+
+        let mainName = '';
+        let subNameHTML = '';
+
+        if (nameTh) {
+          mainName = nameTh;
+          if (nameEn && nameEn.toLowerCase() !== nameTh.toLowerCase()) {
+            subNameHTML = `<div style="font-size: 0.85rem; color: #777; margin-top: 2px; font-weight: 400;">${nameEn}</div>`;
+          }
+        } else {
+          mainName = nameEn || teacher.name || 'Unknown Name';
+        }
+
         const teacherId = teacher.id;
-
-        const nameEn = `${teacher.first_name_en || ''} ${teacher.last_name_en || ''}`.trim()
-          || `${teacher.first_name_th || ''} ${teacher.last_name_th || ''}`.trim()
-          || teacher.name
-          || 'Unknown Name';
-
+        const count = pubCountMap[teacherId] || 0;
         const faculty = teacher.faculty_en || teacher.faculty_th || teacher.faculty || teacher.institution || 'Thammasat University';
-        const department = teacher.department_en || teacher.department_th || teacher.department || '-';
+        const department = teacher.department_en || teacher.department_th || teacher.department || '';
+
+        const departmentHTML = department && department !== '-' && department !== 'None'
+          ? `<p class="label" style="margin-top: 4px;">Department</p><p class="value">${department}</p>`
+          : '';
 
         html += `
           <div class="card card-author">
@@ -311,13 +385,18 @@
               <i class="fa fa-user-circle"></i>
             </div>
             <div class="author-info">
-              <h3>
-                <a href="teacher.html?id=${teacherId}" class="author-link">${nameEn}</a>
+              <h3 style="margin-bottom: 2px;">
+                <a href="teacher.html?id=${teacherId}" class="author-link">${mainName}</a>
               </h3>
-              <p class="label">Institution</p>
+              ${subNameHTML}
+              <p class="label" style="margin-top: 8px;">Institution</p>
               <p class="value">${faculty}</p>
-              <p class="label">Department</p>
-              <p class="value">${department}</p>
+              ${departmentHTML}
+              <div style="margin-top: 10px;">
+                <span style="display: inline-flex; align-items: center; gap: 5px; font-size: 0.82rem; background: #fdf2f2; color: #800000; padding: 3px 10px; border-radius: 12px; font-weight: 600; border: 1px solid #f5c2c7;">
+                  <i class="fa fa-book"></i> ${count} ${count <= 1 ? 'publication' : 'publications'}
+                </span>
+              </div>
             </div>
             <div class="author-action">
               <a href="teacher.html?id=${teacherId}" class="btn-profile">View Profile</a>
@@ -325,7 +404,6 @@
           </div>
         `;
       });
-
       container.innerHTML = html;
     }
 
