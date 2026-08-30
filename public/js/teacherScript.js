@@ -163,6 +163,17 @@ async function loadTeacherData() {
   if (teacher.email) {
     document.getElementById('t-email').innerHTML = `<i class="fa fa-envelope-o" style="width: 24px; color: #800000;"></i> <a href="mailto:${teacher.email}" style="color: #800000; text-decoration: none;">${teacher.email}</a>`;
   }
+  if (teacher.office) {
+    document.getElementById('t-office').innerHTML = `<i class="fa fa-building-o" style="width: 24px; color: #800000;"></i> ${teacher.office}`;
+  }else {
+    document.getElementById('t-office').innerHTML = `<i class="fa fa-building-o" style="width: 24px; color: #800000;"></i> ${teacher.faculty_en}`;
+  }
+
+  if (teacher.phone) {
+    document.getElementById('t-phone').innerHTML = `<i class="fa fa-phone" style="width: 24px; color: #800000;"></i> ${teacher.phone}`;
+  } else {
+    document.getElementById('t-phone').style.display = 'none';
+  }
 
   // 2. ดึงจากตารางเชื่อม teacher_publications
   const { data: relations } = await supabaseClient
