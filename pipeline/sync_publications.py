@@ -10,22 +10,43 @@ load_dotenv()
 SUPABASE_URL = os.getenv("SUPABASE_URL")
 SUPABASE_KEY = os.getenv("SUPABASE_KEY")
 OPENALEX_MAILTO = os.getenv("OPENALEX_MAILTO")
+OPENALEX_API_KEY = os.getenv("OPENALEX_API_KEY")
+
+RESET_CHECKPOINT = False  # SET processed_teachers.txt ที่เก็บ uuid อาจารย์ที่ดึงข้อมูลแล้ว (True = ล้างไฟล์เก่า, False = ต่อจากเดิม)
 
 supabase: Client = create_client(SUPABASE_URL, SUPABASE_KEY)
-OPENALEX_API_URL = "https://api.openalex.org/works"
+OPENALEX_AUTHORS_URL = "https://api.openalex.org/authors"
+OPENALEX_WORKS_URL = "https://api.openalex.org/works"
+CHECKPOINT_FILE = "processed_teachers.txt"
+BATCH_SIZE = 75
 
 
-def clean_name_str(name_str):
-    """ฟังก์ชันทำความสะอาดชื่อเพื่อนำไปเทียบแมตช์"""
-    if not name_str:
-        return ""
-    # ตัดคำนำหน้าทางวิชาการและอักขระพิเศษ
-    cleaned = re.sub(r'^(assoc\.?|asst\.?|prof\.?|dr\.?|mr\.?|mrs\.?|ms\.?)\s+', '', name_str.strip(), flags=re.IGNORECASE)
-    return re.sub(r'[^a-zA-Z0-9]', '', cleaned).lower()
+def get_fresh_session():
+    s = requests.Session()
+    s.proxies = {}
+    s.trust_env = False
+    return s
+
+
+def load_processed_teacher_ids():
+    if os.path.exists(CHECKPOINT_FILE):
+        with open(CHECKPOINT_FILE, "r", encoding="utf-8") as f:
+            return set(line.strip() for line in f if line.strip())
+    return set()
+
+
+def save_processed_teacher_id(teacher_id):
+    with open(CHECKPOINT_FILE, "a", encoding="utf-8") as f:
+        f.write(f"{str(teacher_id)}\n")
+
+
+def is_english_name(text):
+    if not text:
+        return False
+    return bool(re.search(r'[a-zA-Z]', text))
 
 
 def fetch_all_teachers():
-    """ดึงข้อมูลอาจารย์ทั้งหมดจาก Supabase"""
     all_teachers = []
     page_size = 1000
     start = 0
@@ -34,183 +55,376 @@ def fetch_all_teachers():
         end = start + page_size - 1
         res = (
             supabase.table("teachers")
-            .select("id, first_name_th, last_name_th, first_name_en, last_name_en")
+            .select("id, first_name_th, last_name_th, first_name_en, last_name_en, openalex_id")
             .order("id")
             .range(start, end)
             .execute()
         )
-        
         data = res.data
         if not data:
             break
-            
         all_teachers.extend(data)
         if len(data) < page_size:
             break
-            
         start += page_size
 
     return all_teachers
 
 
-def build_teacher_lookup(teachers):
-    """สร้างตาราง Lookup สำหรับตรวจจับ Co-authors ทุกรูปแบบชื่อ"""
-    lookup = []
-    for t in teachers:
-        fn = t.get("first_name_en") or ""
-        ln = t.get("last_name_en") or ""
-        full = f"{fn} {ln}".strip()
-        
-        lookup.append({
-            "id": t["id"],
-            "first_clean": clean_name_str(fn),
-            "last_clean": clean_name_str(ln),
-            "full_clean": clean_name_str(full),
-            "first_init": clean_name_str(fn[:1]) if fn else "",
-            "last_init": clean_name_str(ln[:1]) if ln else ""
-        })
-    return lookup
-
-
-def match_teacher_id(raw_author_name, lookup_list):
-    """เทียบชื่อผู้แต่งจากงานวิจัยว่าตรงกับอาจารย์ท่านไหนใน มธ."""
-    if not raw_author_name or not lookup_list:
-        return None
-
-    raw_clean = clean_name_str(raw_author_name)
-    parts = raw_author_name.strip().split()
-    first_part = clean_name_str(parts[0]) if len(parts) > 0 else ""
-    last_part = clean_name_str(parts[-1]) if len(parts) > 1 else ""
-
-    for t in lookup_list:
-        # 1. แมตช์ชื่อเต็มตรงกัน
-        if t["full_clean"] and (t["full_clean"] == raw_clean or t["full_clean"] in raw_clean or raw_clean in t["full_clean"]):
-            return t["id"]
-
-        # 2. แมตช์แบบชื่อย่อ (เช่น P. Rattanatamrong หรือ Prapaporn R.)
-        if first_part and last_part:
-            if t["first_clean"] == first_part and (last_part.startswith(t["last_init"]) or t["last_clean"].startswith(last_part)):
-                return t["id"]
-            if t["last_clean"] == last_part and (first_part.startswith(t["first_init"]) or t["first_clean"].startswith(first_part)):
-                return t["id"]
-
-    return None
-
-
-def fetch_openalex_works(author_name):
-    """ค้นหาผลงานวิจัยจาก OpenAlex"""
+def safe_openalex_get(session, url, params):
     headers = {"User-Agent": f"TAPRR-Aggregator/1.0 (mailto:{OPENALEX_MAILTO})"}
-    
-    try:
-        author_api_url = "https://api.openalex.org/authors"
-        author_params = {"search": author_name}
-        res_author = requests.get(author_api_url, headers=headers, params=author_params, timeout=10)
-        
-        author_id = None
-        if res_author.status_code == 200:
-            authors = res_author.json().get("results", [])
-            if authors:
-                author_id = authors[0].get("id")
+    wait_time = 5
 
-        if author_id:
-            works_params = {"filter": f"author.id:{author_id}", "per_page": 50}
-        else:
-            works_params = {"filter": f"raw_author_name.search:{author_name}", "per_page": 50}
+    while True:
+        try:
+            res = session.get(url, headers=headers, params=params, timeout=15)
 
-        res_works = requests.get(OPENALEX_API_URL, headers=headers, params=works_params, timeout=10)
-        if res_works.status_code == 200:
-            return res_works.json().get("results", [])
+            if res.status_code in (429, 420):
+                retry_after = res.headers.get("Retry-After")
+                if retry_after and retry_after.isdigit():
+                    sleep_sec = int(retry_after)
+                else:
+                    sleep_sec = wait_time
 
-    except Exception as e:
-        print(f"❌ ดึงข้อมูล OpenAlex ล้มเหลว ({author_name}): {e}")
-    
+                print(f"  ⏳ ติด Rate Limit (HTTP {res.status_code})! พักรอ {sleep_sec} วินาทีก่อนลองใหม่...")
+                time.sleep(sleep_sec)
+                wait_time = min(wait_time + 5, 60)
+                continue
+
+            if res.status_code == 200:
+                return res.json()
+
+            if res.status_code >= 500:
+                print(f"  ⚠️ OpenAlex Server Error (HTTP {res.status_code}) พักรอ 5 วินาที...")
+                time.sleep(5)
+                continue
+
+            print(f"  ⚠️ OpenAlex ตอบกลับ HTTP Status: {res.status_code}")
+            return None
+
+        except Exception as e:
+            print(f"  ⚠️ เกิดข้อผิดพลาด Network: {e} พักรอ 3 วินาที...")
+            time.sleep(3)
+
+
+def search_author_profiles(session, fn_clean, ln_clean):
+    search_queries = [
+        f"{fn_clean} {ln_clean}",
+        f"{fn_clean} {ln_clean[0]}." if ln_clean else fn_clean,
+        fn_clean
+    ]
+
+    for query in search_queries:
+        params = {
+            "search": query,
+            "per_page": 10,
+            "mailto": OPENALEX_MAILTO
+        }
+        if OPENALEX_API_KEY:
+            params["api_key"] = OPENALEX_API_KEY
+
+        data = safe_openalex_get(session, OPENALEX_AUTHORS_URL, params)
+        if data and "results" in data:
+            results = data.get("results", [])
+            if results:
+                return results
+
     return []
 
 
+def is_tu_affiliated_author(author_obj):
+    last_inst = author_obj.get("last_known_institution") or {}
+    if "thammasat" in (last_inst.get("display_name") or "").lower():
+        return True
+
+    for inst in author_obj.get("last_known_institutions") or []:
+        if "thammasat" in (inst.get("display_name") or "").lower():
+            return True
+
+    for aff in author_obj.get("affiliations") or []:
+        inst = aff.get("institution") or {}
+        if "thammasat" in (inst.get("display_name") or "").lower():
+            return True
+
+    return False
+
+
+def is_name_match(author_obj, fn_clean, ln_clean):
+    fn_lower = fn_clean.lower()
+    ln_lower = ln_clean.lower()
+    ln_initial = ln_lower[0] if ln_lower else ""
+
+    names_to_check = [author_obj.get("display_name") or ""]
+    names_to_check.extend(author_obj.get("display_name_alternatives") or [])
+
+    for name in names_to_check:
+        n_lower = name.lower()
+        if fn_lower in n_lower:
+            if (ln_lower in n_lower) or (f" {ln_initial}." in n_lower) or (f" {ln_initial} " in n_lower) or n_lower.endswith(f" {ln_initial}"):
+                return True
+    return False
+
+
+def fetch_all_works_by_author_id(session, author_id):
+    all_works = []
+    page = 1
+    per_page = 100
+
+    while True:
+        params = {
+            "filter": f"author.id:{author_id}",
+            "per_page": per_page,
+            "page": page,
+            "mailto": OPENALEX_MAILTO
+        }
+        if OPENALEX_API_KEY:
+            params["api_key"] = OPENALEX_API_KEY
+
+        data = safe_openalex_get(session, OPENALEX_WORKS_URL, params)
+        if not data or "results" not in data:
+            break
+
+        results = data.get("results", [])
+        if not results:
+            break
+
+        all_works.extend(results)
+        if len(results) < per_page:
+            break
+        page += 1
+
+    return all_works
+
+
 def run_pipeline():
-    print("🚀 เริ่มต้นกระบวนการดึงงานวิจัยและผูกความสัมพันธ์อาจารย์ทั้งหมด...\n")
+    if RESET_CHECKPOINT and os.path.exists(CHECKPOINT_FILE):
+        os.remove(CHECKPOINT_FILE)
+        print("🧹 ทำการล้างไฟล์ประวัติการรันเก่าเรียบร้อยแล้ว\n")
+
+    print("🚀 เริ่มต้นกระบวนการดึงงานวิจัยแบบ Profile-First Search (Bulk Mode)...\n")
 
     teachers = fetch_all_teachers()
     if not teachers:
         print("⚠️ ไม่พบข้อมูลอาจารย์ในฐานข้อมูล Supabase")
         return
 
-    print(f"📋 พบข้อมูลอาจารย์ในระบบทั้งหมด {len(teachers)} ท่าน")
-    lookup_list = build_teacher_lookup(teachers)
-
-    total_works_saved = 0
-
+    # 📌 สร้าง Map เก็บ openalex_id -> teacher_id ของอาจารย์ทุกคนเพื่อรองรับ Smart Cross-Linking
+    openalex_to_teacher_map = {}
     for t in teachers:
-        first_name_en = t.get("first_name_en")
-        last_name_en = t.get("last_name_en")
-        first_name_th = t.get("first_name_th", "")
-        last_name_th = t.get("last_name_th", "")
+        if t.get("openalex_id"):
+            openalex_to_teacher_map[str(t["openalex_id"])] = str(t["id"])
 
-        if not first_name_en or not last_name_en:
-            print(f"⏩ ข้ามอาจารย์ {first_name_th} {last_name_th} (ไม่มีชื่อภาษาอังกฤษ)")
-            continue
+    processed_ids = load_processed_teacher_ids()
+    total_teachers = len(teachers)
+    total_batches = (total_teachers + BATCH_SIZE - 1) // BATCH_SIZE
+    
+    print(f"📋 อาจารย์ทั้งหมด: {total_teachers} ท่าน | แบ่งเป็น {total_batches} Batch (กลุ่มละ {BATCH_SIZE} คน)")
+    print(f"📌 ดึงเสร็จไปแล้ว: {len(processed_ids)} ท่าน\n")
 
-        full_name_en = f"{first_name_en.strip()} {last_name_en.strip()}"
-        print(f"📌 กำลังประมวลผล: {first_name_th} {last_name_th} ({full_name_en})")
+    total_saved = 0
 
-        works = fetch_openalex_works(full_name_en)
-        print(f"  └─ พบงานวิจัยใน OpenAlex จำนวน {len(works)} รายการ")
+    TARGET_BATCH = 42  # ตั้ง batch เริ่มต้น
 
-        for work in works:
-            openalex_id = work.get("id", "").split("/")[-1]
-            if not openalex_id:
+    start_idx = (TARGET_BATCH - 1) * BATCH_SIZE
+
+    for batch_idx in range(start_idx, total_teachers, BATCH_SIZE):
+        batch_teachers = teachers[batch_idx : batch_idx + BATCH_SIZE]
+        current_batch_num = (batch_idx // BATCH_SIZE) + 1
+        start_num = batch_idx + 1
+        end_num = min(batch_idx + BATCH_SIZE, total_teachers)
+
+        print(f"============================================================")
+        print(f"📦 เริ่มต้น Batch ที่ {current_batch_num}/{total_batches} (อาจารย์คนที่ {start_num} - {end_num})")
+        print(f"============================================================\n")
+
+        current_session = get_fresh_session()
+
+        for t in batch_teachers:
+            teacher_id = str(t["id"])
+            first_name_th = t.get("first_name_th", "")
+            last_name_th = t.get("last_name_th", "")
+
+            if teacher_id in processed_ids:
+                print(f"⏩ ข้ามอาจารย์ {first_name_th} {last_name_th} (เคยทำเสร็จแล้ว)")
                 continue
 
-            authorships = work.get("authorships", [])
-            authors_list = []
-            for authorship in authorships:
-                name = authorship.get("author", {}).get("display_name") or authorship.get("raw_author_name")
-                if name:
-                    authors_list.append(name)
-            authors_str = ", ".join(authors_list) if authors_list else "N/A"
+            first_name_en = t.get("first_name_en") or ""
+            last_name_en = t.get("last_name_en") or ""
 
-            primary_loc = work.get("primary_location") or {}
-            source = primary_loc.get("source") or {}
+            if not is_english_name(first_name_en) or not is_english_name(last_name_en):
+                print(f"⏩ ข้ามอาจารย์ {first_name_th} {last_name_th} (ชื่อภาษาอังกฤษไม่ถูกต้อง)")
+                save_processed_teacher_id(teacher_id)
+                continue
 
-            pub_data = {
-                "openalex_id": openalex_id,
-                "title": work.get("title") or "Untitled",
-                "authors": authors_str,
-                "publication_year": work.get("publication_year"),
-                "publication_date": work.get("publication_date"),
-                "work_type": work.get("type"),
-                "doi": work.get("doi"),
-                "official_url": primary_loc.get("landing_page_url") or work.get("doi"),
-                "source_name": source.get("display_name"),
-                "citation_count": work.get("cited_by_count", 0),
-                "raw_data": work
-            }
+            fn_clean = first_name_en.strip()
+            ln_clean = last_name_en.strip()
+            full_name_en = f"{fn_clean} {ln_clean}"
+            print(f"📌 กำลังจัดการข้อมูลอาจารย์: {first_name_th} {last_name_th} ({full_name_en})")
 
-            pub_res = supabase.table("publications").upsert(pub_data, on_conflict="openalex_id").execute()
+            target_author_id = t.get("openalex_id")
 
-            if pub_res.data:
-                pub_id = pub_res.data[0]["id"]
+            if target_author_id:
+                print(f"  └─ ⚡ พบ OpenAlex ID ในฐานข้อมูลแล้ว: {target_author_id}")
+            else:
+                author_profiles = search_author_profiles(current_session, fn_clean, ln_clean)
+                
+                for profile in author_profiles:
+                    if is_name_match(profile, fn_clean, ln_clean) and is_tu_affiliated_author(profile):
+                        raw_id = profile.get("id", "")
+                        if raw_id:
+                            target_author_id = raw_id.split("/")[-1]
+                        break
 
-                # วนลูป Co-authors ทุกคนเพื่อผูกอาจารย์ทั้งหมดที่อยู่ในเปเปอร์นี้
-                for authorship in authorships:
-                    author_name = authorship.get("author", {}).get("display_name") or authorship.get("raw_author_name")
-                    matched_id = match_teacher_id(author_name, lookup_list)
+                if not target_author_id:
+                    print(f"  └─ ⏩ ข้าม: ไม่พบโปรไฟล์นักวิจัยใน OpenAlex ที่ชื่อตรงและระบุสังกัด Thammasat University\n")
+                    save_processed_teacher_id(teacher_id)
+                    continue
 
-                    if matched_id:
-                        link_data = {
-                            "teacher_id": matched_id,
-                            "publication_id": pub_id,
+                try:
+                    supabase.table("teachers").update({"openalex_id": target_author_id}).eq("id", teacher_id).execute()
+                    openalex_to_teacher_map[str(target_author_id)] = str(teacher_id)  # อัปเดต Map ทันทีที่เจอ ID ใหม่
+                    print(f"  └─ 💾 บันทึก OpenAlex ID ({target_author_id}) ลงตาราง teachers สำเร็จ")
+                except Exception as e:
+                    print(f"  ⚠️ อัปเดต openalex_id ลงฐานข้อมูลไม่สำเร็จ: {e}")
+
+            works = fetch_all_works_by_author_id(current_session, target_author_id)
+            print(f"  └─ 📚 ดึงผลงานวิจัยจากโปรไฟล์ได้ทั้งหมด {len(works)} รายการ")
+
+            if not works:
+                save_processed_teacher_id(teacher_id)
+                continue
+
+            seen_ids = set()
+            pubs_to_upsert = []
+            links_map = []
+
+            for work in works:
+                openalex_id = work.get("id", "").split("/")[-1]
+                if not openalex_id or openalex_id in seen_ids:
+                    continue
+                seen_ids.add(openalex_id)
+
+                authors_list = []
+                matched_teachers_in_work = []
+
+                for authorship in work.get("authorships", []):
+                    author_obj = authorship.get("author") or {}
+                    curr_author_id = author_obj.get("id", "").split("/")[-1] if author_obj.get("id") else ""
+                    
+                    display_name = author_obj.get("display_name") or authorship.get("raw_author_name") or ""
+                    if display_name:
+                        authors_list.append(display_name)
+                    
+                    # 💡 Smart Cross-Linking: เช็กว่าผู้แต่งคนนี้ตรงกับอาจารย์ท่านใดในฐานข้อมูลเราบ้าง (ผูกหมดทั้ง A และ B)
+                    if curr_author_id in openalex_to_teacher_map:
+                        matched_teachers_in_work.append({
+                            "teacher_id": openalex_to_teacher_map[curr_author_id],
                             "author_position": authorship.get("author_position")
-                        }
-                        supabase.table("teacher_publications").upsert(
-                            link_data, on_conflict="teacher_id,publication_id"
-                        ).execute()
+                        })
 
-                total_works_saved += 1
+                # รับประกันว่าอาจารย์ปัจจุบันจะถูกผูกเข้ากับงานวิจัยเสมอ
+                if not any(m["teacher_id"] == teacher_id for m in matched_teachers_in_work):
+                    matched_teachers_in_work.append({
+                        "teacher_id": teacher_id,
+                        "author_position": None
+                    })
 
-        time.sleep(0.2)
+                authors_str = ", ".join(authors_list) if authors_list else "N/A"
+                primary_loc = work.get("primary_location") or {}
+                source = primary_loc.get("source") or {}
 
-    print(f"\n🎉 ซิงก์เสร็จสิ้นเรียบร้อย! อัปเดตงานวิจัยไปทั้งหมด {total_works_saved} รายการ")
+                pubs_to_upsert.append({
+                    "openalex_id": openalex_id,
+                    "title": work.get("title") or "Untitled",
+                    "authors": authors_str,
+                    "publication_year": work.get("publication_year"),
+                    "publication_date": work.get("publication_date"),
+                    "work_type": work.get("type"),
+                    "doi": work.get("doi"),
+                    "official_url": primary_loc.get("landing_page_url") or work.get("doi"),
+                    "source_name": source.get("display_name"),
+                    "citation_count": work.get("cited_by_count", 0),
+                    "raw_data": work
+                })
+
+                for m in matched_teachers_in_work:
+                    links_map.append({
+                        "teacher_id": m["teacher_id"],
+                        "openalex_id": openalex_id,
+                        "author_position": m["author_position"]
+                    })
+
+            if pubs_to_upsert:
+                try:
+                    # 1. Deduplication ลบรายการซ้ำใน Memory ก่อนส่ง
+                    unique_pubs_dict = {p["openalex_id"]: p for p in pubs_to_upsert}
+                    pubs_to_upsert = list(unique_pubs_dict.values())
+
+                    # จัดกลุ่ม links ตาม openalex_id เพื่อดึงใช้ตาม chunk ได้เร็วขึ้น
+                    links_by_oid = {}
+                    for item in links_map:
+                        oid = item["openalex_id"]
+                        if oid not in links_by_oid:
+                            links_by_oid[oid] = []
+                        links_by_oid[oid].append(item)
+
+                    # 2. ลด CHUNK_SIZE เหลือ 10 รายการ ป้องกัน Statement Timeout (57014) สำหรับอาจารย์ที่มีผลงานเยอะ
+                    CHUNK_SIZE = 10
+                    total_saved_teacher = 0
+
+                    print(f"  └─ 🔄 กำลังบันทึกผลงาน {len(pubs_to_upsert)} รายการ (แบ่งส่งทีละ {CHUNK_SIZE} รายการ)...")
+
+                    for i in range(0, len(pubs_to_upsert), CHUNK_SIZE):
+                        pub_chunk = pubs_to_upsert[i : i + CHUNK_SIZE]
+
+                        # Upsert ตาราง publications ทีละ 10 รายการ
+                        pub_res = (
+                            supabase.table("publications")
+                            .upsert(pub_chunk, on_conflict="openalex_id")
+                            .select("id, openalex_id")
+                            .execute()
+                        )
+
+                        oid_to_db_id = {p["openalex_id"]: p["id"] for p in (pub_res.data or [])}
+
+                        # ดึงเฉพาะ links ความสัมพันธ์ของ chunk นี้มา upsert
+                        links_to_upsert = []
+                        for p_item in pub_chunk:
+                            oid = p_item["openalex_id"]
+                            db_pub_id = oid_to_db_id.get(oid)
+                            if db_pub_id and oid in links_by_oid:
+                                for l_item in links_by_oid[oid]:
+                                    links_to_upsert.append({
+                                        "teacher_id": l_item["teacher_id"],
+                                        "publication_id": db_pub_id,
+                                        "author_position": l_item["author_position"]
+                                    })
+
+                        if links_to_upsert:
+                            unique_links = {(l["teacher_id"], l["publication_id"]): l for l in links_to_upsert}
+                            supabase.table("teacher_publications").upsert(
+                                list(unique_links.values()), on_conflict="teacher_id,publication_id"
+                            ).execute()
+
+                        total_saved_teacher += len(pub_chunk)
+                        time.sleep(0.2)  # พัก 0.2 วินาทีให้ Database ระบายคิว ไม่ให้ CPU พีคเกินไป
+
+                    print(f"  └─ ✅ บันทึกและผูกสัมพันธ์สำเร็จทั้งหมด {total_saved_teacher} รายการ\n")
+                    total_saved += total_saved_teacher
+
+                except Exception as e:
+                    print(f"  ❌ เกิดข้อผิดพลาดในการบันทึกข้อมูล: {e}\n")
+
+            save_processed_teacher_id(teacher_id)
+            time.sleep(0.5)
+
+        current_session.close()
+
+        if current_batch_num < total_batches:
+            print(f"☕ จบ Batch ที่ {current_batch_num} -> พักรอ 5 วินาที...\n")
+            time.sleep(5)
+
+    print(f"🎉 เสร็จสิ้นกระบวนการทั้งหมด! บันทึกไปรวมทั้งสิ้น {total_saved} รายการ")
 
 
 if __name__ == "__main__":
