@@ -223,7 +223,7 @@ def run_pipeline():
 
     total_saved = 0
 
-    TARGET_BATCH = 16  # ตั้ง batch เริ่มต้น
+    TARGET_BATCH = 42  # ตั้ง batch เริ่มต้น
 
     start_idx = (TARGET_BATCH - 1) * BATCH_SIZE
 
