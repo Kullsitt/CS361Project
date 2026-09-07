@@ -1,5 +1,5 @@
-const SUPABASE_URL = "https://svijmtiaeormkmdtmbud.supabase.co";
-const SUPABASE_KEY = "sb_publishable_e6LgiJKOQeA6VXi5Ng_JGg_Q8aKNDLD";
+const SUPABASE_URL = "https://ewklxmvohanstvaphwow.supabase.co";
+const SUPABASE_KEY = "sb_publishable_tTlNhmQ6ZfFJVD1VEvXewA_piv6ngYP";
 const supabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
 
 let currentTab = 'publications';
@@ -388,7 +388,7 @@ function renderAuthors(teachers) {
     const expertise = teacher.research_interests || teacher.expertise || teacher.department_th || teacher.department_en || teacher.department || '';
     const email = teacher.email || '';
     const phone = teacher.phone || teacher.tel || '';
-    const imageUrl = teacher.image_url || teacher.photo || teacher.avatar_url || '';
+    const imageUrl = teacher.profile_url || teacher.photo || teacher.avatar_url || '';
 
     html += `
       <div class="card card-author">
