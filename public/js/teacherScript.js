@@ -1,3 +1,4 @@
+// Configuration
 const SUPABASE_URL = "https://ewklxmvohanstvaphwow.supabase.co";
 const SUPABASE_KEY = "sb_publishable_tTlNhmQ6ZfFJVD1VEvXewA_piv6ngYP";
 const supabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
@@ -7,18 +8,58 @@ const teacherId = urlParams.get('id');
 
 let teacherLookupList = [];
 
-// ฟังก์ชันทำความสะอาดข้อความ รองรับภาษาไทยและอังกฤษสมบูรณ์
+// Helper: XSS Protection
+function escapeHtml(str) {
+  if (!str) return '';
+  return String(str)
+    .replace(/&/g, '&amp;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;')
+    .replace(/"/g, '&quot;')
+    .replace(/'/g, '&#039;');
+}
+
+// Helper: Safe DOM element setter
+function setElementText(id, text) {
+  const el = document.getElementById(id);
+  if (el) el.innerText = text;
+}
+
+// Helper: Normalize string/array inputs to Array
+function normalizeList(input) {
+  if (Array.isArray(input)) return input;
+  if (typeof input === 'string' && input.trim()) {
+    return input.split(/[,;\n]/).map(s => s.trim()).filter(Boolean);
+  }
+  return [];
+}
+
+// Clean prefixes and special characters
 function cleanStr(str) {
-  return (str || '')
+  if (!str) return '';
+  return str
     .toString()
+    .trim()
     .toLowerCase()
     .replace(/^(assoc\.?\s*prof\.?|asst\.?\s*prof\.?|prof\.?|dr\.?|mr\.?|mrs\.?|ms\.?|ศ\.?|รศ\.?|ผศ\.?|ดร\.?|อาจารย์|นาย|นาง|นางสาว)\s+/i, '')
     .replace(/[^a-z0-9\u0E00-\u0E7F]/g, '');
 }
 
-// โหลดข้อมูลอาจารย์ทั้งหมดแบบทะลุ Limit 1000
+// Batch load teacher lookup with optional SessionStorage caching
 async function loadTeacherMap() {
   if (teacherLookupList.length > 0) return;
+
+  // Try retrieving from session cache first
+  const cached = sessionStorage.getItem('teacherLookupList');
+  if (cached) {
+    try {
+      teacherLookupList = JSON.parse(cached);
+      return;
+    } catch (e) {
+      sessionStorage.removeItem('teacherLookupList');
+    }
+  }
+
   try {
     let allRecords = [];
     let start = 0;
@@ -28,7 +69,7 @@ async function loadTeacherMap() {
     while (hasMore) {
       const { data, error } = await supabaseClient
         .from('teachers')
-        .select('*')
+        .select('id, first_name_en, last_name_en, first_name_th, last_name_th, name')
         .range(start, start + batchSize - 1);
 
       if (error || !data || data.length === 0) {
@@ -60,27 +101,31 @@ async function loadTeacherMap() {
           rawFull: rawFullEn || rawFullTh || t.name || ''
         };
       });
+
+      // Cache to avoid refetching during same session
+      sessionStorage.setItem('teacherLookupList', JSON.stringify(teacherLookupList));
     }
   } catch (e) {
     console.error("Failed to load teacher map", e);
   }
 }
 
-// อัลกอริทึมค้นหาแบบ Token-Based และ Partial Match
+// Token-Based Matching
 function findTeacherMatch(rawName) {
   if (!rawName || teacherLookupList.length === 0) return null;
 
   const rawClean = cleanStr(rawName);
   if (!rawClean) return null;
 
-  // 1. เช็กความตรงกันของชื่อเต็ม
+  // 1. Exact Full Name Match
   for (const t of teacherLookupList) {
-    if (t.fullCleanEn && (t.fullCleanEn === rawClean || rawClean.includes(t.fullCleanEn) || t.fullCleanEn.includes(rawClean))) return t;
-    if (t.fullCleanTh && (t.fullCleanTh === rawClean || rawClean.includes(t.fullCleanTh) || t.fullCleanTh.includes(rawClean))) return t;
+    if (t.fullCleanEn && t.fullCleanEn === rawClean) return t;
+    if (t.fullCleanTh && t.fullCleanTh === rawClean) return t;
   }
 
-  // 2. แยกพยางค์/คำ (ตัดช่องว่าง, จุลภาค, จุด, ขีด)
+  // 2. Tokenized Name Match
   const rawParts = rawName
+    .trim()
     .replace(/^(assoc\.?\s*prof\.?|asst\.?\s*prof\.?|prof\.?|dr\.?|mr\.?|mrs\.?|ms\.?|ศ\.?|รศ\.?|ผศ\.?|ดร\.?|อาจารย์|นาย|นาง|นางสาว)\s+/i, '')
     .split(/[\s,.\-_/]+/)
     .map(cleanStr)
@@ -89,7 +134,7 @@ function findTeacherMatch(rawName) {
   if (rawParts.length < 2) return null;
 
   for (const t of teacherLookupList) {
-    // ตรวจสอบชื่อภาษาอังกฤษ
+    // English Checks
     if (t.firstCleanEn && t.lastCleanEn) {
       const fn = t.firstCleanEn;
       const ln = t.lastCleanEn;
@@ -102,19 +147,17 @@ function findTeacherMatch(rawName) {
           const p1 = rawParts[i];
           const p2 = rawParts[j];
 
-          if ((p1 === fn || fn.startsWith(p1) || p1.startsWith(fn)) && (p2 === ln || ln.startsWith(p2) || p2.startsWith(ln))) return t;
-          if ((p1 === fn || fn.startsWith(p1)) && (p2 === lnInit || ln.startsWith(p2))) return t;
-          if ((p1 === ln || ln.startsWith(p1)) && (p2 === fnInit || fn.startsWith(p2))) return t;
+          if (p1 === fn && p2 === ln) return t;
+          if (p1 === fn && p2 === lnInit) return t;
+          if (p1 === ln && p2 === fnInit) return t;
         }
       }
     }
 
-    // ตรวจสอบชื่อภาษาไทย
+    // Thai Checks
     if (t.firstCleanTh && t.lastCleanTh) {
-      const fnTh = t.firstCleanTh;
-      const lnTh = t.lastCleanTh;
-      const hasFn = rawParts.some(p => p === fnTh || fnTh.startsWith(p) || p.startsWith(fnTh));
-      const hasLn = rawParts.some(p => p === lnTh || lnTh.startsWith(p) || p.startsWith(lnTh));
+      const hasFn = rawParts.includes(t.firstCleanTh);
+      const hasLn = rawParts.includes(t.lastCleanTh);
       if (hasFn && hasLn) return t;
     }
   }
@@ -124,34 +167,32 @@ function findTeacherMatch(rawName) {
 
 function formatShortName(fullName) {
   if (!fullName) return "";
-  const cleaned = fullName.trim().replace(/^(assoc\.?\s*prof\.?|asst\.?\s*prof\.?|prof\.?|dr\.?|mr\.?|mrs\.?|ms\.?|ศ\.?|รศ\.?|ผศ\.?|ดร\.?|อาจารย์|นาย|นาง|นางสาว)\s+/i, '');
+  const cleaned = fullName
+    .trim()
+    .replace(/^(assoc\.?\s*prof\.?|asst\.?\s*prof\.?|prof\.?|dr\.?|mr\.?|mrs\.?|ms\.?|ศ\.?|รศ\.?|ผศ\.?|ดร\.?|อาจารย์|นาย|นาง|นางสาว)\s+/i, '');
   const parts = cleaned.split(/[\s,]+/).filter(Boolean);
-  if (parts.length === 1) return parts[0];
+  if (parts.length === 1) return escapeHtml(parts[0]);
   const firstName = parts[0];
   const lastName = parts[parts.length - 1];
-  return `${firstName} ${lastName.charAt(0).toUpperCase()}.`;
+  return `${escapeHtml(firstName)} ${escapeHtml(lastName.charAt(0).toUpperCase())}.`;
 }
 
 function renderAuthorBadge(rawName) {
   const shortName = formatShortName(rawName);
   const matchedTeacher = findTeacherMatch(rawName);
+  const safeRawName = escapeHtml(rawName);
 
   if (matchedTeacher) {
-    return `<a href="teacher.html?id=${matchedTeacher.id}" title="${rawName} (อาจารย์ มธ. - คลิกดูผลงาน)" class="author-item" style="text-decoration: underline; text-decoration-color: #800000; text-underline-offset: 3px; color: #1a1a1a; font-weight: 600; cursor: pointer;"><i class="fa fa-user-circle" style="color: #800000;"></i>${shortName}</a>`;
+    return `<a href="teacher.html?id=${encodeURIComponent(matchedTeacher.id)}" title="${safeRawName} (อาจารย์ มธ. - คลิกดูผลงาน)" class="author-item" style="text-decoration: underline; text-decoration-color: #800000; text-underline-offset: 3px; color: #1a1a1a; font-weight: 600; cursor: pointer;"><i class="fa fa-user-circle" style="color: #800000;"></i>${shortName}</a>`;
   }
-  return `<span title="${rawName}" class="author-item" style="cursor: default; color: #555;"><i class="fa fa-user-circle-o" style="color: #888;"></i>${shortName}</span>`;
+  return `<span title="${safeRawName}" class="author-item" style="cursor: default; color: #555;"><i class="fa fa-user-circle-o" style="color: #888;"></i>${shortName}</span>`;
 }
 
 function formatAuthors(rawAuthors, pubId) {
-  if (!rawAuthors || rawAuthors === "N/A") {
-    return '<div class="authors-container"><span class="author-item"><i class="fa fa-user-circle-o"></i> Unknown Author</span></div>';
-  }
+  const authorArray = normalizeList(rawAuthors);
 
-  let authorArray = [];
-  if (Array.isArray(rawAuthors)) {
-    authorArray = rawAuthors;
-  } else if (typeof rawAuthors === 'string') {
-    authorArray = rawAuthors.split(/[,;]/).map(name => name.trim()).filter(Boolean);
+  if (authorArray.length === 0) {
+    return '<div class="authors-container"><span class="author-item"><i class="fa fa-user-circle-o"></i> Unknown Author</span></div>';
   }
 
   if (authorArray.length <= 5) {
@@ -164,22 +205,43 @@ function formatAuthors(rawAuthors, pubId) {
   return `
     <div class="authors-container">
       ${visible}
-      <button type="button" onclick="document.getElementById('hidden-authors-t-${pubId}').style.display = 'inline-flex'; this.style.display = 'none';" style="background: none; border: none; color: #800000; font-weight: bold; cursor: pointer; padding: 0 4px; font-size: inherit;">et al.</button>
-      <span id="hidden-authors-t-${pubId}" class="hidden-authors">${hidden}</span>
+      <button type="button" data-pub-id="${pubId}" class="btn-et-al" style="background: none; border: none; color: #800000; font-weight: bold; cursor: pointer; padding: 0 4px; font-size: inherit;">et al.</button>
+      <span id="hidden-authors-t-${pubId}" class="hidden-authors" style="display: none;">${hidden}</span>
     </div>
   `;
 }
 
+function renderListItems(elementId, dataList, fallbackText) {
+  const container = document.getElementById(elementId);
+  if (!container) return;
+
+  container.innerHTML = '';
+  const items = normalizeList(dataList);
+
+  if (items.length > 0) {
+    items.forEach(item => {
+      const li = document.createElement('li');
+      li.style.listStyleType = 'disc';
+      li.style.marginLeft = '20px';
+      li.innerText = item;
+      container.appendChild(li);
+    });
+  } else {
+    container.innerText = fallbackText;
+  }
+}
+
 async function loadTeacherData() {
   if (!teacherId) {
-    document.getElementById('t-name-en').innerText = 'ไม่พบรหัสอาจารย์ใน URL';
-    document.getElementById('teacher-publications-list').innerHTML = '<div class="info-card" style="text-align: center; color: #666;">กรุณาเลือกอาจารย์จากหน้าหลัก</div>';
+    setElementText('t-name-en', 'ไม่พบรหัสอาจารย์ใน URL');
+    const container = document.getElementById('teacher-publications-list');
+    if (container) container.innerHTML = '<div class="info-card" style="text-align: center; color: #666;">กรุณาเลือกอาจารย์จากหน้าหลัก</div>';
     return;
   }
 
   await loadTeacherMap();
 
-  // 1. ดึงข้อมูลอาจารย์
+  // 1. Fetch Teacher Info
   const { data: teacher, error } = await supabaseClient
     .from('teachers')
     .select('*')
@@ -187,57 +249,73 @@ async function loadTeacherData() {
     .single();
 
   if (error || !teacher) {
-    document.getElementById('t-name-en').innerText = 'ไม่พบข้อมูลอาจารย์ในระบบ';
+    setElementText('t-name-en', 'ไม่พบข้อมูลอาจารย์ในระบบ');
     return;
   }
 
+  // Set Profile Metadata
   const nameTh = `${teacher.first_name_th || ''} ${teacher.last_name_th || ''}`.trim();
   const nameEn = `${teacher.first_name_en || ''} ${teacher.last_name_en || ''}`.trim();
-  const faculty = teacher.faculty_en || teacher.faculty_th || teacher.faculty || 'Thammasat University';
-  const department = teacher.department_en || teacher.department_th || teacher.department;
-
   const titleEl = document.getElementById('t-name-en');
   const subEl = document.getElementById('t-name-th');
 
   if (nameTh && nameEn) {
-    titleEl.innerText = nameTh;
-    subEl.innerText = nameEn.toUpperCase();
-    subEl.style.display = 'block';
+    if (titleEl) titleEl.innerText = nameTh;
+    if (subEl) { subEl.innerText = nameEn.toUpperCase(); subEl.style.display = 'block'; }
   } else if (nameTh) {
-    titleEl.innerText = nameTh;
-    subEl.innerText = '';
-    subEl.style.display = 'none';
+    if (titleEl) titleEl.innerText = nameTh;
+    if (subEl) subEl.style.display = 'none';
   } else if (nameEn) {
-    titleEl.innerText = nameEn.toUpperCase();
-    subEl.innerText = '';
-    subEl.style.display = 'none';
+    if (titleEl) titleEl.innerText = nameEn.toUpperCase();
+    if (subEl) subEl.style.display = 'none';
   } else {
-    titleEl.innerText = teacher.name || 'Unknown Name';
-    subEl.innerText = '';
-    subEl.style.display = 'none';
+    if (titleEl) titleEl.innerText = teacher.name || 'Unknown Name';
+    if (subEl) subEl.style.display = 'none';
   }
 
-  document.getElementById('t-faculty').innerText = faculty;
-  if (department) {
-    document.getElementById('t-department').innerText = `Department: ${department}`;
+  // Render Expertise & Research Interests safely
+  renderListItems('t-expertise', teacher.expertise, 'ไม่พบข้อมูลความเชี่ยวชาญ');
+  renderListItems('t-research_interests', teacher.research_interests, 'ไม่พบข้อมูลความสนใจในการวิจัย');
+  renderListItems('t-education', teacher.education, 'ไม่พบข้อมูลการศึกษา');
+  
+  // Profile Image
+  const profileImageEl = document.getElementById('profile_image');
+  if (profileImageEl) {
+    profileImageEl.src = teacher.profile_url || 'assets/default-profile.png';
   }
 
-  if (teacher.email) {
-    document.getElementById('t-email').innerHTML = `<i class="fa fa-envelope-o" style="width: 24px; color: #800000;"></i> <a href="mailto:${teacher.email}" style="color: #800000; text-decoration: none;">${teacher.email}</a>`;
-  }
-  if (teacher.office) {
-    document.getElementById('t-office').innerHTML = `<i class="fa fa-building-o" style="width: 24px; color: #800000;"></i> ${teacher.office}`;
-  }else {
-    document.getElementById('t-office').innerHTML = `<i class="fa fa-building-o" style="width: 24px; color: #800000;"></i> ${teacher.faculty_en}`;
+  // Contact Information
+  const faculty = teacher.faculty_en || teacher.faculty_th || teacher.faculty || 'Thammasat University';
+  setElementText('t-faculty', faculty);
+
+  if (teacher.department_en || teacher.department_th || teacher.department) {
+    setElementText('t-department', `Department: ${teacher.department_en || teacher.department_th || teacher.department}`);
   }
 
-  if (teacher.phone) {
-    document.getElementById('t-phone').innerHTML = `<i class="fa fa-phone" style="width: 24px; color: #800000;"></i> ${teacher.phone}`;
-  } else {
-    document.getElementById('t-phone').style.display = 'none';
+  const emailEl = document.getElementById('t-email');
+  if (emailEl) {
+    emailEl.innerHTML = teacher.email 
+      ? `<i class="fa fa-envelope-o" style="width: 24px; color: #800000;"></i> <a href="mailto:${escapeHtml(teacher.email)}" style="color: #800000; text-decoration: none;">${escapeHtml(teacher.email)}</a>`
+      : '';
   }
 
-  // 2. ดึงจากตารางเชื่อม teacher_publications
+  const officeEl = document.getElementById('t-office_address');
+  if (officeEl) {
+    const officeText = teacher.office_address || faculty;
+    officeEl.innerHTML = `<i class="fa fa-building-o" style="width: 24px; color: #800000;"></i> ${escapeHtml(officeText)}`;
+  }
+
+  const phoneEl = document.getElementById('t-phone');
+  if (phoneEl) {
+    if (teacher.phone_number) {
+      phoneEl.style.display = 'block';
+      phoneEl.innerHTML = `<i class="fa fa-phone" style="width: 24px; color: #800000;"></i> ${escapeHtml(teacher.phone_number)}`;
+    } else {
+      phoneEl.style.display = 'none';
+    }
+  }
+
+  // 2. Fetch Publications via Join
   const { data: relations } = await supabaseClient
     .from('teacher_publications')
     .select(`publications (*)`)
@@ -248,7 +326,7 @@ async function loadTeacherData() {
     pubs = relations.map(r => r.publications).filter(Boolean);
   }
 
-  // 3. Fallback: ถ้ายังไม่มีในตารางเชื่อม ให้ค้นหาจากรายชื่องานวิจัยทั้งหมด
+  // Fallback: Scan publications
   if (pubs.length === 0) {
     let allPubs = [];
     let start = 0;
@@ -272,13 +350,7 @@ async function loadTeacherData() {
 
     if (allPubs.length > 0) {
       pubs = allPubs.filter(p => {
-        let authors = [];
-        if (Array.isArray(p.authors)) {
-          authors = p.authors;
-        } else if (typeof p.authors === 'string') {
-          authors = p.authors.split(/[,;]/).map(a => a.trim()).filter(Boolean);
-        }
-
+        const authors = normalizeList(p.authors || p.author_names);
         return authors.some(authorName => {
           const matched = findTeacherMatch(authorName);
           return matched && String(matched.id) === String(teacherId);
@@ -292,6 +364,8 @@ async function loadTeacherData() {
 
 function renderPubList(pubs) {
   const container = document.getElementById('teacher-publications-list');
+  if (!container) return;
+
   if (!pubs || pubs.length === 0) {
     container.innerHTML = `
       <div class="info-card" style="text-align: center; color: #666;">
@@ -303,20 +377,21 @@ function renderPubList(pubs) {
 
   let html = '';
   pubs.forEach((pub, idx) => {
-    const title = pub.title || "Untitled Paper";
-    const paperUrl = pub.official_url || pub.doi_url || pub.doi || pub.url || pub.link || '';
-    const pubType = pub.work_type ? pub.work_type.toUpperCase() : "ARTICLE";
-    const pubDate = pub.publication_date || pub.publication_year || "Unknown Date";
+    const title = escapeHtml(pub.title || "Untitled Paper");
+    const rawPaperUrl = pub.official_url || pub.doi_url || pub.doi || pub.url || pub.link || '';
+    const paperUrl = escapeHtml(rawPaperUrl);
+    const pubType = escapeHtml((pub.work_type ? pub.work_type : "ARTICLE").toUpperCase());
+    const pubDate = escapeHtml(pub.publication_date || pub.publication_year || "Unknown Date");
 
     let hostDomain = '';
-    if (paperUrl) {
+    if (rawPaperUrl) {
       try {
-        const fullUrl = paperUrl.startsWith('http') ? paperUrl : 'https://' + paperUrl;
-        hostDomain = new URL(fullUrl).hostname.replace(/^www\./, '');
+        const fullUrl = rawPaperUrl.startsWith('http') ? rawPaperUrl : 'https://' + rawPaperUrl;
+        hostDomain = escapeHtml(new URL(fullUrl).hostname.replace(/^www\./, ''));
       } catch (e) { }
     }
 
-    const sourceName = pub.source_name || pub.publisher || '';
+    const sourceName = escapeHtml(pub.source_name || pub.publisher || '');
 
     let metaParts = [pubDate];
     if (hostDomain) metaParts.push(`<a href="${paperUrl}" target="_blank" rel="noopener noreferrer" style="color: inherit; text-decoration: underline;">${hostDomain}</a>`);
@@ -340,6 +415,16 @@ function renderPubList(pubs) {
   });
 
   container.innerHTML = html;
+
+  // Event delegation for "et al." buttons
+  container.querySelectorAll('.btn-et-al').forEach(btn => {
+    btn.addEventListener('click', function() {
+      const pubId = this.getAttribute('data-pub-id');
+      const hiddenSpan = document.getElementById(`hidden-authors-t-${pubId}`);
+      if (hiddenSpan) hiddenSpan.style.display = 'inline-flex';
+      this.style.display = 'none';
+    });
+  });
 }
 
 document.addEventListener('DOMContentLoaded', loadTeacherData);

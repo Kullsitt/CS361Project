@@ -29,6 +29,9 @@
   <!-- Navigation Bar -->
   <nav class="navbar">
     <a href="#about" class="nav-tab">About</a>
+    <a href="#expertise" class="nav-tab">Expertise</a>
+    <a href="#research-interests" class="nav-tab">Interests</a>
+    <a href="#education" class="nav-tab">Education</a>
     <a href="#publications" class="nav-tab">Publications</a>
     <a href="#contact" class="nav-tab">Contact</a>
   </nav>
@@ -43,14 +46,35 @@
     <!-- ABOUT SECTION -->
     <div id="about" class="section-title">About</div>
     <div class="profile-card" id="teacher-profile-card">
-      <div style="font-size: 64px; color: #444; display: flex; align-items: center;">
-        <i class="fa fa-user-circle"></i>
+      <div >
+          <img  id="profile_image" style="width: 150px ; " >
       </div>
       <div>
         <h2 id="t-name-en" style="margin: 0 0 6px 0; font-size: 1.35rem; color: #111;">กำลังโหลดข้อมูลอาจารย์...</h2>
         <p id="t-name-th" style="margin: 0 0 8px 0; color: #666; font-size: 1rem;"></p>
         <p id="t-faculty" style="margin: 0; color: #444; font-size: 0.95rem; font-weight: 500;"></p>
         <p id="t-department" style="margin: 4px 0 0 0; color: #777; font-size: 0.9rem;"></p>
+      </div>
+    </div>
+
+    <!-- expertise -->
+    <div id="expertise" class="section-title">Expertise</div>
+    <div id="teacher-expertise-list">
+      <div class="info-card" id="t-expertise" style="margin: 0 0 8px 0; color: #666; font-size: 1rem; font-weight: bold;">
+      </div>
+    </div>
+
+    <!-- research interests -->
+    <div id="research-interests" class="section-title">Research Interests</div>
+    <div id="teacher-research-interests-list">
+      <div class="info-card" id="t-research_interests" style="margin: 0 0 8px 0; font-weight: bold; color: #666; font-size: 1rem;">
+      </div>
+    </div>
+
+    <!-- education -->
+    <div id="education" class="section-title">Education</div>
+    <div id="teacher-education-list">
+      <div class="info-card" id="t-education" style="margin: 0 0 8px 0; color: #666; font-size: 1rem; font-weight: bold;">
       </div>
     </div>
 
@@ -66,7 +90,7 @@
     <div id="contact" class="section-title">Contact</div>
     <div class="info-card" style="line-height: 2;">
       <div id="t-email"><i class="fa fa-envelope-o" style="width: 24px; color: #800000;"></i> -</div>
-      <div id="t-office"><i class="fa fa-building-o" style="width: 24px; color: #800000;"></i> -</div>
+      <div id="t-office_address"><i class="fa fa-building-o" style="width: 24px; color: #800000;"></i> -</div>
       <div id="t-phone"><i class="fa fa-phone" style="width: 24px; color: #800000;"></i> -</div>
     </div>
   </div>
