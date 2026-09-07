@@ -12,13 +12,13 @@ SUPABASE_KEY = os.getenv("SUPABASE_KEY")
 OPENALEX_MAILTO = os.getenv("OPENALEX_MAILTO")
 OPENALEX_API_KEY = os.getenv("OPENALEX_API_KEY")
 
-RESET_CHECKPOINT = False  # SET processed_teachers.txt ที่เก็บ uuid อาจารย์ที่ดึงข้อมูลแล้ว (True = ล้างไฟล์เก่า, False = ต่อจากเดิม)
+RESET_CHECKPOINT = False  # True = ล้างไฟล์ประวัติเพื่อเริ่มใหม่, False = รันต่อจากเดิม
+CHECKPOINT_FILE = "processed_teachers.txt"
+BATCH_SIZE = 75
 
 supabase: Client = create_client(SUPABASE_URL, SUPABASE_KEY)
 OPENALEX_AUTHORS_URL = "https://api.openalex.org/authors"
 OPENALEX_WORKS_URL = "https://api.openalex.org/works"
-CHECKPOINT_FILE = "processed_teachers.txt"
-BATCH_SIZE = 75
 
 
 def get_fresh_session():
@@ -53,9 +53,10 @@ def fetch_all_teachers():
 
     while True:
         end = start + page_size - 1
+        # ดึงฟิลด์ข้อมูลอาจารย์รวมถึงคอลัมน์ที่เป็น ARRAY เช่น education, expertise, research_interests
         res = (
             supabase.table("teachers")
-            .select("id, first_name_th, last_name_th, first_name_en, last_name_en, openalex_id")
+            .select("id, first_name_th, last_name_th, first_name_en, last_name_en, openalex_id, education, expertise, research_interests")
             .order("id")
             .range(start, end)
             .execute()
@@ -81,12 +82,8 @@ def safe_openalex_get(session, url, params):
 
             if res.status_code in (429, 420):
                 retry_after = res.headers.get("Retry-After")
-                if retry_after and retry_after.isdigit():
-                    sleep_sec = int(retry_after)
-                else:
-                    sleep_sec = wait_time
-
-                print(f"  ⏳ ติด Rate Limit (HTTP {res.status_code})! พักรอ {sleep_sec} วินาทีก่อนลองใหม่...")
+                sleep_sec = int(retry_after) if retry_after and retry_after.isdigit() else wait_time
+                print(f" ⏳ ติด Rate Limit (HTTP {res.status_code})! พักรอ {sleep_sec} วินาที...")
                 time.sleep(sleep_sec)
                 wait_time = min(wait_time + 5, 60)
                 continue
@@ -95,15 +92,15 @@ def safe_openalex_get(session, url, params):
                 return res.json()
 
             if res.status_code >= 500:
-                print(f"  ⚠️ OpenAlex Server Error (HTTP {res.status_code}) พักรอ 5 วินาที...")
+                print(f" ⚠️ OpenAlex Server Error (HTTP {res.status_code}) พักรอ 5 วินาที...")
                 time.sleep(5)
                 continue
 
-            print(f"  ⚠️ OpenAlex ตอบกลับ HTTP Status: {res.status_code}")
+            print(f" ⚠️ OpenAlex ตอบกลับ HTTP Status: {res.status_code}")
             return None
 
         except Exception as e:
-            print(f"  ⚠️ เกิดข้อผิดพลาด Network: {e} พักรอ 3 วินาที...")
+            print(f" ⚠️ เกิดข้อผิดพลาด Network: {e} พักรอ 3 วินาที...")
             time.sleep(3)
 
 
@@ -196,19 +193,27 @@ def fetch_all_works_by_author_id(session, author_id):
     return all_works
 
 
+def format_list_to_array(data_list):
+    """
+    ฟังก์ชันช่วยสำหรับแปลงลิสต์ของ Python ให้พร้อมส่งเข้าคอลัมน์ประเภท ARRAY (text[]) ของ Supabase
+    """
+    if not data_list:
+        return []
+    return [str(item).strip() for item in data_list if str(item).strip()]
+
+
 def run_pipeline():
     if RESET_CHECKPOINT and os.path.exists(CHECKPOINT_FILE):
         os.remove(CHECKPOINT_FILE)
         print("🧹 ทำการล้างไฟล์ประวัติการรันเก่าเรียบร้อยแล้ว\n")
 
-    print("🚀 เริ่มต้นกระบวนการดึงงานวิจัยแบบ Profile-First Search (Bulk Mode)...\n")
+    print("🚀 เริ่มต้นกระบวนการดึงงานวิจัยแบบ Profile-First Search (Database ARRAY Compatible Mode)...\n")
 
     teachers = fetch_all_teachers()
     if not teachers:
         print("⚠️ ไม่พบข้อมูลอาจารย์ในฐานข้อมูล Supabase")
         return
 
-    # 📌 สร้าง Map เก็บ openalex_id -> teacher_id ของอาจารย์ทุกคนเพื่อรองรับ Smart Cross-Linking
     openalex_to_teacher_map = {}
     for t in teachers:
         if t.get("openalex_id"):
@@ -217,13 +222,12 @@ def run_pipeline():
     processed_ids = load_processed_teacher_ids()
     total_teachers = len(teachers)
     total_batches = (total_teachers + BATCH_SIZE - 1) // BATCH_SIZE
-    
+
     print(f"📋 อาจารย์ทั้งหมด: {total_teachers} ท่าน | แบ่งเป็น {total_batches} Batch (กลุ่มละ {BATCH_SIZE} คน)")
     print(f"📌 ดึงเสร็จไปแล้ว: {len(processed_ids)} ท่าน\n")
 
     total_saved = 0
-
-    TARGET_BATCH = 42  # ตั้ง batch เริ่มต้น
+    TARGET_BATCH = 1  # สามารถปรับตั้ง batch เริ่มต้นได้ตามต้องการ
 
     start_idx = (TARGET_BATCH - 1) * BATCH_SIZE
 
@@ -267,7 +271,7 @@ def run_pipeline():
                 print(f"  └─ ⚡ พบ OpenAlex ID ในฐานข้อมูลแล้ว: {target_author_id}")
             else:
                 author_profiles = search_author_profiles(current_session, fn_clean, ln_clean)
-                
+
                 for profile in author_profiles:
                     if is_name_match(profile, fn_clean, ln_clean) and is_tu_affiliated_author(profile):
                         raw_id = profile.get("id", "")
@@ -282,7 +286,7 @@ def run_pipeline():
 
                 try:
                     supabase.table("teachers").update({"openalex_id": target_author_id}).eq("id", teacher_id).execute()
-                    openalex_to_teacher_map[str(target_author_id)] = str(teacher_id)  # อัปเดต Map ทันทีที่เจอ ID ใหม่
+                    openalex_to_teacher_map[str(target_author_id)] = str(teacher_id)
                     print(f"  └─ 💾 บันทึก OpenAlex ID ({target_author_id}) ลงตาราง teachers สำเร็จ")
                 except Exception as e:
                     print(f"  ⚠️ อัปเดต openalex_id ลงฐานข้อมูลไม่สำเร็จ: {e}")
@@ -310,38 +314,35 @@ def run_pipeline():
                 for authorship in work.get("authorships", []):
                     author_obj = authorship.get("author") or {}
                     curr_author_id = author_obj.get("id", "").split("/")[-1] if author_obj.get("id") else ""
-                    
+
                     display_name = author_obj.get("display_name") or authorship.get("raw_author_name") or ""
                     if display_name:
                         authors_list.append(display_name)
-                    
-                    # 💡 Smart Cross-Linking: เช็กว่าผู้แต่งคนนี้ตรงกับอาจารย์ท่านใดในฐานข้อมูลเราบ้าง (ผูกหมดทั้ง A และ B)
+
                     if curr_author_id in openalex_to_teacher_map:
                         matched_teachers_in_work.append({
                             "teacher_id": openalex_to_teacher_map[curr_author_id],
                             "author_position": authorship.get("author_position")
                         })
 
-                # รับประกันว่าอาจารย์ปัจจุบันจะถูกผูกเข้ากับงานวิจัยเสมอ
                 if not any(m["teacher_id"] == teacher_id for m in matched_teachers_in_work):
                     matched_teachers_in_work.append({
                         "teacher_id": teacher_id,
                         "author_position": None
                     })
 
-                authors_str = ", ".join(authors_list) if authors_list else "N/A"
                 primary_loc = work.get("primary_location") or {}
                 source = primary_loc.get("source") or {}
 
+                # บันทึกข้อมูล authors ลงในรูปแบบ ARRAY (List) สำหรับSupabase
                 pubs_to_upsert.append({
                     "openalex_id": openalex_id,
                     "title": work.get("title") or "Untitled",
-                    "authors": authors_str,
+                    "authors": format_list_to_array(authors_list),  # จัดรูปแบบส่งเข้าคอลัมน์ ARRAY
                     "publication_year": work.get("publication_year"),
                     "publication_date": work.get("publication_date"),
                     "work_type": work.get("type"),
                     "doi": work.get("doi"),
-                    "official_url": primary_loc.get("landing_page_url") or work.get("doi"),
                     "source_name": source.get("display_name"),
                     "citation_count": work.get("cited_by_count", 0),
                     "raw_data": work
@@ -356,11 +357,9 @@ def run_pipeline():
 
             if pubs_to_upsert:
                 try:
-                    # 1. Deduplication ลบรายการซ้ำใน Memory ก่อนส่ง
                     unique_pubs_dict = {p["openalex_id"]: p for p in pubs_to_upsert}
                     pubs_to_upsert = list(unique_pubs_dict.values())
 
-                    # จัดกลุ่ม links ตาม openalex_id เพื่อดึงใช้ตาม chunk ได้เร็วขึ้น
                     links_by_oid = {}
                     for item in links_map:
                         oid = item["openalex_id"]
@@ -368,7 +367,6 @@ def run_pipeline():
                             links_by_oid[oid] = []
                         links_by_oid[oid].append(item)
 
-                    # 2. ลด CHUNK_SIZE เหลือ 10 รายการ ป้องกัน Statement Timeout (57014) สำหรับอาจารย์ที่มีผลงานเยอะ
                     CHUNK_SIZE = 10
                     total_saved_teacher = 0
 
@@ -377,7 +375,6 @@ def run_pipeline():
                     for i in range(0, len(pubs_to_upsert), CHUNK_SIZE):
                         pub_chunk = pubs_to_upsert[i : i + CHUNK_SIZE]
 
-                        # Upsert ตาราง publications ทีละ 10 รายการ
                         pub_res = (
                             supabase.table("publications")
                             .upsert(pub_chunk, on_conflict="openalex_id")
@@ -387,7 +384,6 @@ def run_pipeline():
 
                         oid_to_db_id = {p["openalex_id"]: p["id"] for p in (pub_res.data or [])}
 
-                        # ดึงเฉพาะ links ความสัมพันธ์ของ chunk นี้มา upsert
                         links_to_upsert = []
                         for p_item in pub_chunk:
                             oid = p_item["openalex_id"]
@@ -407,7 +403,7 @@ def run_pipeline():
                             ).execute()
 
                         total_saved_teacher += len(pub_chunk)
-                        time.sleep(0.2)  # พัก 0.2 วินาทีให้ Database ระบายคิว ไม่ให้ CPU พีคเกินไป
+                        time.sleep(0.2)
 
                     print(f"  └─ ✅ บันทึกและผูกสัมพันธ์สำเร็จทั้งหมด {total_saved_teacher} รายการ\n")
                     total_saved += total_saved_teacher
