@@ -70,14 +70,6 @@ async function loadTeacherMap() {
   }
 }
 
-function cleanStr(str) {
-  return (str || '')
-    .toString()
-    .toLowerCase()
-    .replace(/^(assoc\.?\s*prof\.?|asst\.?\s*prof\.?|prof\.?|dr\.?|mr\.?|mrs\.?|ms\.?|ศ\.?|รศ\.?|ผศ\.?|ดร\.?|อาจารย์|นาย|นาง|นางสาว)\s+/i, '')
-    .replace(/[^a-z0-9\u0E00-\u0E7F]/g, '');
-}
-
 // ฟังก์ชันจับคู่อาจารย์แบบ Token-Based และ Partial Initials
 function findTeacherMatch(rawName) {
   if (!rawName || teacherLookupList.length === 0) return null;
@@ -326,6 +318,8 @@ async function fetchData() {
 
 function renderPublications(publications) {
   const container = document.getElementById('cards-container');
+  container.className = 'cards-list'; // ใช้ Layout แบบ List สำหรับงานวิจัย
+
   if (!publications || publications.length === 0) {
     container.innerHTML = '<p style="text-align: center; color: #666;">ไม่พบข้อมูลงานวิจัย</p>';
     return;
@@ -374,6 +368,8 @@ function renderPublications(publications) {
 
 function renderAuthors(teachers) {
   const container = document.getElementById('cards-container');
+  container.className = 'cards-grid'; // เปลี่ยนเป็น Grid 4 คอลัมน์สำหรับแท็บอาจารย์
+
   if (!teachers || teachers.length === 0) {
     container.innerHTML = '<p style="text-align: center; color: #666;">ไม่พบข้อมูลอาจารย์</p>';
     return;
@@ -384,48 +380,37 @@ function renderAuthors(teachers) {
     const nameTh = `${teacher.first_name_th || ''} ${teacher.last_name_th || ''}`.trim();
     const nameEn = `${teacher.first_name_en || ''} ${teacher.last_name_en || ''}`.trim();
 
-    let mainName = '';
-    let subNameHTML = '';
-
-    if (nameTh) {
-      mainName = nameTh;
-      if (nameEn && nameEn.toLowerCase() !== nameTh.toLowerCase()) {
-        subNameHTML = `<div style="font-size: 0.85rem; color: #777; margin-top: 2px; font-weight: 400;">${nameEn}</div>`;
-      }
-    } else {
-      mainName = nameEn || teacher.name || 'Unknown Name';
-    }
-
+    let mainName = nameTh || nameEn || teacher.name || 'Unknown Name';
     const teacherId = teacher.id;
     const count = pubCountMap[teacherId] || 0;
-    const faculty = teacher.faculty_en || teacher.faculty_th || teacher.faculty || teacher.institution || 'Thammasat University';
-    const department = teacher.department_en || teacher.department_th || teacher.department || '';
 
-    const departmentHTML = department && department !== '-' && department !== 'None'
-      ? `<p class="label" style="margin-top: 4px;">Department</p><p class="value">${department}</p>`
-      : '';
+    // ดึงความเชี่ยวชาญ/สาขา หรือข้อมูลติดต่อจาก Supabase DB
+    const expertise = teacher.research_interests || teacher.expertise || teacher.department_th || teacher.department_en || teacher.department || '';
+    const email = teacher.email || '';
+    const phone = teacher.phone || teacher.tel || '';
+    const imageUrl = teacher.image_url || teacher.photo || teacher.avatar_url || '';
 
     html += `
       <div class="card card-author">
-        <div class="author-avatar">
-          <i class="fa fa-user-circle"></i>
-        </div>
+        ${imageUrl 
+          ? `<img src="${imageUrl}" alt="${mainName}" class="author-avatar-img">`
+          : `<div class="author-avatar-placeholder"><i class="fa fa-user"></i></div>`
+        }
+
         <div class="author-info">
-          <h3 style="margin-bottom: 2px;">
+          <h3>
             <a href="teacher.html?id=${teacherId}" class="author-link">${mainName}</a>
           </h3>
-          ${subNameHTML}
-          <p class="label" style="margin-top: 8px;">Institution</p>
-          <p class="value">${faculty}</p>
-          ${departmentHTML}
-          <div style="margin-top: 10px;">
+          
+          ${expertise ? `<p class="label">${expertise}</p>` : ''}
+          ${phone ? `<p class="value" style="margin-top: 6px;">${phone}</p>` : ''}
+          ${email ? `<p class="value" style="margin-top: 2px;">${email}</p>` : ''}
+          
+          <div style="margin-top: auto; padding-top: 14px;">
             <span style="display: inline-flex; align-items: center; gap: 5px; font-size: 0.82rem; background: #fdf2f2; color: #800000; padding: 3px 10px; border-radius: 12px; font-weight: 600; border: 1px solid #f5c2c7;">
               <i class="fa fa-book"></i> ${count} ${count <= 1 ? 'publication' : 'publications'}
             </span>
           </div>
-        </div>
-        <div class="author-action">
-          <a href="teacher.html?id=${teacherId}" class="btn-profile">View Profile</a>
         </div>
       </div>
     `;
