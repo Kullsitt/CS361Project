@@ -58,6 +58,35 @@
 
   <!-- Main Content Layout -->
   <main class="main-container">
+    
+    <!-- เพิ่ม Sidebar สำหรับ Filter & Search ตรงนี้ -->
+    <aside class="sidebar" id="filter-sidebar">
+      <div class="filter-group">
+        <h3>กรองผลงานวิจัย</h3>
+        
+        <label for="search-input">ค้นหาชื่อผลงาน / ผู้แต่ง</label>
+        <input type="text" id="search-input" placeholder="พิมพ์คำค้นหา..." oninput="debounceSearch()">
+
+        <label for="year-filter">ปีที่ตีพิมพ์ (Year)</label>
+        <select id="year-filter" onchange="applyFilters()">
+          <option value="">ทั้งหมด (All Years)</option>
+          <option value="2024">2024</option>
+          <option value="2023">2023</option>
+          <option value="2022">2022</option>
+          <option value="2021">2021</option>
+          <option value="2020">2020</option>
+        </select>
+
+        <label for="type-filter">หมวดหมู่ภาระงาน (Type)</label>
+        <select id="type-filter" onchange="applyFilters()">
+          <option value="">ทั้งหมด (All Types)</option>
+          <option value="ARTICLE">Article (บทความวิจัย)</option>
+          <option value="CONFERENCE">Conference (การประชุมวิชาการ)</option>
+          <option value="BOOK">Book / Chapter (หนังสือ/ตำรา)</option>
+        </select>
+      </div>
+    </aside>
+
     <section class="content-area">
       <div id="cards-container" class="cards-list">
         <p style="text-align: center; color: #666; padding: 20px;">กำลังโหลดข้อมูล...</p>
@@ -65,7 +94,6 @@
       <div id="pagination" class="pagination"></div>
     </section>
   </main>
-
   <script src="js/index.js"></script>
 </body>
 

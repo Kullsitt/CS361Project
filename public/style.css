@@ -375,3 +375,62 @@ body {
 @media (max-width: 480px) {
   .cards-grid { grid-template-columns: 1fr; }
 }
+/* =========================================
+   Filter Sidebar Styles (Advanced Search)
+   ========================================= */
+.sidebar {
+  padding: 20px;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+  height: max-content; 
+  align-self: flex-start; 
+}
+
+.filter-group h3 {
+  font-size: 16px;
+  margin-bottom: 16px;
+  color: #8C1D24;
+  border-bottom: 2px solid #8C1D24;
+  padding-bottom: 8px;
+}
+
+.filter-group label {
+  display: block;
+  font-size: 13px;
+  font-weight: 600;
+  margin-bottom: 6px;
+  margin-top: 16px;
+  color: #333;
+}
+
+.filter-group input,
+.filter-group select {
+  width: 100%;
+  padding: 8px 12px;
+  font-size: 14px;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+  outline: none;
+  font-family: inherit;
+  transition: border-color 0.2s ease;
+}
+
+.filter-group input:focus,
+.filter-group select:focus {
+  border-color: #8C1D24;
+}
+
+/* ซ่อน Sidebar เมื่ออยู่แท็บอาจารย์ */
+.sidebar.hidden {
+  display: none;
+}
+
+/* Responsive สำหรับมือถือและแท็บเล็ต */
+@media (max-width: 768px) {
+  .main-container {
+    flex-direction: column;
+  }
+  .sidebar {
+    width: 100%;
+    min-height: auto;
+  }
+}

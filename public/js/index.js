@@ -5,6 +5,10 @@ const supabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
 let currentTab = 'publications';
 let currentPage = 1;
 const ITEMS_PER_PAGE = 10;
+let searchQuery = '';
+let filterYear = '';
+let filterType = '';
+let searchTimeout = null;
 
 let teacherLookupList = [];
 let isTeacherMapLoaded = false;
@@ -70,20 +74,17 @@ async function loadTeacherMap() {
   }
 }
 
-// ฟังก์ชันจับคู่อาจารย์แบบ Token-Based และ Partial Initials
 function findTeacherMatch(rawName) {
   if (!rawName || teacherLookupList.length === 0) return null;
 
   const rawClean = cleanStr(rawName);
   if (!rawClean) return null;
 
-  // 1. เช็กชื่อเต็มตรงกัน 100% หรือเป็น Substring กัน
   for (const t of teacherLookupList) {
     if (t.fullCleanEn && (t.fullCleanEn === rawClean || rawClean.includes(t.fullCleanEn) || t.fullCleanEn.includes(rawClean))) return t;
     if (t.fullCleanTh && (t.fullCleanTh === rawClean || rawClean.includes(t.fullCleanTh) || t.fullCleanTh.includes(rawClean))) return t;
   }
 
-  // 2. แยกคำทั้งหมดออกมาเป็น Array (ตัดช่องว่าง, จุลภาค, จุด, ขีด)
   const rawParts = rawName
     .replace(/^(assoc\.?\s*prof\.?|asst\.?\s*prof\.?|prof\.?|dr\.?|mr\.?|mrs\.?|ms\.?|ศ\.?|รศ\.?|ผศ\.?|ดร\.?|อาจารย์|นาย|นาง|นางสาว)\s+/i, '')
     .split(/[\s,.\-_/]+/)
@@ -92,9 +93,7 @@ function findTeacherMatch(rawName) {
 
   if (rawParts.length < 2) return null;
 
-  // ค้นหาแบบเปรียบเทียบชิ้นส่วน (Tokens)
   for (const t of teacherLookupList) {
-    // --- ตรวจสอบชื่อภาษาอังกฤษ ---
     if (t.firstCleanEn && t.lastCleanEn) {
       const fn = t.firstCleanEn;
       const ln = t.lastCleanEn;
@@ -107,17 +106,12 @@ function findTeacherMatch(rawName) {
           const p1 = rawParts[i];
           const p2 = rawParts[j];
 
-          // รูปแบบ: ชื่อเต็ม + นามสกุลเต็ม (หรือขึ้นต้นด้วยคำเดียวกัน)
           if ((p1 === fn || fn.startsWith(p1) || p1.startsWith(fn)) && (p2 === ln || ln.startsWith(p2) || p2.startsWith(ln))) {
             return t;
           }
-
-          // รูปแบบ: ชื่อเต็ม + นามสกุลย่อ (เช่น "Chansuda" + "B")
           if ((p1 === fn || fn.startsWith(p1)) && (p2 === lnInit || ln.startsWith(p2))) {
             return t;
           }
-
-          // รูปแบบ: นามสกุลเต็ม + ชื่อย่อ (เช่น "Phantawong" + "K")
           if ((p1 === ln || ln.startsWith(p1)) && (p2 === fnInit || fn.startsWith(p2))) {
             return t;
           }
@@ -125,32 +119,16 @@ function findTeacherMatch(rawName) {
       }
     }
 
-    // --- ตรวจสอบชื่อภาษาไทย ---
     if (t.firstCleanTh && t.lastCleanTh) {
       const fnTh = t.firstCleanTh;
       const lnTh = t.lastCleanTh;
-
       const hasFn = rawParts.some(p => p === fnTh || fnTh.startsWith(p) || p.startsWith(fnTh));
       const hasLn = rawParts.some(p => p === lnTh || lnTh.startsWith(p) || p.startsWith(lnTh));
-
       if (hasFn && hasLn) return t;
     }
   }
 
   return null;
-}
-
-function extractHostDomain(urlStr) {
-  if (!urlStr) return '';
-  try {
-    let validUrl = urlStr;
-    if (!validUrl.startsWith('http://') && !validUrl.startsWith('https://')) {
-      validUrl = 'https://' + validUrl;
-    }
-    return new URL(validUrl).hostname.replace(/^www\./, '');
-  } catch (e) {
-    return '';
-  }
 }
 
 function getPaperUrl(pub) {
@@ -211,6 +189,16 @@ function switchTab(tab) {
   currentPage = 1;
   document.getElementById('tab-publications').classList.toggle('active', tab === 'publications');
   document.getElementById('tab-authors').classList.toggle('active', tab === 'authors');
+  
+  const sidebar = document.getElementById('filter-sidebar');
+  if (sidebar) {
+    if (tab === 'authors') {
+      sidebar.classList.add('hidden');
+    } else {
+      sidebar.classList.remove('hidden');
+    }
+  }
+  
   fetchData();
 }
 
@@ -240,14 +228,40 @@ async function fetchData() {
     await loadTeacherMap();
 
     if (currentTab === 'publications') {
-      const { data, count, error } = await supabaseClient
+      let query = supabaseClient
         .from('publications')
-        .select('*', { count: 'exact' })
+        .select('*', { count: 'exact' });
+
+      // กรองปีตามช่วงวันที่ (ชนิด Date)
+      if (filterYear) {
+        query = query.gte('publication_date', `${filterYear}-01-01`).lte('publication_date', `${filterYear}-12-31`);
+      }
+      if (filterType) {
+        query = query.ilike('work_type', filterType);
+      }
+
+      // รองรับการค้นหาพร้อมกันทั้งชื่อผลงาน (title) และชื่อผู้แต่ง (authors)
+      if (searchQuery) {
+        // ค้นหาคำที่ผู้ใช้นำมาเทียบว่าตรงกับอาจารย์ท่านใดในอาจารย์ มธ. หรือไม่
+        const matchedTeacher = findTeacherMatch(searchQuery);
+
+        if (matchedTeacher) {
+          // หากผู้ใช้พิมพ์ชื่อ/นามสกุลอาจารย์ ให้ค้นหาผลงานที่มีชื่ออาจารย์ หรือมีคำนี้ในชื่อผลงาน
+          const term = searchQuery.trim();
+          query = query.or(`title.ilike.%${term}%,authors.cs.{"${matchedTeacher.rawFull}"}`);
+        } else {
+          // หากเป็นคำทั่วไป ค้นหาจากชื่อผลงานวิจัยแบบ ilike
+          query = query.ilike('title', `%${searchQuery}%`);
+        }
+      }
+
+      const { data, count, error } = await query
         .order('publication_date', { ascending: false, nullsFirst: false })
         .range(from, from + ITEMS_PER_PAGE - 1);
 
       if (error) {
         container.innerHTML = '<p style="color: red; text-align: center;">เกิดข้อผิดพลาดในการโหลดข้อมูล</p>';
+        console.error("Supabase Error:", error);
         return;
       }
 
@@ -313,62 +327,47 @@ async function fetchData() {
     }
   } catch (err) {
     container.innerHTML = '<p style="color: red; text-align: center;">เกิดข้อผิดพลาดในการเชื่อมต่อ</p>';
+    console.error(err);
   }
 }
 
 function renderPublications(publications) {
   const container = document.getElementById('cards-container');
-  container.className = 'cards-list'; // ใช้ Layout แบบ List สำหรับงานวิจัย
+  container.className = ''; 
 
   if (!publications || publications.length === 0) {
-    container.innerHTML = '<p style="text-align: center; color: #666;">ไม่พบข้อมูลงานวิจัย</p>';
+    container.innerHTML = '<p style="text-align: center; color: #666; padding: 20px;">ไม่พบข้อมูลที่ค้นหา</p>';
     return;
   }
 
   let html = '';
-  publications.forEach((pub, idx) => {
-    const title = pub.title || "Untitled Paper";
-    const paperUrl = getPaperUrl(pub);
-    const isLinkValid = paperUrl && paperUrl.trim() !== '';
-
-    const pubType = pub.work_type ? pub.work_type.toUpperCase() : "ARTICLE";
-    const pubDate = pub.publication_date || pub.publication_year || "Unknown Date";
-    const hostDomain = extractHostDomain(paperUrl);
-    const sourceName = pub.source_name || pub.publisher || pub.category || '';
-
-    let metaParts = [pubDate];
-    if (hostDomain) {
-      metaParts.push(`<a href="${paperUrl}" target="_blank" rel="noopener noreferrer" style="color: inherit; text-decoration: underline;">${hostDomain}</a>`);
-    }
-    if (sourceName && sourceName !== "Unknown Source" && sourceName !== hostDomain) {
-      metaParts.push(sourceName);
-    }
-
-    const metaInfoHTML = metaParts.join(' &bull; ');
-    const authorsHTML = formatAuthors(pub.authors || pub.author_names, pub.id || idx);
-
+  publications.forEach(pub => {
+    const title = pub.title || 'ไม่มีชื่อผลงาน';
+    const year = pub.publication_date ? pub.publication_date.substring(0, 4) : 'N/A';
+    const type = pub.work_type || pub.type || 'N/A';
+    const authorsHtml = formatAuthors(pub.authors || pub.author, pub.id);
+    const url = getPaperUrl(pub);
+    
     html += `
-      <div class="card card-pub">
-        <h3 class="card-pub-title">
-          ${isLinkValid
-            ? `<a href="${paperUrl}" target="_blank" rel="noopener noreferrer" style="color: inherit; text-decoration: none; cursor: pointer;">${title}</a>`
-            : title
-          }
+      <div class="card" style="padding: 15px; margin-bottom: 15px; background: #fff; border-radius: 8px; box-shadow: 0 1px 3px rgba(0,0,0,0.1);">
+        <h3 style="margin-top: 0; margin-bottom: 12px; font-size: 1.15rem;">
+          ${url ? `<a href="${url}" target="_blank" style="color: #800000; text-decoration: none;">${title}</a>` : `<span style="color: #333;">${title}</span>`}
         </h3>
-        <div class="card-pub-meta">
-          <span class="badge-article">${pubType}</span>
-          <span class="meta-info">${metaInfoHTML}</span>
+        <div style="margin-bottom: 12px;">${authorsHtml}</div>
+        <div style="font-size: 0.85rem; color: #666; display: flex; gap: 15px;">
+          <span><i class="fa fa-calendar" style="color: #800000;"></i> ปีที่พิมพ์: ${year}</span>
+          <span><i class="fa fa-tag" style="color: #800000;"></i> ประเภท: ${type}</span>
         </div>
-        ${authorsHTML}
       </div>
     `;
   });
+  
   container.innerHTML = html;
 }
 
 function renderAuthors(teachers) {
   const container = document.getElementById('cards-container');
-  container.className = 'cards-grid'; // เปลี่ยนเป็น Grid 4 คอลัมน์สำหรับแท็บอาจารย์
+  container.className = 'cards-grid'; 
 
   if (!teachers || teachers.length === 0) {
     container.innerHTML = '<p style="text-align: center; color: #666;">ไม่พบข้อมูลอาจารย์</p>';
@@ -384,7 +383,6 @@ function renderAuthors(teachers) {
     const teacherId = teacher.id;
     const count = pubCountMap[teacherId] || 0;
 
-    // ดึงความเชี่ยวชาญ/สาขา หรือข้อมูลติดต่อจาก Supabase DB
     const expertise = teacher.research_interests || teacher.expertise || teacher.department_th || teacher.department_en || teacher.department || '';
     const email = teacher.email || '';
     const phone = teacher.phone || teacher.tel || '';
@@ -460,3 +458,19 @@ function changePage(page) {
 }
 
 document.addEventListener('DOMContentLoaded', fetchData);
+
+function debounceSearch() {
+  clearTimeout(searchTimeout);
+  searchTimeout = setTimeout(() => {
+    searchQuery = document.getElementById('search-input').value.trim();
+    currentPage = 1;
+    fetchData();
+  }, 500);
+}
+
+function applyFilters() {
+  filterYear = document.getElementById('year-filter').value;
+  filterType = document.getElementById('type-filter').value;
+  currentPage = 1;
+  fetchData();
+}
