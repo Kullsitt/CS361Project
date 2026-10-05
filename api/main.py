@@ -10,6 +10,7 @@ from urllib.parse import quote, urlsplit
 import requests
 from dotenv import load_dotenv
 from fastapi import Depends, FastAPI, Header, HTTPException, Query
+from fastapi.staticfiles import StaticFiles
 
 load_dotenv(Path(__file__).with_name('.env'))
 app = FastAPI(title='FRWS Repository Query API', version='1.0.0')
@@ -177,3 +178,7 @@ def workload_summary(
             break
     rows = sorted(groups.values(), key=lambda row: (-row['academic_year'], row['category']))
     return {'teacher': teachers[0], 'data': rows}
+
+
+# Serve only public assets, never the repository or environment files.
+app.mount('/ui', StaticFiles(directory=Path(__file__).resolve().parents[1] / 'public', html=True), name='ui')

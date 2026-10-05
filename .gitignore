@@ -6,3 +6,4 @@ processed_teachers.txt
 .venv/
 __pycache__/
 .pytest_cache/
+tests/workload-mobile.png

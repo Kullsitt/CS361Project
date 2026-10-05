@@ -1,0 +1,30 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>รายละเอียดภาระงาน | FRWS</title>
+  <link rel="stylesheet" href="style.css">
+  <link href="https://fonts.googleapis.com/css2?family=Sarabun:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="workloadStyle.css">
+  <script src="js/workload.js" defer></script>
+</head>
+<body>
+  <header class="header"><div class="header-left"><img class="header-logo" src="assets/Emblem_of_Thammasat_University.svg.webp" alt="TU Logo"><div class="header-title">Faculty Research<br>&amp; Workload Management System (FRWS)</div></div></header>
+  <main>
+    <nav aria-label="เส้นทางนำทาง"><a href="index.html">หน้าหลัก</a><a id="back-teacher" hidden> / กลับไปภาระงานอาจารย์</a><span> / รายละเอียดภาระงาน</span></nav>
+    <div id="state" class="panel state" role="status" aria-live="polite">กำลังโหลดรายละเอียดภาระงาน…</div>
+    <button id="retry" type="button" hidden>ลองอีกครั้ง</button>
+    <article id="workload" hidden>
+      <section class="hero"><span id="category" class="badge"></span><h1 id="title"></h1><a id="teacher"></a><p id="affiliation"></p><dl id="summary" class="facts"></dl></section>
+      <div class="columns">
+        <div>
+          <section class="panel"><h2>ข้อมูลภาระงาน</h2><p id="description" class="description"></p><dl id="general" class="facts"></dl></section>
+          <section class="panel"><h2 id="detail-heading">รายละเอียดเฉพาะหมวด</h2><p id="detail-empty" hidden>ยังไม่มีรายละเอียดเพิ่มเติม</p><dl id="details" class="facts"></dl><div id="publication"></div></section>
+        </div>
+        <section class="panel evidence-panel" aria-labelledby="evidence-heading"><h2 id="evidence-heading">หลักฐานประกอบ <span id="evidence-count"></span></h2><p class="muted">เปิดดูไฟล์หรือลิงก์หลักฐานในแท็บใหม่</p><ul id="evidences"></ul><p id="evidence-empty" hidden>ยังไม่มีหลักฐานประกอบสำหรับรายการนี้</p></section>
+      </div>
+    </article>
+  </main>
+</body>
+</html>

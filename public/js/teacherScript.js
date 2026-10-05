@@ -428,3 +428,51 @@ function renderPubList(pubs) {
 }
 
 document.addEventListener('DOMContentLoaded', loadTeacherData);
+
+// Workloads use the same-origin FastAPI service, independently of publications.
+let workloadPage = 1;
+let loadedWorkloads = 0;
+async function loadTeacherWorkloads() {
+  const container = document.getElementById('teacher-workloads');
+  const more = document.getElementById('workload-more');
+  const retry = document.getElementById('workload-retry');
+  const categoryNames = {TEACHING:'การสอน',RESEARCH:'งานวิจัย',SERVICE:'บริการวิชาการ',ADVISING:'การดูแลนักศึกษา'};
+  more.hidden = true;
+  retry.hidden = true;
+  if (!teacherId) { container.textContent = 'กรุณาเลือกอาจารย์จากหน้าหลัก'; return; }
+  const controller = new AbortController();
+  const timeout = setTimeout(() => controller.abort(), 30000);
+  try {
+    const params = new URLSearchParams({teacher_id:teacherId,page:String(workloadPage),page_size:'10'});
+    const response = await fetch(`/api/workloads?${params}`, {signal:controller.signal});
+    if (!response.ok) throw new Error('Unable to load workloads');
+    const result = await response.json();
+    if (!Array.isArray(result.data)) throw new Error('Invalid workload response');
+    if (workloadPage === 1) container.replaceChildren();
+    for (const item of result.data) {
+      const card = document.createElement('div'); card.className = 'info-card workload-card';
+      const heading = document.createElement('h3');
+      const link = document.createElement('a');
+      link.href = `workload.html?id=${encodeURIComponent(item.id)}`;
+      link.textContent = item.title || 'ภาระงาน';
+      heading.append(link);
+      const meta = document.createElement('p');
+      meta.textContent = `${categoryNames[item.category] || item.category} · ปีการศึกษา ${item.academic_year} · ${item.semester == null ? 'ทั้งปีการศึกษา' : `ภาคเรียน ${item.semester}`} · ${item.workload_hours == null ? 'ไม่ระบุชั่วโมง' : `${item.workload_hours} ชั่วโมง`}`;
+      const evidence = document.createElement('p');
+      evidence.textContent = `หลักฐาน ${item.evidence_count ?? 0} รายการ · คลิกชื่อภาระงานเพื่อดูรายละเอียดและหลักฐาน`;
+      card.append(heading,meta,evidence); container.append(card);
+    }
+    loadedWorkloads += result.data.length;
+    if (!loadedWorkloads) container.textContent = 'ยังไม่มีข้อมูลภาระงานของอาจารย์ท่านนี้';
+    more.hidden = result.total == null ? result.data.length < 10 : loadedWorkloads >= result.total;
+    workloadPage += 1;
+  } catch {
+    if (workloadPage === 1) container.textContent = 'ไม่สามารถโหลดภาระงานได้ กรุณาลองอีกครั้ง';
+    retry.hidden = false;
+  } finally { clearTimeout(timeout); }
+}
+document.addEventListener('DOMContentLoaded', () => {
+  document.getElementById('workload-more').addEventListener('click', loadTeacherWorkloads);
+  document.getElementById('workload-retry').addEventListener('click', loadTeacherWorkloads);
+  loadTeacherWorkloads();
+});
