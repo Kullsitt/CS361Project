@@ -52,3 +52,10 @@ CS361Project/
 │   └── teacherStyle.css           # สไตล์เฉพาะหน้าโปรไฟล์อาจารย์
 │
 └── README.md                      # เอกสารอธิบายโปรเจกต์
+```
+
+## Repository Query API (Issue #12)
+
+API สำหรับค้นหาและกรองภาระงาน ดึงรายละเอียดพร้อมหลักฐาน และสรุปภาระงานรายอาจารย์ตามปีการศึกษา ใช้ schema V2 ใน `database/01_v2_schema.sql`
+
+ดูวิธีรัน API, parameters, response, และวิธีทดสอบใน [API Specification](api/README.md)
