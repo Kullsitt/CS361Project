@@ -15,6 +15,13 @@ from fastapi.staticfiles import StaticFiles
 load_dotenv(Path(__file__).with_name('.env'))
 app = FastAPI(title='FRWS Repository Query API', version='1.0.0')
 
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=["*"],  # เปิดให้ทุกโดเมนยิงเข้ามาได้ (หรือใส่ URL ของ S3)
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
 
 class Category(str, Enum):
     TEACHING = 'TEACHING'
