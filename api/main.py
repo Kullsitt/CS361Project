@@ -12,6 +12,7 @@ from dotenv import load_dotenv
 from fastapi import Depends, FastAPI, Header, HTTPException, Query
 from fastapi.staticfiles import StaticFiles
 from fastapi.responses import RedirectResponse
+from fastapi.middleware.cors import CORSMiddleware
 
 load_dotenv(Path(__file__).with_name('.env'))
 app = FastAPI(title='FRWS Repository Query API', version='1.0.0')
