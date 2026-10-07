@@ -4,6 +4,13 @@ from api.main import app
 client = TestClient(app)
 
 
+def test_deployment_entry_and_liveness():
+    response = client.get('/', follow_redirects=False)
+    assert response.status_code == 307
+    assert response.headers['location'] == '/ui/index.html'
+    assert client.get('/healthz').json() == {'status': 'ok'}
+
+
 def test_workload_page_and_script_are_served():
     page = client.get('/ui/workload.html')
     assert page.status_code == 200
