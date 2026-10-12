@@ -434,3 +434,67 @@ body {
     min-height: auto;
   }
 }
+/* =========================================================
+   จัดระเบียบส่วนปุ่มด้านล่างการ์ด (ไม่ขยายขนาดการ์ด ไม่ล้นแน่นอน)
+   ========================================================= */
+
+/* คอนเทนเนอร์ปุ่มด้านล่าง - ดันลงท้ายการ์ด และจัดเป็น 2 บรรทัดเรียงลงมา */
+.author-info > div:last-child {
+  display: flex !important;
+  flex-direction: column !important;
+  align-items: stretch !important;
+  gap: 6px !important;
+  width: 100% !important;
+  margin-top: auto !important;
+  padding-top: 10px !important;
+  border-top: 1px solid #eee !important;
+  box-sizing: border-box !important;
+}
+
+/* กรอบ Badge จำนวนผลงาน (บรรทัดบน) */
+.author-info > div:last-child span,
+.author-info > div:last-child span.pub-badge {
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  gap: 6px !important;
+  font-size: 11px !important;
+  padding: 4px 8px !important;
+  border-radius: 4px !important;
+  background-color: #fdf2f2 !important;
+  border: 1px solid #f5c2c7 !important;
+  color: #800000 !important;
+  font-weight: 600 !important;
+  line-height: 1.2 !important;
+  text-align: center !important;
+  width: 100% !important;
+  box-sizing: border-box !important;
+}
+
+/* กรอบปุ่มกดดูโปรไฟล์ (บรรทัดล่าง) */
+.author-info > div:last-child a,
+.author-info > div:last-child a.author-link,
+.author-info > div:last-child a.profile-link {
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  font-size: 11px !important;
+  padding: 4px 8px !important;
+  border-radius: 4px !important;
+  border: 1px solid #800000 !important;
+  color: #800000 !important;
+  background-color: #ffffff !important;
+  font-weight: 600 !important;
+  text-decoration: none !important;
+  line-height: 1.2 !important;
+  text-align: center !important;
+  width: 100% !important;
+  box-sizing: border-box !important;
+  transition: all 0.2s ease !important;
+}
+
+/* เอฟเฟกต์ตอนเอาเมาส์ชี้ปุ่มดูโปรไฟล์ */
+.author-info > div:last-child a:hover {
+  background-color: #800000 !important;
+  color: #ffffff !important;
+}

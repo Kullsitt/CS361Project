@@ -12,7 +12,80 @@
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <style>
-    /* 🎨 CSS จัดแถวแนวนอนสำหรับ Authors */
+    .top-search-banner {
+      background: linear-gradient(135deg, #8C1D24 0%, #6B1419 100%);
+      color: #ffffff;
+      padding: 24px;
+      border-radius: 8px;
+      margin-bottom: 20px;
+      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.12);
+    }
+
+    .top-search-banner h2 {
+      font-size: 20px;
+      font-weight: 700;
+      margin-bottom: 4px;
+      color: #ffffff;
+    }
+
+    .top-search-banner p {
+      font-size: 13px;
+      color: #f2d6d8;
+      margin-bottom: 16px;
+    }
+
+    .search-filter-box {
+      background: rgba(0, 0, 0, 0.2);
+      padding: 12px;
+      border-radius: 6px;
+      display: flex;
+      gap: 10px;
+      flex-wrap: wrap;
+      align-items: center;
+    }
+
+    .search-filter-box input,
+    .search-filter-box select {
+      padding: 8px 12px;
+      font-size: 13.5px;
+      border: 1px solid #ddd;
+      border-radius: 4px;
+      outline: none;
+      background: #ffffff;
+      color: #333;
+      font-family: inherit;
+    }
+
+    .search-filter-box input {
+      flex: 2 1 220px;
+    }
+
+    .search-filter-box select {
+      flex: 1 1 160px;
+      cursor: pointer;
+    }
+
+    .btn-reset {
+      background: #5B0000;
+      color: #ffffff;
+      border: 1px solid rgba(255, 255, 255, 0.3);
+      padding: 8px 16px;
+      border-radius: 4px;
+      font-size: 13.5px;
+      font-weight: 600;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      transition: background 0.2s, border-color 0.2s;
+      white-space: nowrap;
+    }
+
+    .btn-reset:hover {
+      background: #420000;
+      border-color: #ffffff;
+    }
+
     .authors-container {
       display: flex;
       flex-wrap: wrap;
@@ -52,48 +125,88 @@
 
   <!-- Navigation Bar -->
   <nav class="navbar">
-    <button class="nav-tab active" id="tab-publications" onclick="switchTab('publications')">Publications</button>
-    <button class="nav-tab" id="tab-authors" onclick="switchTab('authors')">Faculty Members</button>
+    <button class="nav-tab active" id="tab-authors" onclick="switchTab('authors')">Faculty Members</button>
+    <button class="nav-tab" id="tab-publications" onclick="switchTab('publications')">Publications</button>
   </nav>
 
   <!-- Main Content Layout -->
-  <main class="main-container">
+  <main class="main-container" style="display: block;">
     
-    <!-- เพิ่ม Sidebar สำหรับ Filter & Search ตรงนี้ -->
-    <aside class="sidebar" id="filter-sidebar">
-      <div class="filter-group">
-        <h3>กรองผลงานวิจัย</h3>
+    <!-- Banner ค้นหา -->
+    <div class="top-search-banner">
+      <h2 id="banner-title">ค้นหารายชื่ออาจารย์ บุคลากร และความเชี่ยวชาญ</h2>
+      <p id="banner-sub">ระบบคลังข้อมูลคณาจารย์ ผลงานวิจัย ตารางการงานวิชาการ และสาขาวิชาที่เชี่ยวชาญเพื่อความร่วมมือทางวิชาการ</p>
+      
+      <div class="search-filter-box">
+        <input type="text" id="search-input" placeholder="ค้นชื่ออาจารย์, ความเชี่ยวชาญ หรือคีย์เวิร์ด..." oninput="debounceSearch()">
         
-        <label for="search-input">ค้นหาชื่อผลงาน / ผู้แต่ง</label>
-        <input type="text" id="search-input" placeholder="พิมพ์คำค้นหา..." oninput="debounceSearch()">
-
-        <label for="year-filter">ปีที่ตีพิมพ์ (Year)</label>
-        <select id="year-filter" onchange="applyFilters()">
-          <option value="">ทั้งหมด (All Years)</option>
+        <!-- ตัวกรองปี 2026 - 1996 (ซ่อนเมื่ออยู่หน้าอาจารย์) -->
+        <select id="year-filter" onchange="applyFilters()" style="display: none;">
+          <option value="">ปีที่ตีพิมพ์ (ทั้งหมด)</option>
+          <option value="2026">2026</option>
+          <option value="2025">2025</option>
           <option value="2024">2024</option>
           <option value="2023">2023</option>
           <option value="2022">2022</option>
           <option value="2021">2021</option>
           <option value="2020">2020</option>
+          <option value="2019">2019</option>
+          <option value="2018">2018</option>
+          <option value="2017">2017</option>
+          <option value="2016">2016</option>
+          <option value="2015">2015</option>
+          <option value="2014">2014</option>
+          <option value="2013">2013</option>
+          <option value="2012">2012</option>
+          <option value="2011">2011</option>
+          <option value="2010">2010</option>
+          <option value="2009">2009</option>
+          <option value="2008">2008</option>
+          <option value="2007">2007</option>
+          <option value="2006">2006</option>
+          <option value="2005">2005</option>
+          <option value="2004">2004</option>
+          <option value="2003">2003</option>
+          <option value="2002">2002</option>
+          <option value="2001">2001</option>
+          <option value="2000">2000</option>
+          <option value="1999">1999</option>
+          <option value="1998">1998</option>
+          <option value="1997">1997</option>
+          <option value="1996">1996</option>
         </select>
 
-        <label for="type-filter">หมวดหมู่ภาระงาน (Type)</label>
-        <select id="type-filter" onchange="applyFilters()">
-          <option value="">ทั้งหมด (All Types)</option>
-          <option value="ARTICLE">Article (บทความวิจัย)</option>
-          <option value="CONFERENCE">Conference (การประชุมวิชาการ)</option>
-          <option value="BOOK">Book / Chapter (หนังสือ/ตำรา)</option>
+        <!-- หมวดหมู่ประเภทงานวิจัยครบทั้ง 12 หมวดหมู่จาก DB -->
+        <select id="type-filter" onchange="applyFilters()" style="display: none;">
+          <option value="">ประเภทภาระงาน (ทั้งหมด)</option>
+          <option value="article">Article (บทความวิจัย)</option>
+          <option value="conference-paper">Conference Paper (บทความประชุมวิชาการ)</option>
+          <option value="conference-abstract">Conference Abstract (บทย่อประชุมวิชาการ)</option>
+          <option value="preprint">Preprint (เอกสารฉบับร่างก่อนตีพิมพ์)</option>
+          <option value="book">Book (หนังสือ/ตำรา)</option>
+          <option value="book-chapter">Book Chapter (หมวด/บทในหนังสือ)</option>
+          <option value="report">Report (รายงานวิชาการ)</option>
+          <option value="review">Review Article (บทความปริทรรศน์)</option>
+          <option value="dissertation">Dissertation / Thesis (วิทยานิพนธ์)</option>
+          <option value="data-paper">Data Paper (บทความชุดข้อมูล)</option>
+          <option value="peer-review">Peer Review (การประเมินบทความ)</option>
+          <option value="other">Other (ผลงานอื่นๆ)</option>
         </select>
+
+        <button class="btn-reset" type="button" onclick="resetSearch()">
+          <i class="fa fa-refresh"></i> รีเซ็ตตัวกรอง
+        </button>
       </div>
-    </aside>
+    </div>
 
     <section class="content-area">
-      <div id="cards-container" class="cards-list">
-        <p style="text-align: center; color: #666; padding: 20px;">กำลังโหลดข้อมูล...</p>
+      <div id="cards-container" class="cards-grid">
+        <p style="text-align: center; color: #666; padding: 20px; grid-column: 1 / -1;">กำลังโหลดข้อมูล...</p>
       </div>
       <div id="pagination" class="pagination"></div>
     </section>
   </main>
+
   <script src="js/index.js"></script>
 </body>
 

@@ -2,9 +2,9 @@ const SUPABASE_URL = "https://ewklxmvohanstvaphwow.supabase.co";
 const SUPABASE_KEY = "sb_publishable_tTlNhmQ6ZfFJVD1VEvXewA_piv6ngYP";
 const supabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
 
-let currentTab = 'publications';
+let currentTab = 'authors';
 let currentPage = 1;
-const ITEMS_PER_PAGE = 10;
+const ITEMS_PER_PAGE = 12;
 let searchQuery = '';
 let filterYear = '';
 let filterType = '';
@@ -57,6 +57,7 @@ async function loadTeacherMap() {
 
         return {
           id: t.id,
+          fnEn, lnEn, fnTh, lnTh,
           firstCleanEn: cleanStr(fnEn),
           lastCleanEn: cleanStr(lnEn),
           fullCleanEn: cleanStr(rawFullEn),
@@ -67,67 +68,26 @@ async function loadTeacherMap() {
         };
       });
       isTeacherMapLoaded = true;
-      console.log(`[FRWS] โหลดข้อมูลอาจารย์สำเร็จ: ${teacherLookupList.length} ท่าน`);
     }
   } catch (e) {
     console.error("Failed to load teacher map", e);
   }
 }
 
+// ค้นหาอาจารย์ที่จับคู่ได้จากชื่อ (รองรับไทย/อังกฤษ)
 function findTeacherMatch(rawName) {
   if (!rawName || teacherLookupList.length === 0) return null;
-
   const rawClean = cleanStr(rawName);
   if (!rawClean) return null;
 
   for (const t of teacherLookupList) {
-    if (t.fullCleanEn && (t.fullCleanEn === rawClean || rawClean.includes(t.fullCleanEn) || t.fullCleanEn.includes(rawClean))) return t;
-    if (t.fullCleanTh && (t.fullCleanTh === rawClean || rawClean.includes(t.fullCleanTh) || t.fullCleanTh.includes(rawClean))) return t;
+    if (t.fullCleanEn && (t.fullCleanEn.includes(rawClean) || rawClean.includes(t.fullCleanEn))) return t;
+    if (t.fullCleanTh && (t.fullCleanTh.includes(rawClean) || rawClean.includes(t.fullCleanTh))) return t;
+    if (t.firstCleanEn && (t.firstCleanEn === rawClean || rawClean.includes(t.firstCleanEn))) return t;
+    if (t.lastCleanEn && (t.lastCleanEn === rawClean || rawClean.includes(t.lastCleanEn))) return t;
+    if (t.firstCleanTh && (t.firstCleanTh === rawClean || rawClean.includes(t.firstCleanTh))) return t;
+    if (t.lastCleanTh && (t.lastCleanTh === rawClean || rawClean.includes(t.lastCleanTh))) return t;
   }
-
-  const rawParts = rawName
-    .replace(/^(assoc\.?\s*prof\.?|asst\.?\s*prof\.?|prof\.?|dr\.?|mr\.?|mrs\.?|ms\.?|ศ\.?|รศ\.?|ผศ\.?|ดร\.?|อาจารย์|นาย|นาง|นางสาว)\s+/i, '')
-    .split(/[\s,.\-_/]+/)
-    .map(cleanStr)
-    .filter(p => p.length > 0);
-
-  if (rawParts.length < 2) return null;
-
-  for (const t of teacherLookupList) {
-    if (t.firstCleanEn && t.lastCleanEn) {
-      const fn = t.firstCleanEn;
-      const ln = t.lastCleanEn;
-      const fnInit = fn.charAt(0);
-      const lnInit = ln.charAt(0);
-
-      for (let i = 0; i < rawParts.length; i++) {
-        for (let j = 0; j < rawParts.length; j++) {
-          if (i === j) continue;
-          const p1 = rawParts[i];
-          const p2 = rawParts[j];
-
-          if ((p1 === fn || fn.startsWith(p1) || p1.startsWith(fn)) && (p2 === ln || ln.startsWith(p2) || p2.startsWith(ln))) {
-            return t;
-          }
-          if ((p1 === fn || fn.startsWith(p1)) && (p2 === lnInit || ln.startsWith(p2))) {
-            return t;
-          }
-          if ((p1 === ln || ln.startsWith(p1)) && (p2 === fnInit || fn.startsWith(p2))) {
-            return t;
-          }
-        }
-      }
-    }
-
-    if (t.firstCleanTh && t.lastCleanTh) {
-      const fnTh = t.firstCleanTh;
-      const lnTh = t.lastCleanTh;
-      const hasFn = rawParts.some(p => p === fnTh || fnTh.startsWith(p) || p.startsWith(fnTh));
-      const hasLn = rawParts.some(p => p === lnTh || lnTh.startsWith(p) || p.startsWith(lnTh));
-      if (hasFn && hasLn) return t;
-    }
-  }
-
   return null;
 }
 
@@ -150,7 +110,7 @@ function renderAuthorBadge(rawName) {
   const matchedTeacher = findTeacherMatch(rawName);
 
   if (matchedTeacher) {
-    return `<a href="teacher.html?id=${matchedTeacher.id}" title="${rawName} (อาจารย์ มธ. - คลิกดูโปรไฟล์)" class="author-item" style="text-decoration: underline; text-decoration-color: #800000; text-underline-offset: 3px; color: #1a1a1a; font-weight: 600; cursor: pointer;"><i class="fa fa-user-circle" style="color: #800000;"></i>${shortName}</a>`;
+    return `<a href="teacher.html?id=${matchedTeacher.id}" title="${rawName} (คลิกดูโปรไฟล์)" class="author-item" style="text-decoration: underline; text-decoration-color: #800000; text-underline-offset: 3px; color: #1a1a1a; font-weight: 600; cursor: pointer;"><i class="fa fa-user-circle" style="color: #800000;"></i>${shortName}</a>`;
   }
   return `<span title="${rawName}" class="author-item" style="cursor: default; color: #555;"><i class="fa fa-user-circle-o" style="color: #888;"></i>${shortName}</span>`;
 }
@@ -177,7 +137,7 @@ function formatAuthors(rawAuthors, pubId) {
   return `
     <div class="authors-container">
       ${visible}
-      <button type="button" onclick="document.getElementById('hidden-authors-idx-${pubId}').style.display = 'inline-flex'; this.style.display = 'none';" style="background: none; border: none; color: #800000; font-weight: bold; cursor: pointer; padding: 0 4px; font-size: inherit;">et al.</button>
+      <button type="button" onclick="document.getElementById('hidden-authors-idx-${pubId}').style.display = 'inline-flex'; this.style.display = 'none';" style="background: none; border: none; color: #800000; font-weight: bold; cursor: pointer; padding: 0 4px;">et al.</button>
       <span id="hidden-authors-idx-${pubId}" class="hidden-authors">${hidden}</span>
     </div>
   `;
@@ -189,17 +149,30 @@ function switchTab(tab) {
   currentPage = 1;
   document.getElementById('tab-publications').classList.toggle('active', tab === 'publications');
   document.getElementById('tab-authors').classList.toggle('active', tab === 'authors');
-  
-  const sidebar = document.getElementById('filter-sidebar');
-  if (sidebar) {
-    if (tab === 'authors') {
-      sidebar.classList.add('hidden');
-    } else {
-      sidebar.classList.remove('hidden');
-    }
+
+  const bannerTitle = document.getElementById('banner-title');
+  const bannerSub = document.getElementById('banner-sub');
+  const searchInput = document.getElementById('search-input');
+  const yearFilter = document.getElementById('year-filter');
+  const typeFilter = document.getElementById('type-filter');
+
+  if (tab === 'authors') {
+    if (bannerTitle) bannerTitle.innerText = 'ค้นหารายชื่ออาจารย์ บุคลากร และความเชี่ยวชาญ';
+    if (bannerSub) bannerSub.innerText = 'ระบบคลังข้อมูลคณาจารย์ ผลงานวิจัย ตารางการงานวิชาการ และสาขาวิชาที่เชี่ยวชาญเพื่อความร่วมมือทางวิชาการ';
+    if (searchInput) searchInput.placeholder = 'ค้นชื่ออาจารย์ (ไทย/Eng), ความเชี่ยวชาญ...';
+    
+    if (yearFilter) yearFilter.style.display = 'none';
+    if (typeFilter) typeFilter.style.display = 'none';
+  } else {
+    if (bannerTitle) bannerTitle.innerText = 'ค้นหาผลงานวิจัยและสิ่งตีพิมพ์';
+    if (bannerSub) bannerSub.innerText = 'สืบค้นข้อมูลบทความวิจัย การประชุมวิชาการ และตำราวิชาการของคณาจารย์';
+    if (searchInput) searchInput.placeholder = 'พิมพ์ชื่อผลงานวิจัย หรือชื่อผู้แต่ง (ไทย/Eng)...';
+    
+    if (yearFilter) yearFilter.style.display = 'inline-block';
+    if (typeFilter) typeFilter.style.display = 'inline-block';
   }
-  
-  fetchData();
+
+  resetSearch();
 }
 
 async function fetchCountsForPage(teacherIds) {
@@ -220,7 +193,7 @@ async function fetchCountsForPage(teacherIds) {
 
 async function fetchData() {
   const container = document.getElementById('cards-container');
-  container.innerHTML = '<p style="text-align: center; color: #666; padding: 20px;">กำลังโหลดข้อมูล...</p>';
+  container.innerHTML = '<p style="text-align: center; color: #666; padding: 20px; grid-column: 1 / -1;">กำลังโหลดข้อมูล...</p>';
 
   const from = (currentPage - 1) * ITEMS_PER_PAGE;
 
@@ -232,26 +205,31 @@ async function fetchData() {
         .from('publications')
         .select('*', { count: 'exact' });
 
-      // กรองปีตามช่วงวันที่ (ชนิด Date)
       if (filterYear) {
         query = query.gte('publication_date', `${filterYear}-01-01`).lte('publication_date', `${filterYear}-12-31`);
       }
+      
       if (filterType) {
-        query = query.ilike('work_type', filterType);
+        query = query.ilike('work_type', `%${filterType}%`);
       }
 
-      // รองรับการค้นหาพร้อมกันทั้งชื่อผลงาน (title) และชื่อผู้แต่ง (authors)
+      // ค้นหาทั้งชื่อผลงานวิจัย หรือค้นหาอาจารย์ (รองรับทั้งภาษาไทยและอังกฤษ)
       if (searchQuery) {
-        // ค้นหาคำที่ผู้ใช้นำมาเทียบว่าตรงกับอาจารย์ท่านใดในอาจารย์ มธ. หรือไม่
         const matchedTeacher = findTeacherMatch(searchQuery);
+        const term = searchQuery.trim();
 
         if (matchedTeacher) {
-          // หากผู้ใช้พิมพ์ชื่อ/นามสกุลอาจารย์ ให้ค้นหาผลงานที่มีชื่ออาจารย์ หรือมีคำนี้ในชื่อผลงาน
-          const term = searchQuery.trim();
-          query = query.or(`title.ilike.%${term}%,authors.cs.{"${matchedTeacher.rawFull}"}`);
+          // หากตรงกับชื่ออาจารย์ ให้ค้นหาทั้งชื่อภาษาไทยและภาษาอังกฤษของอาจารย์ท่านนั้น
+          const nameEn = matchedTeacher.rawFull;
+          const nameTh = `${matchedTeacher.fnTh} ${matchedTeacher.lnTh}`.trim();
+          
+          let orConditions = [`title.ilike.%${term}%`];
+          if (nameEn) orConditions.push(`authors.cs.{"${nameEn}"}`);
+          if (nameTh) orConditions.push(`authors.cs.{"${nameTh}"}`);
+          
+          query = query.or(orConditions.join(','));
         } else {
-          // หากเป็นคำทั่วไป ค้นหาจากชื่อผลงานวิจัยแบบ ilike
-          query = query.ilike('title', `%${searchQuery}%`);
+          query = query.ilike('title', `%${term}%`);
         }
       }
 
@@ -260,12 +238,10 @@ async function fetchData() {
         .range(from, from + ITEMS_PER_PAGE - 1);
 
       if (error) {
-        container.innerHTML = '<p style="color: red; text-align: center;">เกิดข้อผิดพลาดในการโหลดข้อมูล</p>';
-        console.error("Supabase Error:", error);
+        container.innerHTML = '<p style="color: red; text-align: center; grid-column: 1 / -1;">เกิดข้อผิดพลาดในการโหลดข้อมูล</p>';
         return;
       }
 
-      window.currentPubData = data;
       renderPublications(data);
       renderPagination(count || 0);
 
@@ -283,7 +259,7 @@ async function fetchData() {
             .range(start, start + batchSize - 1);
 
           if (error) {
-            container.innerHTML = '<p style="color: red; text-align: center;">เกิดข้อผิดพลาดในการโหลดข้อมูลอาจารย์</p>';
+            container.innerHTML = '<p style="color: red; text-align: center; grid-column: 1 / -1;">เกิดข้อผิดพลาดในการโหลดข้อมูลอาจารย์</p>';
             return;
           }
 
@@ -299,25 +275,32 @@ async function fetchData() {
         cachedAllTeachers = allRecords.filter(t => {
           const raw = `${t.first_name_en || ''} ${t.first_name_th || ''} ${t.name || ''}`.toUpperCase();
           return !raw.includes('ACCOUNT') && !raw.includes('กลาง');
-        }).sort((a, b) => {
-          const thA = (a.first_name_th || '').trim();
-          const thB = (b.first_name_th || '').trim();
-          const enA = (a.first_name_en || '').trim();
-          const enB = (b.first_name_en || '').trim();
-
-          const isThaiA = thA.length > 0 && thA.charCodeAt(0) >= 0x0E00 && thA.charCodeAt(0) <= 0x0E7F;
-          const isThaiB = thB.length > 0 && thB.charCodeAt(0) >= 0x0E00 && thB.charCodeAt(0) <= 0x0E7F;
-
-          if (isThaiA && !isThaiB) return -1;
-          if (!isThaiA && isThaiB) return 1;
-
-          if (isThaiA && isThaiB) return thA.localeCompare(thB, 'th');
-          return enA.localeCompare(enB, 'en');
         });
       }
 
-      const totalItems = cachedAllTeachers.length;
-      const pageData = cachedAllTeachers.slice(from, from + ITEMS_PER_PAGE);
+      // ค้นหาอาจารย์รองรับทั้งภาษาไทย ภาษาอังกฤษ และความเชี่ยวชาญ
+      let filteredTeachers = cachedAllTeachers;
+      if (searchQuery) {
+        const q = cleanStr(searchQuery);
+        filteredTeachers = cachedAllTeachers.filter(t => {
+          const fnTh = cleanStr(t.first_name_th);
+          const lnTh = cleanStr(t.last_name_th);
+          const fullTh = cleanStr(`${t.first_name_th || ''}${t.last_name_th || ''}`);
+
+          const fnEn = cleanStr(t.first_name_en);
+          const lnEn = cleanStr(t.last_name_en);
+          const fullEn = cleanStr(`${t.first_name_en || ''}${t.last_name_en || ''}`);
+
+          const exp = cleanStr(t.research_interests || t.expertise || t.department_th || t.department_en || '');
+
+          return fullTh.includes(q) || fnTh.includes(q) || lnTh.includes(q) ||
+                 fullEn.includes(q) || fnEn.includes(q) || lnEn.includes(q) ||
+                 exp.includes(q);
+        });
+      }
+
+      const totalItems = filteredTeachers.length;
+      const pageData = filteredTeachers.slice(from, from + ITEMS_PER_PAGE);
 
       const pageIds = pageData.map(t => t.id);
       await fetchCountsForPage(pageIds);
@@ -326,7 +309,7 @@ async function fetchData() {
       renderPagination(totalItems);
     }
   } catch (err) {
-    container.innerHTML = '<p style="color: red; text-align: center;">เกิดข้อผิดพลาดในการเชื่อมต่อ</p>';
+    container.innerHTML = '<p style="color: red; text-align: center; grid-column: 1 / -1;">เกิดข้อผิดพลาดในการเชื่อมต่อ</p>';
     console.error(err);
   }
 }
@@ -365,12 +348,13 @@ function renderPublications(publications) {
   container.innerHTML = html;
 }
 
+// ปรับปรุงส่วนปุ่มด้านล่างให้เท่ากันทุกการ์ด
 function renderAuthors(teachers) {
   const container = document.getElementById('cards-container');
   container.className = 'cards-grid'; 
 
   if (!teachers || teachers.length === 0) {
-    container.innerHTML = '<p style="text-align: center; color: #666;">ไม่พบข้อมูลอาจารย์</p>';
+    container.innerHTML = '<p style="text-align: center; color: #666; grid-column: 1 / -1; padding: 30px;">ไม่พบรายชื่ออาจารย์ตรงกับคำค้นหา</p>';
     return;
   }
 
@@ -404,10 +388,11 @@ function renderAuthors(teachers) {
           ${phone ? `<p class="value" style="margin-top: 6px;">${phone}</p>` : ''}
           ${email ? `<p class="value" style="margin-top: 2px;">${email}</p>` : ''}
           
-          <div style="margin-top: auto; padding-top: 14px;">
-            <span style="display: inline-flex; align-items: center; gap: 5px; font-size: 0.82rem; background: #fdf2f2; color: #800000; padding: 3px 10px; border-radius: 12px; font-weight: 600; border: 1px solid #f5c2c7;">
-              <i class="fa fa-book"></i> ${count} ${count <= 1 ? 'publication' : 'publications'}
+          <div class="author-card-footer">
+            <span class="pub-badge">
+              <i class="fa fa-book"></i> ${count} ผลงาน
             </span>
+            <a href="teacher.html?id=${teacherId}" class="profile-link">ดูโปรไฟล์แบบเต็ม &gt;</a>
           </div>
         </div>
       </div>
@@ -457,15 +442,24 @@ function changePage(page) {
   window.scrollTo({ top: 0, behavior: 'smooth' });
 }
 
-document.addEventListener('DOMContentLoaded', fetchData);
-
 function debounceSearch() {
   clearTimeout(searchTimeout);
   searchTimeout = setTimeout(() => {
     searchQuery = document.getElementById('search-input').value.trim();
     currentPage = 1;
     fetchData();
-  }, 500);
+  }, 300);
+}
+
+function resetSearch() {
+  document.getElementById('search-input').value = '';
+  searchQuery = '';
+  if (document.getElementById('year-filter')) document.getElementById('year-filter').value = '';
+  if (document.getElementById('type-filter')) document.getElementById('type-filter').value = '';
+  filterYear = '';
+  filterType = '';
+  currentPage = 1;
+  fetchData();
 }
 
 function applyFilters() {
@@ -474,3 +468,5 @@ function applyFilters() {
   currentPage = 1;
   fetchData();
 }
+
+document.addEventListener('DOMContentLoaded', fetchData);
