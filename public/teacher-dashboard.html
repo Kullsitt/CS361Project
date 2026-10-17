@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>ข้อมูลส่วนตัวอาจารย์ | FRWS</title>
+  <link rel="stylesheet" href="style.css">
+  <link rel="stylesheet" href="teacher-dashboard.css">
+  <link href="https://fonts.googleapis.com/css2?family=Sarabun:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <script src="js/teacher-dashboard.js" defer></script>
+</head>
+<body>
+  <header class="header">
+    <div class="header-left"><img class="header-logo" src="assets/Emblem_of_Thammasat_University.svg.webp" alt="มหาวิทยาลัยธรรมศาสตร์"><p class="header-title">Faculty Research<br>& Workload Management System (FRWS)</p></div>
+    <a class="home-link" href="index.html">กลับหน้าหลัก ↗</a>
+  </header>
+  <main class="teacher-dash">
+    <div class="page-heading"><div><p class="eyebrow">MY DASHBOARD</p><h1>ข้อมูลส่วนตัวของฉัน</h1><p class="muted">ดูและจัดการข้อมูลประวัติ ความเชี่ยวชาญ และช่องทางติดต่อ</p></div><button id="edit" hidden>แก้ไขข้อมูลส่วนตัว</button></div>
+    <div id="notice" role="status" aria-live="polite" hidden></div>
+    <div id="dashboard" class="profile-layout" hidden>
+      <aside class="profile-panel">
+        <div class="profile-cover"></div><div class="profile-intro"><div class="avatar" id="avatar" aria-hidden="true">อ</div><p class="eyebrow">โปรไฟล์อาจารย์</p><h2 id="profile-name"></h2><p id="profile-name-en" class="muted"></p><span id="profile-rank" class="rank"></span><hr><p id="profile-faculty"></p><p id="profile-department" class="muted"></p><hr><p class="muted">อีเมลติดต่อ</p><p id="profile-email"></p></div>
+      </aside>
+      <section class="content-panel" aria-label="รายละเอียดข้อมูลส่วนตัว">
+        <nav class="section-nav" aria-label="ส่วนข้อมูล"><a href="#personal">ข้อมูลทั่วไป</a><a href="#academic">ข้อมูลวิชาการ</a><a href="#contact">การติดต่อ</a></nav>
+        <form id="profile-form">
+          <p id="edit-hint" class="edit-hint" hidden>แก้ไขข้อมูลที่ต้องการ แล้วกดบันทึกการเปลี่ยนแปลง ช่องที่มี * จำเป็นต้องกรอก</p>
+          <fieldset id="fields" disabled>
+            <section id="personal" class="form-section"><h2><span>01</span> ข้อมูลทั่วไป</h2><p class="muted">ชื่อและสังกัดที่แสดงในโปรไฟล์ของคุณ</p>
+              <div class="field-grid">
+                <label>คำนำหน้าชื่อ<input name="title" maxlength="100"></label><label>คำนำหน้าชื่อ (อังกฤษ)<input name="title_en" maxlength="100"></label>
+                <label>ชื่อ (ไทย) *<input name="first_name_th" required maxlength="150" autocomplete="given-name"></label><label>นามสกุล (ไทย) *<input name="last_name_th" required maxlength="150" autocomplete="family-name"></label>
+                <label>ชื่อ (อังกฤษ)<input name="first_name_en" maxlength="150"></label><label>นามสกุล (อังกฤษ)<input name="last_name_en" maxlength="150"></label>
+                <label>ตำแหน่งทางวิชาการ<input name="academic_rank" maxlength="200"></label><label>ตำแหน่งทางวิชาการ (อังกฤษ)<input name="academic_rank_en" maxlength="200"></label>
+                <label>คณะ<input name="faculty" readonly></label><label>ภาควิชา / สาขาวิชา<input name="department" readonly></label>
+              </div>
+            </section>
+            <section id="academic" class="form-section"><h2><span>02</span> ข้อมูลวิชาการ</h2><p class="muted">แนะนำความเชี่ยวชาญและประวัติการศึกษาของคุณ</p><div class="field-grid">
+              <label class="full">ความเชี่ยวชาญ<textarea name="expertise" rows="3" maxlength="5000" placeholder="เช่น วิศวกรรมซอฟต์แวร์, ปัญญาประดิษฐ์"></textarea></label>
+              <label class="full">ความสนใจในการวิจัย<textarea name="research_interests" rows="3" maxlength="5000"></textarea></label>
+              <label class="full">ประวัติการศึกษา<textarea name="education" rows="4" maxlength="5000" placeholder="ระบุวุฒิการศึกษา สถาบัน และปีที่สำเร็จการศึกษา"></textarea></label>
+              <label>Google Scholar<input name="google_scholar" type="url" maxlength="2000" placeholder="https://scholar.google.com/…"></label><label>ResearchGate<input name="research_gate" type="url" maxlength="2000" placeholder="https://www.researchgate.net/…"></label>
+            </div></section>
+            <section id="contact" class="form-section"><h2><span>03</span> ช่องทางติดต่อ</h2><p class="muted">ข้อมูลสำหรับการติดต่อทางวิชาการ</p><div class="field-grid">
+              <label>อีเมล *<input name="email" type="email" required maxlength="254" autocomplete="email"></label><label>หมายเลขโทรศัพท์<input name="phone_number" type="tel" maxlength="50" autocomplete="tel"></label><label class="full">ห้องทำงาน / ที่อยู่ติดต่อ<textarea name="office_address" rows="2" maxlength="1000"></textarea></label>
+            </div></section>
+          </fieldset>
+          <div id="actions" class="form-actions" hidden><p id="save-state" class="muted">ข้อมูลจะเปลี่ยนแปลงเมื่อกดบันทึก</p><button type="button" id="cancel" class="secondary">ยกเลิก</button><button type="submit" id="save">บันทึกการเปลี่ยนแปลง</button></div>
+        </form>
+      </section>
+    </div>
+    <p class="page-footer">FRWS · ระบบจัดการข้อมูลผลงานวิจัยและภาระงานอาจารย์</p>
+  </main>
+</body>
+</html>

@@ -542,3 +542,19 @@ body {
   color: #ffffff;
   transform: translateX(2px);
 }
+/* Compact shortcut to the teacher dashboard mockup. */
+.dashboard-icon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 38px;
+  height: 38px;
+  flex-shrink: 0;
+  margin-right: 10px;
+  border-radius: 50%;
+  color: white;
+  text-decoration: none;
+  font-size: 26px;
+}
+.dashboard-icon:hover { background: rgba(255, 255, 255, 0.15); }
+.dashboard-icon:focus-visible { outline: 2px solid white; outline-offset: 2px; }
