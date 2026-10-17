@@ -1,8 +1,0 @@
-requests
-supabase
-python-dotenv
-fastapi
-uvicorn
-pydantic
-httpx>=0.27,<1
-pytest>=8,<10

@@ -1,6 +1,5 @@
-const SUPABASE_URL = "https://ewklxmvohanstvaphwow.supabase.co";
-const SUPABASE_KEY = "sb_publishable_tTlNhmQ6ZfFJVD1VEvXewA_piv6ngYP";
-const supabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+// ดึง API_BASE_URL จาก config.js (ถ้าไม่มีจะใช้ค่า Default)
+const API_URL = typeof API_BASE_URL !== 'undefined' ? API_BASE_URL : 'http://localhost:8000/api';
 
 let currentTab = 'authors';
 let currentPage = 1;
@@ -23,28 +22,15 @@ function cleanStr(str) {
     .replace(/[^a-z0-9\u0E00-\u0E7F]/g, '');
 }
 
+// 1. ดึงรายชื่ออาจารย์ทั้งหมดจาก FastAPI เพื่อทำ Map สำหรับจับคู่ชื่อผู้แต่ง
 async function loadTeacherMap() {
   if (isTeacherMapLoaded && teacherLookupList.length > 0) return;
   try {
-    let allRecords = [];
-    let start = 0;
-    const batchSize = 1000;
-    let hasMore = true;
-
-    while (hasMore) {
-      const { data, error } = await supabaseClient
-        .from('teachers')
-        .select('*')
-        .range(start, start + batchSize - 1);
-
-      if (error || !data || data.length === 0) {
-        hasMore = false;
-      } else {
-        allRecords = allRecords.concat(data);
-        start += batchSize;
-        if (data.length < batchSize) hasMore = false;
-      }
-    }
+    const response = await fetch(`${API_URL}/professors/`);
+    if (!response.ok) throw new Error('ไม่สามารถดึงข้อมูลอาจารย์ได้');
+    
+    const result = await response.json();
+    const allRecords = result.data || [];
 
     if (allRecords.length > 0) {
       teacherLookupList = allRecords.map(t => {
@@ -64,7 +50,7 @@ async function loadTeacherMap() {
           firstCleanTh: cleanStr(fnTh),
           lastCleanTh: cleanStr(lnTh),
           fullCleanTh: cleanStr(rawFullTh),
-          rawFull: rawFullEn || rawFullTh || t.name || ''
+          rawFull: rawFullEn || rawFullTh || t.full_name_th || t.full_name_en || ''
         };
       });
       isTeacherMapLoaded = true;
@@ -92,7 +78,7 @@ function findTeacherMatch(rawName) {
 }
 
 function getPaperUrl(pub) {
-  return pub.official_url || pub.doi_url || pub.doi || pub.url || pub.link || '';
+  return pub.doi || pub.official_url || pub.doi_url || pub.url || pub.link || '';
 }
 
 function formatShortName(fullName) {
@@ -175,22 +161,23 @@ function switchTab(tab) {
   resetSearch();
 }
 
+// 2. ดึงจำนวนผลงานวิชาการของอาจารย์แต่ละคนในหน้านั้นๆ
 async function fetchCountsForPage(teacherIds) {
   if (!teacherIds || teacherIds.length === 0) return;
   try {
-    const { data } = await supabaseClient
-      .from('teacher_publications')
-      .select('teacher_id')
-      .in('teacher_id', teacherIds);
-
-    if (data) {
-      data.forEach(r => {
-        pubCountMap[r.teacher_id] = (pubCountMap[r.teacher_id] || 0) + 1;
-      });
-    }
-  } catch (e) { }
+    await Promise.all(teacherIds.map(async (id) => {
+      const res = await fetch(`${API_URL}/publications/professor/${id}`);
+      if (res.ok) {
+        const result = await res.json();
+        pubCountMap[id] = result.count || (result.data ? result.data.length : 0);
+      }
+    }));
+  } catch (e) {
+    console.error("Failed to fetch pub counts", e);
+  }
 }
 
+// 3. ฟังก์ชันหลักสำหรับดึงข้อมูลตาม Tab ที่เลือก
 async function fetchData() {
   const container = document.getElementById('cards-container');
   container.innerHTML = '<p style="text-align: center; color: #666; padding: 20px; grid-column: 1 / -1;">กำลังโหลดข้อมูล...</p>';
@@ -201,84 +188,58 @@ async function fetchData() {
     await loadTeacherMap();
 
     if (currentTab === 'publications') {
-      let query = supabaseClient
-        .from('publications')
-        .select('*', { count: 'exact' });
+      let url = `${API_URL}/publications/?`;
+      if (filterYear) url += `year=${encodeURIComponent(filterYear)}&`;
 
-      if (filterYear) {
-        query = query.gte('publication_date', `${filterYear}-01-01`).lte('publication_date', `${filterYear}-12-31`);
+      // ค้นหาอาจารย์ถ้าข้อความค้นหาตรงกับชื่ออาจารย์
+      const matchedTeacher = searchQuery ? findTeacherMatch(searchQuery) : null;
+      if (matchedTeacher) {
+        url += `professor_id=${matchedTeacher.id}&`;
       }
+
+      const response = await fetch(url);
+      if (!response.ok) throw new Error('เกิดข้อผิดพลาดในการดึงข้อมูลผลงาน');
       
+      const result = await response.json();
+      let publications = result.data || [];
+
+      // Filter เพิ่มเติมฝั่ง Client-side สำหรับ Text Search และ Work Type
+      if (searchQuery && !matchedTeacher) {
+        const q = cleanStr(searchQuery);
+        publications = publications.filter(p => 
+          cleanStr(p.title).includes(q) || 
+          cleanStr(JSON.stringify(p.authors || '')).includes(q)
+        );
+      }
+
       if (filterType) {
-        query = query.ilike('work_type', `%${filterType}%`);
+        publications = publications.filter(p => 
+          (p.work_type || '').toLowerCase().includes(filterType.toLowerCase())
+        );
       }
 
-      // ค้นหาทั้งชื่อผลงานวิจัย หรือค้นหาอาจารย์ (รองรับทั้งภาษาไทยและอังกฤษ)
-      if (searchQuery) {
-        const matchedTeacher = findTeacherMatch(searchQuery);
-        const term = searchQuery.trim();
+      const totalItems = publications.length;
+      const pageData = publications.slice(from, from + ITEMS_PER_PAGE);
 
-        if (matchedTeacher) {
-          // หากตรงกับชื่ออาจารย์ ให้ค้นหาทั้งชื่อภาษาไทยและภาษาอังกฤษของอาจารย์ท่านนั้น
-          const nameEn = matchedTeacher.rawFull;
-          const nameTh = `${matchedTeacher.fnTh} ${matchedTeacher.lnTh}`.trim();
-          
-          let orConditions = [`title.ilike.%${term}%`];
-          if (nameEn) orConditions.push(`authors.cs.{"${nameEn}"}`);
-          if (nameTh) orConditions.push(`authors.cs.{"${nameTh}"}`);
-          
-          query = query.or(orConditions.join(','));
-        } else {
-          query = query.ilike('title', `%${term}%`);
-        }
-      }
-
-      const { data, count, error } = await query
-        .order('publication_date', { ascending: false, nullsFirst: false })
-        .range(from, from + ITEMS_PER_PAGE - 1);
-
-      if (error) {
-        container.innerHTML = '<p style="color: red; text-align: center; grid-column: 1 / -1;">เกิดข้อผิดพลาดในการโหลดข้อมูล</p>';
-        return;
-      }
-
-      renderPublications(data);
-      renderPagination(count || 0);
+      renderPublications(pageData);
+      renderPagination(totalItems);
 
     } else {
+      // Tab อาจารย์ (Authors)
       if (!cachedAllTeachers) {
-        let allRecords = [];
-        let start = 0;
-        const batchSize = 1000;
-        let hasMore = true;
+        const response = await fetch(`${API_URL}/professors/`);
+        if (!response.ok) throw new Error('เกิดข้อผิดพลาดในการโหลดข้อมูลอาจารย์');
 
-        while (hasMore) {
-          const { data, error } = await supabaseClient
-            .from('teachers')
-            .select('*')
-            .range(start, start + batchSize - 1);
-
-          if (error) {
-            container.innerHTML = '<p style="color: red; text-align: center; grid-column: 1 / -1;">เกิดข้อผิดพลาดในการโหลดข้อมูลอาจารย์</p>';
-            return;
-          }
-
-          if (data && data.length > 0) {
-            allRecords = allRecords.concat(data);
-            start += batchSize;
-            if (data.length < batchSize) hasMore = false;
-          } else {
-            hasMore = false;
-          }
-        }
+        const result = await response.json();
+        const allRecords = result.data || [];
 
         cachedAllTeachers = allRecords.filter(t => {
-          const raw = `${t.first_name_en || ''} ${t.first_name_th || ''} ${t.name || ''}`.toUpperCase();
+          const raw = `${t.first_name_en || ''} ${t.first_name_th || ''} ${t.full_name_th || ''}`.toUpperCase();
           return !raw.includes('ACCOUNT') && !raw.includes('กลาง');
         });
       }
 
-      // ค้นหาอาจารย์รองรับทั้งภาษาไทย ภาษาอังกฤษ และความเชี่ยวชาญ
+      // Filter อาจารย์ตามชื่อหรือความเชี่ยวชาญ
       let filteredTeachers = cachedAllTeachers;
       if (searchQuery) {
         const q = cleanStr(searchQuery);
@@ -291,7 +252,7 @@ async function fetchData() {
           const lnEn = cleanStr(t.last_name_en);
           const fullEn = cleanStr(`${t.first_name_en || ''}${t.last_name_en || ''}`);
 
-          const exp = cleanStr(t.research_interests || t.expertise || t.department_th || t.department_en || '');
+          const exp = cleanStr(t.research_interests || t.expertise || t.department || t.faculty || '');
 
           return fullTh.includes(q) || fnTh.includes(q) || lnTh.includes(q) ||
                  fullEn.includes(q) || fnEn.includes(q) || lnEn.includes(q) ||
@@ -309,7 +270,7 @@ async function fetchData() {
       renderPagination(totalItems);
     }
   } catch (err) {
-    container.innerHTML = '<p style="color: red; text-align: center; grid-column: 1 / -1;">เกิดข้อผิดพลาดในการเชื่อมต่อ</p>';
+    container.innerHTML = '<p style="color: red; text-align: center; grid-column: 1 / -1;">เกิดข้อผิดพลาดในการเชื่อมต่อเซิร์ฟเวอร์</p>';
     console.error(err);
   }
 }
@@ -326,9 +287,9 @@ function renderPublications(publications) {
   let html = '';
   publications.forEach(pub => {
     const title = pub.title || 'ไม่มีชื่อผลงาน';
-    const year = pub.publication_date ? pub.publication_date.substring(0, 4) : 'N/A';
-    const type = pub.work_type || pub.type || 'N/A';
-    const authorsHtml = formatAuthors(pub.authors || pub.author, pub.id);
+    const year = pub.publication_year || (pub.publication_date ? pub.publication_date.substring(0, 4) : 'N/A');
+    const type = pub.work_type || 'N/A';
+    const authorsHtml = formatAuthors(pub.authors, pub.id);
     const url = getPaperUrl(pub);
     
     html += `
@@ -348,7 +309,6 @@ function renderPublications(publications) {
   container.innerHTML = html;
 }
 
-// ปรับปรุงส่วนปุ่มด้านล่างให้เท่ากันทุกการ์ด
 function renderAuthors(teachers) {
   const container = document.getElementById('cards-container');
   container.className = 'cards-grid'; 
@@ -363,14 +323,14 @@ function renderAuthors(teachers) {
     const nameTh = `${teacher.first_name_th || ''} ${teacher.last_name_th || ''}`.trim();
     const nameEn = `${teacher.first_name_en || ''} ${teacher.last_name_en || ''}`.trim();
 
-    let mainName = nameTh || nameEn || teacher.name || 'Unknown Name';
+    let mainName = teacher.full_name_th || nameTh || teacher.full_name_en || nameEn || 'Unknown Name';
     const teacherId = teacher.id;
     const count = pubCountMap[teacherId] || 0;
 
-    const expertise = teacher.research_interests || teacher.expertise || teacher.department_th || teacher.department_en || teacher.department || '';
+    const expertise = teacher.research_interests || teacher.expertise || teacher.department || teacher.faculty || '';
     const email = teacher.email || '';
-    const phone = teacher.phone || teacher.tel || '';
-    const imageUrl = teacher.profile_url || teacher.photo || teacher.avatar_url || '';
+    const phone = teacher.phone_number || '';
+    const imageUrl = teacher.profile_url || '';
 
     html += `
       <div class="card card-author">

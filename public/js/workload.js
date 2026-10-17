@@ -1,5 +1,7 @@
 'use strict';
 
+const API_BASE_URL = 'https://cs361project.onrender.com/';
+
 const categories = {TEACHING: 'การสอน', RESEARCH: 'งานวิจัย', SERVICE: 'บริการวิชาการ', ADVISING: 'การดูแลนักศึกษา'};
 const labels = {
   course_code:'รหัสวิชา',course_name_th:'ชื่อวิชา (ไทย)',course_name_en:'ชื่อวิชา (อังกฤษ)',section:'กลุ่มเรียน',credits:'หน่วยกิต',course_level:'ระดับรายวิชา',lecture_hours_per_week:'ชั่วโมงบรรยายต่อสัปดาห์',lab_hours_per_week:'ชั่วโมงปฏิบัติต่อสัปดาห์',weeks:'จำนวนสัปดาห์',enrolled_students:'จำนวนนักศึกษา',teaching_share_percent:'สัดส่วนการสอน (%)',role:'บทบาท',
@@ -87,7 +89,7 @@ async function loadWorkload() {
   }
   const controller = new AbortController(); const timer = setTimeout(() => controller.abort(), 30000);
   try {
-    const response = await fetch(`/api/workloads/${encodeURIComponent(id)}`, {signal:controller.signal});
+    const response = await fetch(`${API_BASE_URL}/api/workloads/${encodeURIComponent(id)}`, {signal: controller.signal});
     if (!response.ok) {
       const error = new Error(response.status === 404 ? 'ไม่พบรายการภาระงานนี้' : response.status === 401 || response.status === 403 ? 'ไม่มีสิทธิ์เข้าถึงข้อมูลนี้' : 'ไม่สามารถโหลดรายละเอียดได้ กรุณาลองอีกครั้ง');
       error.retryable = ![401,403,404,422].includes(response.status); throw error;
