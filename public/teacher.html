@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="th">
 
 <head>
   <meta charset="UTF-8">
@@ -32,8 +32,7 @@
     <a href="#expertise" class="nav-tab">Expertise</a>
     <a href="#research-interests" class="nav-tab">Interests</a>
     <a href="#education" class="nav-tab">Education</a>
-    <a href="#publications" class="nav-tab">Publications</a>
-    <a href="#workloads" class="nav-tab">Workloads</a>
+    <a href="#workloads-section" class="nav-tab">Workloads & Publications</a>
     <a href="#contact" class="nav-tab">Contact</a>
   </nav>
 
@@ -76,20 +75,39 @@
       <div class="info-card" id="t-education" style="margin: 0 0 8px 0; color: #666; font-size: 1rem;"></div>
     </div>
 
-    <!-- PUBLICATIONS SECTION -->
-    <div id="publications" class="section-title">Publications</div>
-    <div id="teacher-publications-list">
-      <div class="info-card" style="text-align: center; color: #666;">
-        กำลังโหลดรายการงานวิจัย...
+    <!-- WORKLOADS & PUBLICATIONS SECTION (ปรับดีไซน์ใหม่ตรงตามรูปตัวอย่าง) -->
+    <div id="workloads-section" class="workload-main-header">
+      <div class="header-title-box">
+        <div class="red-line-bar"></div>
+        <div>
+          <h2>ภาระงานและผลงานวิชาการ</h2>
+          <p>ข้อมูลภาระงานตามแบบฟอร์มรายงานผลการปฏิบัติงาน</p>
+        </div>
+      </div>
+      <div class="term-filter-box">
+        <label for="term-select">ภาค/ปีการศึกษา:</label>
+        <select id="term-select" onchange="filterWorkloads()">
+          <option value="all">ทั้งหมด (All Terms)</option>
+        </select>
       </div>
     </div>
 
-    <!-- WORKLOADS SECTION -->
-    <div id="workloads" class="section-title">Workloads / ภาระงาน</div>
-    <div id="teacher-workloads" aria-live="polite"><div class="info-card">กำลังโหลดภาระงาน...</div></div>
-    <div class="workload-controls">
-      <button id="workload-more" type="button" hidden>โหลดภาระงานเพิ่มเติม</button>
-      <button id="workload-retry" type="button" hidden>ลองโหลดภาระงานอีกครั้ง</button>
+    <!-- Sub Navigation Tabs (หมวดหมู่ 1-4) -->
+    <div class="workload-sub-tabs">
+      <button class="sub-tab active" onclick="switchWorkloadTab('TEACHING', this)">1. งานสอน</button>
+      <button class="sub-tab" onclick="switchWorkloadTab('ADVISING', this)">2. การดูแลนักศึกษา</button>
+      <button class="sub-tab" onclick="switchWorkloadTab('RESEARCH', this)">3. งานวิจัย/วิชาการ</button>
+      <button class="sub-tab" onclick="switchWorkloadTab('SERVICE', this)">4. งานบริการและบริหาร</button>
+    </div>
+
+    <!-- Search Box -->
+    <div class="workload-search-box">
+      <input type="text" id="workload-search-input" placeholder="ค้นหาตามรหัสวิชา, ชื่องาน, หรือบทบาท..." oninput="filterWorkloads()">
+    </div>
+
+    <!-- Dynamic Content Container -->
+    <div id="workload-cards-container">
+      <div class="info-card" style="text-align: center; color: #666;">กำลังโหลดข้อมูลภาระงานและผลงานวิชาการ...</div>
     </div>
 
     <!-- CONTACT SECTION -->

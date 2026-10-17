@@ -7,6 +7,9 @@ const urlParams = new URLSearchParams(window.location.search);
 const teacherId = urlParams.get('id');
 
 let teacherLookupList = [];
+let currentWorkloadCategory = 'TEACHING';
+let rawWorkloadList = [];
+let rawPublicationsList = [];
 
 // Helper: XSS Protection
 function escapeHtml(str) {
@@ -34,183 +37,7 @@ function normalizeList(input) {
   return [];
 }
 
-// Clean prefixes and special characters
-function cleanStr(str) {
-  if (!str) return '';
-  return str
-    .toString()
-    .trim()
-    .toLowerCase()
-    .replace(/^(assoc\.?\s*prof\.?|asst\.?\s*prof\.?|prof\.?|dr\.?|mr\.?|mrs\.?|ms\.?|ศ\.?|รศ\.?|ผศ\.?|ดร\.?|อาจารย์|นาย|นาง|นางสาว)\s+/i, '')
-    .replace(/[^a-z0-9\u0E00-\u0E7F]/g, '');
-}
-
-// Batch load teacher lookup with optional SessionStorage caching
-async function loadTeacherMap() {
-  if (teacherLookupList.length > 0) return;
-
-  // Try retrieving from session cache first
-  const cached = sessionStorage.getItem('teacherLookupList');
-  if (cached) {
-    try {
-      teacherLookupList = JSON.parse(cached);
-      return;
-    } catch (e) {
-      sessionStorage.removeItem('teacherLookupList');
-    }
-  }
-
-  try {
-    let allRecords = [];
-    let start = 0;
-    const batchSize = 1000;
-    let hasMore = true;
-
-    while (hasMore) {
-      const { data, error } = await supabaseClient
-        .from('teachers')
-        .select('id, first_name_en, last_name_en, first_name_th, last_name_th, name')
-        .range(start, start + batchSize - 1);
-
-      if (error || !data || data.length === 0) {
-        hasMore = false;
-      } else {
-        allRecords = allRecords.concat(data);
-        start += batchSize;
-        if (data.length < batchSize) hasMore = false;
-      }
-    }
-
-    if (allRecords.length > 0) {
-      teacherLookupList = allRecords.map(t => {
-        const fnEn = (t.first_name_en || '').trim();
-        const lnEn = (t.last_name_en || '').trim();
-        const fnTh = (t.first_name_th || '').trim();
-        const lnTh = (t.last_name_th || '').trim();
-        const rawFullEn = `${fnEn} ${lnEn}`.trim();
-        const rawFullTh = `${fnTh} ${lnTh}`.trim();
-
-        return {
-          id: t.id,
-          firstCleanEn: cleanStr(fnEn),
-          lastCleanEn: cleanStr(lnEn),
-          fullCleanEn: cleanStr(rawFullEn),
-          firstCleanTh: cleanStr(fnTh),
-          lastCleanTh: cleanStr(lnTh),
-          fullCleanTh: cleanStr(rawFullTh),
-          rawFull: rawFullEn || rawFullTh || t.name || ''
-        };
-      });
-
-      // Cache to avoid refetching during same session
-      sessionStorage.setItem('teacherLookupList', JSON.stringify(teacherLookupList));
-    }
-  } catch (e) {
-    console.error("Failed to load teacher map", e);
-  }
-}
-
-// Token-Based Matching
-function findTeacherMatch(rawName) {
-  if (!rawName || teacherLookupList.length === 0) return null;
-
-  const rawClean = cleanStr(rawName);
-  if (!rawClean) return null;
-
-  // 1. Exact Full Name Match
-  for (const t of teacherLookupList) {
-    if (t.fullCleanEn && t.fullCleanEn === rawClean) return t;
-    if (t.fullCleanTh && t.fullCleanTh === rawClean) return t;
-  }
-
-  // 2. Tokenized Name Match
-  const rawParts = rawName
-    .trim()
-    .replace(/^(assoc\.?\s*prof\.?|asst\.?\s*prof\.?|prof\.?|dr\.?|mr\.?|mrs\.?|ms\.?|ศ\.?|รศ\.?|ผศ\.?|ดร\.?|อาจารย์|นาย|นาง|นางสาว)\s+/i, '')
-    .split(/[\s,.\-_/]+/)
-    .map(cleanStr)
-    .filter(p => p.length > 0);
-
-  if (rawParts.length < 2) return null;
-
-  for (const t of teacherLookupList) {
-    // English Checks
-    if (t.firstCleanEn && t.lastCleanEn) {
-      const fn = t.firstCleanEn;
-      const ln = t.lastCleanEn;
-      const fnInit = fn.charAt(0);
-      const lnInit = ln.charAt(0);
-
-      for (let i = 0; i < rawParts.length; i++) {
-        for (let j = 0; j < rawParts.length; j++) {
-          if (i === j) continue;
-          const p1 = rawParts[i];
-          const p2 = rawParts[j];
-
-          if (p1 === fn && p2 === ln) return t;
-          if (p1 === fn && p2 === lnInit) return t;
-          if (p1 === ln && p2 === fnInit) return t;
-        }
-      }
-    }
-
-    // Thai Checks
-    if (t.firstCleanTh && t.lastCleanTh) {
-      const hasFn = rawParts.includes(t.firstCleanTh);
-      const hasLn = rawParts.includes(t.lastCleanTh);
-      if (hasFn && hasLn) return t;
-    }
-  }
-
-  return null;
-}
-
-function formatShortName(fullName) {
-  if (!fullName) return "";
-  const cleaned = fullName
-    .trim()
-    .replace(/^(assoc\.?\s*prof\.?|asst\.?\s*prof\.?|prof\.?|dr\.?|mr\.?|mrs\.?|ms\.?|ศ\.?|รศ\.?|ผศ\.?|ดร\.?|อาจารย์|นาย|นาง|นางสาว)\s+/i, '');
-  const parts = cleaned.split(/[\s,]+/).filter(Boolean);
-  if (parts.length === 1) return escapeHtml(parts[0]);
-  const firstName = parts[0];
-  const lastName = parts[parts.length - 1];
-  return `${escapeHtml(firstName)} ${escapeHtml(lastName.charAt(0).toUpperCase())}.`;
-}
-
-function renderAuthorBadge(rawName) {
-  const shortName = formatShortName(rawName);
-  const matchedTeacher = findTeacherMatch(rawName);
-  const safeRawName = escapeHtml(rawName);
-
-  if (matchedTeacher) {
-    return `<a href="teacher.html?id=${encodeURIComponent(matchedTeacher.id)}" title="${safeRawName} (อาจารย์ มธ. - คลิกดูผลงาน)" class="author-item" style="text-decoration: underline; text-decoration-color: #800000; text-underline-offset: 3px; color: #1a1a1a; font-weight: 600; cursor: pointer;"><i class="fa fa-user-circle" style="color: #800000;"></i>${shortName}</a>`;
-  }
-  return `<span title="${safeRawName}" class="author-item" style="cursor: default; color: #555;"><i class="fa fa-user-circle-o" style="color: #888;"></i>${shortName}</span>`;
-}
-
-function formatAuthors(rawAuthors, pubId) {
-  const authorArray = normalizeList(rawAuthors);
-
-  if (authorArray.length === 0) {
-    return '<div class="authors-container"><span class="author-item"><i class="fa fa-user-circle-o"></i> Unknown Author</span></div>';
-  }
-
-  if (authorArray.length <= 5) {
-    return `<div class="authors-container">${authorArray.map(renderAuthorBadge).join('')}</div>`;
-  }
-
-  const visible = authorArray.slice(0, 5).map(renderAuthorBadge).join('');
-  const hidden = authorArray.slice(5).map(renderAuthorBadge).join('');
-
-  return `
-    <div class="authors-container">
-      ${visible}
-      <button type="button" data-pub-id="${pubId}" class="btn-et-al" style="background: none; border: none; color: #800000; font-weight: bold; cursor: pointer; padding: 0 4px; font-size: inherit;">et al.</button>
-      <span id="hidden-authors-t-${pubId}" class="hidden-authors" style="display: none;">${hidden}</span>
-    </div>
-  `;
-}
-
+// Render list helper
 function renderListItems(elementId, dataList, fallbackText) {
   const container = document.getElementById(elementId);
   if (!container) return;
@@ -231,17 +58,122 @@ function renderListItems(elementId, dataList, fallbackText) {
   }
 }
 
-async function loadTeacherData() {
-  if (!teacherId) {
-    setElementText('t-name-en', 'ไม่พบรหัสอาจารย์ใน URL');
-    const container = document.getElementById('teacher-publications-list');
-    if (container) container.innerHTML = '<div class="info-card" style="text-align: center; color: #666;">กรุณาเลือกอาจารย์จากหน้าหลัก</div>';
+// สลับแท็บ 1-4 ของ Workloads
+function switchWorkloadTab(category, btnEl) {
+  currentWorkloadCategory = category;
+  document.querySelectorAll('.sub-tab').forEach(b => b.classList.remove('active'));
+  if (btnEl) btnEl.classList.add('active');
+  filterWorkloads();
+}
+
+// กรองข้อมูลตามแท็บ, ภาคเรียน, และคำค้นหา
+function filterWorkloads() {
+  const container = document.getElementById('workload-cards-container');
+  if (!container) return;
+
+  const selectedTerm = document.getElementById('term-select')?.value || 'all';
+  const keyword = document.getElementById('workload-search-input')?.value.trim().toLowerCase() || '';
+
+  let itemsToDisplay = [];
+
+  // หมวดหมู่ที่ 3 (RESEARCH): รวม Publications เข้าด้วย
+  if (currentWorkloadCategory === 'RESEARCH') {
+    const wlResearch = rawWorkloadList.filter(item => item.category === 'RESEARCH');
+    itemsToDisplay = [...wlResearch];
+
+    rawPublicationsList.forEach(pub => {
+      itemsToDisplay.push({
+        id: pub.id,
+        isPublication: true,
+        title: pub.title || "Untitled Paper",
+        academic_year: pub.publication_year || pub.publication_date?.split('-')[0] || "วิจัย",
+        semester: null,
+        workload_hours: null,
+        sub_info: (pub.work_type || 'ARTICLE').toUpperCase(),
+        official_url: pub.official_url || pub.doi_url || pub.url
+      });
+    });
+  } else {
+    itemsToDisplay = rawWorkloadList.filter(item => item.category === currentWorkloadCategory);
+  }
+
+  // 2. กรองตาม Term
+  if (selectedTerm !== 'all') {
+    itemsToDisplay = itemsToDisplay.filter(item => {
+      const termStr = item.semester ? `${item.semester}/${item.academic_year}` : `${item.academic_year}`;
+      return termStr === selectedTerm || String(item.academic_year) === selectedTerm;
+    });
+  }
+
+  // 3. กรองตาม Keyword Search
+  if (keyword) {
+    itemsToDisplay = itemsToDisplay.filter(item => {
+      const titleMatch = (item.title || '').toLowerCase().includes(keyword);
+      const codeMatch = (item.details?.course_code || '').toLowerCase().includes(keyword);
+      const roleMatch = (item.details?.role || '').toLowerCase().includes(keyword);
+      return titleMatch || codeMatch || roleMatch;
+    });
+  }
+
+  // Render HTML Output
+  if (itemsToDisplay.length === 0) {
+    container.innerHTML = `<div class="info-card" style="text-align: center; color: #666; padding: 30px;">ไม่พบรายการภาระงานหรือผลงานวิชาการในหมวดหมู่นี้</div>`;
     return;
   }
 
-  await loadTeacherMap();
+  let html = '';
+  itemsToDisplay.forEach(item => {
+    if (item.isPublication) {
+      const pubLink = item.official_url ? `<a href="${escapeHtml(item.official_url)}" target="_blank" rel="noopener noreferrer">${escapeHtml(item.title)} ↗</a>` : escapeHtml(item.title);
+      html += `
+        <div class="wl-item-card">
+          <div class="wl-badges">
+            <span class="badge-term">${item.academic_year}</span>
+            <span class="badge-hours" style="background:#f2f0ff; color:#4b0082; border-color:#dcd6f7;">${item.sub_info}</span>
+          </div>
+          <div class="wl-title">${pubLink}</div>
+        </div>
+      `;
+    } else {
+      const termLabel = item.semester ? `${item.semester}/${item.academic_year}` : `ปีการศึกษา ${item.academic_year}`;
+      const hoursLabel = item.workload_hours ? `${item.workload_hours} ชั่วโมง` : '';
+      const courseCode = item.details?.course_code ? `${item.details.course_code}: ` : '';
 
-  // 1. Fetch Teacher Info
+      let subText = '';
+      if (item.category === 'TEACHING') {
+        const share = item.details?.teaching_share_percent ? `สัดส่วนการสอน: ${item.details.teaching_share_percent}%` : '';
+        const credits = item.details?.credits ? `${item.details.credits} หน่วยกิต` : '';
+        subText = [credits, share].filter(Boolean).join(' · ');
+      } else {
+        subText = item.description || `หลักฐาน ${item.evidence_count || 0} รายการ`;
+      }
+
+      html += `
+        <div class="wl-item-card">
+          <div class="wl-badges">
+            <span class="badge-term">${termLabel}</span>
+            ${hoursLabel ? `<span class="badge-hours">${hoursLabel}</span>` : ''}
+          </div>
+          <div class="wl-title">
+            <a href="workload.html?id=${encodeURIComponent(item.id)}">${courseCode}${escapeHtml(item.title)}</a>
+          </div>
+          ${subText ? `<div class="wl-subtext">${subText}</div>` : ''}
+        </div>
+      `;
+    }
+  });
+
+  container.innerHTML = html;
+}
+
+// โหลดข้อมูลอาจารย์
+async function loadTeacherData() {
+  if (!teacherId) {
+    setElementText('t-name-en', 'ไม่พบรหัสอาจารย์ใน URL');
+    return;
+  }
+
+  // Fetch Teacher Info
   const { data: teacher, error } = await supabaseClient
     .from('teachers')
     .select('*')
@@ -253,7 +185,6 @@ async function loadTeacherData() {
     return;
   }
 
-  // Set Profile Metadata
   const nameTh = `${teacher.first_name_th || ''} ${teacher.last_name_th || ''}`.trim();
   const nameEn = `${teacher.first_name_en || ''} ${teacher.last_name_en || ''}`.trim();
   const titleEl = document.getElementById('t-name-en');
@@ -273,18 +204,15 @@ async function loadTeacherData() {
     if (subEl) subEl.style.display = 'none';
   }
 
-  // Render Expertise & Research Interests safely
   renderListItems('t-expertise', teacher.expertise, 'ไม่พบข้อมูลความเชี่ยวชาญ');
   renderListItems('t-research_interests', teacher.research_interests, 'ไม่พบข้อมูลความสนใจในการวิจัย');
   renderListItems('t-education', teacher.education, 'ไม่พบข้อมูลการศึกษา');
   
-  // Profile Image
   const profileImageEl = document.getElementById('profile_image');
   if (profileImageEl) {
     profileImageEl.src = teacher.profile_url || 'assets/default-profile.png';
   }
 
-  // Contact Information
   const faculty = teacher.faculty_en || teacher.faculty_th || teacher.faculty || 'Thammasat University';
   setElementText('t-faculty', faculty);
 
@@ -315,164 +243,45 @@ async function loadTeacherData() {
     }
   }
 
-  // 2. Fetch Publications via Join
+  // Fetch Publications
   const { data: relations } = await supabaseClient
     .from('teacher_publications')
     .select(`publications (*)`)
     .eq('teacher_id', teacherId);
 
-  let pubs = [];
   if (relations && relations.length > 0) {
-    pubs = relations.map(r => r.publications).filter(Boolean);
+    rawPublicationsList = relations.map(r => r.publications).filter(Boolean);
   }
 
-  // Fallback: Scan publications
-  if (pubs.length === 0) {
-    let allPubs = [];
-    let start = 0;
-    const batchSize = 1000;
-    let hasMore = true;
-
-    while (hasMore) {
-      const { data: batchPubs, error: pubErr } = await supabaseClient
-        .from('publications')
-        .select('*')
-        .range(start, start + batchSize - 1);
-
-      if (pubErr || !batchPubs || batchPubs.length === 0) {
-        hasMore = false;
-      } else {
-        allPubs = allPubs.concat(batchPubs);
-        start += batchSize;
-        if (batchPubs.length < batchSize) hasMore = false;
-      }
+  // Fetch Workloads
+  try {
+    const res = await fetch(`/api/workloads?teacher_id=${encodeURIComponent(teacherId)}&page_size=100`);
+    if (res.ok) {
+      const result = await res.json();
+      rawWorkloadList = result.data || [];
     }
-
-    if (allPubs.length > 0) {
-      pubs = allPubs.filter(p => {
-        const authors = normalizeList(p.authors || p.author_names);
-        return authors.some(authorName => {
-          const matched = findTeacherMatch(authorName);
-          return matched && String(matched.id) === String(teacherId);
-        });
-      });
-    }
+  } catch (e) {
+    console.error("Failed to fetch workloads", e);
   }
 
-  renderPubList(pubs);
-}
-
-function renderPubList(pubs) {
-  const container = document.getElementById('teacher-publications-list');
-  if (!container) return;
-
-  if (!pubs || pubs.length === 0) {
-    container.innerHTML = `
-      <div class="info-card" style="text-align: center; color: #666;">
-        ไม่พบข้อมูลงานวิจัย
-      </div>
-    `;
-    return;
-  }
-
-  let html = '';
-  pubs.forEach((pub, idx) => {
-    const title = escapeHtml(pub.title || "Untitled Paper");
-    const rawPaperUrl = pub.official_url || pub.doi_url || pub.doi || pub.url || pub.link || '';
-    const paperUrl = escapeHtml(rawPaperUrl);
-    const pubType = escapeHtml((pub.work_type ? pub.work_type : "ARTICLE").toUpperCase());
-    const pubDate = escapeHtml(pub.publication_date || pub.publication_year || "Unknown Date");
-
-    let hostDomain = '';
-    if (rawPaperUrl) {
-      try {
-        const fullUrl = rawPaperUrl.startsWith('http') ? rawPaperUrl : 'https://' + rawPaperUrl;
-        hostDomain = escapeHtml(new URL(fullUrl).hostname.replace(/^www\./, ''));
-      } catch (e) { }
-    }
-
-    const sourceName = escapeHtml(pub.source_name || pub.publisher || '');
-
-    let metaParts = [pubDate];
-    if (hostDomain) metaParts.push(`<a href="${paperUrl}" target="_blank" rel="noopener noreferrer" style="color: inherit; text-decoration: underline;">${hostDomain}</a>`);
-    if (sourceName && sourceName !== hostDomain) metaParts.push(sourceName);
-
-    html += `
-      <div class="info-card" style="margin-bottom: 16px;">
-        <h3 style="margin: 0 0 8px 0; font-size: 1.1rem; line-height: 1.4;">
-          ${paperUrl
-            ? `<a href="${paperUrl}" target="_blank" rel="noopener noreferrer" style="color: #222; text-decoration: none;">${title}</a>`
-            : title
-          }
-        </h3>
-        <div style="font-size: 0.85rem; color: #666; margin-bottom: 8px;">
-          <span class="badge-article">${pubType}</span>
-          <span>${metaParts.join(' &bull; ')}</span>
-        </div>
-        ${formatAuthors(pub.authors || pub.author_names, pub.id || idx)}
-      </div>
-    `;
-  });
-
-  container.innerHTML = html;
-
-  // Event delegation for "et al." buttons
-  container.querySelectorAll('.btn-et-al').forEach(btn => {
-    btn.addEventListener('click', function() {
-      const pubId = this.getAttribute('data-pub-id');
-      const hiddenSpan = document.getElementById(`hidden-authors-t-${pubId}`);
-      if (hiddenSpan) hiddenSpan.style.display = 'inline-flex';
-      this.style.display = 'none';
+  // Dropdown options
+  const termSelect = document.getElementById('term-select');
+  if (termSelect && rawWorkloadList.length > 0) {
+    const terms = new Set();
+    rawWorkloadList.forEach(item => {
+      if (item.semester && item.academic_year) terms.add(`${item.semester}/${item.academic_year}`);
+      else if (item.academic_year) terms.add(`${item.academic_year}`);
     });
-  });
+    
+    terms.forEach(term => {
+      const opt = document.createElement('option');
+      opt.value = term;
+      opt.textContent = term;
+      termSelect.appendChild(opt);
+    });
+  }
+
+  filterWorkloads();
 }
 
 document.addEventListener('DOMContentLoaded', loadTeacherData);
-
-// Workloads use the same-origin FastAPI service, independently of publications.
-let workloadPage = 1;
-let loadedWorkloads = 0;
-async function loadTeacherWorkloads() {
-  const container = document.getElementById('teacher-workloads');
-  const more = document.getElementById('workload-more');
-  const retry = document.getElementById('workload-retry');
-  const categoryNames = {TEACHING:'การสอน',RESEARCH:'งานวิจัย',SERVICE:'บริการวิชาการ',ADVISING:'การดูแลนักศึกษา'};
-  more.hidden = true;
-  retry.hidden = true;
-  if (!teacherId) { container.textContent = 'กรุณาเลือกอาจารย์จากหน้าหลัก'; return; }
-  const controller = new AbortController();
-  const timeout = setTimeout(() => controller.abort(), 30000);
-  try {
-    const params = new URLSearchParams({teacher_id:teacherId,page:String(workloadPage),page_size:'10'});
-    const response = await fetch(`/api/workloads?${params}`, {signal:controller.signal});
-    if (!response.ok) throw new Error('Unable to load workloads');
-    const result = await response.json();
-    if (!Array.isArray(result.data)) throw new Error('Invalid workload response');
-    if (workloadPage === 1) container.replaceChildren();
-    for (const item of result.data) {
-      const card = document.createElement('div'); card.className = 'info-card workload-card';
-      const heading = document.createElement('h3');
-      const link = document.createElement('a');
-      link.href = `workload.html?id=${encodeURIComponent(item.id)}`;
-      link.textContent = item.title || 'ภาระงาน';
-      heading.append(link);
-      const meta = document.createElement('p');
-      meta.textContent = `${categoryNames[item.category] || item.category} · ปีการศึกษา ${item.academic_year} · ${item.semester == null ? 'ทั้งปีการศึกษา' : `ภาคเรียน ${item.semester}`} · ${item.workload_hours == null ? 'ไม่ระบุชั่วโมง' : `${item.workload_hours} ชั่วโมง`}`;
-      const evidence = document.createElement('p');
-      evidence.textContent = `หลักฐาน ${item.evidence_count ?? 0} รายการ · คลิกชื่อภาระงานเพื่อดูรายละเอียดและหลักฐาน`;
-      card.append(heading,meta,evidence); container.append(card);
-    }
-    loadedWorkloads += result.data.length;
-    if (!loadedWorkloads) container.textContent = 'ยังไม่มีข้อมูลภาระงานของอาจารย์ท่านนี้';
-    more.hidden = result.total == null ? result.data.length < 10 : loadedWorkloads >= result.total;
-    workloadPage += 1;
-  } catch {
-    if (workloadPage === 1) container.textContent = 'ไม่สามารถโหลดภาระงานได้ กรุณาลองอีกครั้ง';
-    retry.hidden = false;
-  } finally { clearTimeout(timeout); }
-}
-document.addEventListener('DOMContentLoaded', () => {
-  document.getElementById('workload-more').addEventListener('click', loadTeacherWorkloads);
-  document.getElementById('workload-retry').addEventListener('click', loadTeacherWorkloads);
-  loadTeacherWorkloads();
-});
