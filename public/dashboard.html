@@ -1,0 +1,411 @@
+<!DOCTYPE html>
+<html lang="th">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Dashboard เจ้าหน้าที่ - ระบบติดตามภาระงานอาจารย์ CS (FRWS)</title>
+  
+  <!-- นำเข้าไฟล์ CSS หลัก และ CSS ของ Dashboard -->
+  <link rel="stylesheet" href="style.css">
+  <link rel="stylesheet" href="dashboardStyle.css">
+
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Sarabun:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+</head>
+
+<body>
+
+  <!-- Header -->
+  <header class="header">
+    <div class="header-left">
+      <img src="assets/Emblem_of_Thammasat_University.svg.webp" alt="TU Logo" class="header-logo">
+      <h1 class="header-title">
+        Faculty Research<br>& Workload Management System (FRWS)
+      </h1>
+    </div>
+    <div class="header-right">
+      <span style="color: white; font-size: 13.5px; margin-right: 15px;">
+        <i class="fa fa-user-circle"></i> เจ้าหน้าที่สาขาวิชา (Officer)
+      </span>
+      <a href="index.html" class="btn-login-header">
+        <i class="fa fa-sign-out"></i> ออกจากระบบ
+      </a>
+    </div>
+  </header>
+
+  <!-- Main Container -->
+  <main class="dash-container">
+
+    <!-- Header Banner -->
+    <div class="dash-header-banner">
+      <div class="dash-header-title">
+        <h2>Dashboard ตรวจสอบและติดตามภาระงานอาจารย์</h2>
+        <p>ระบบตรวจสอบคะแนนภาระงานการปฏิบัติงานสำหรับเลื่อนเงินเดือน | รอบการประเมิน 2/2567</p>
+      </div>
+      <div class="dash-badge-dept">
+        <i class="fa fa-university"></i> สาขาวิชาการวิทยาการคอมพิวเตอร์
+      </div>
+    </div>
+
+    <!-- Quick Filter Card -->
+    <div class="filter-card">
+      <div>
+        <label style="font-size:12px; color:#666; display:block; font-weight:600; margin-bottom:4px;">ปีการศึกษา / ภาค</label>
+        <select id="term-filter" onchange="filterData()">
+          <option value="2-2567">ภาคการศึกษา 2 / 2567</option>
+          <option value="1-2567">ภาคการศึกษา 1 / 2567</option>
+          <option value="2-2566">ภาคการศึกษา 2 / 2566</option>
+        </select>
+      </div>
+
+      <div>
+        <label style="font-size:12px; color:#666; display:block; font-weight:600; margin-bottom:4px;">โครงการ/ภาควิชาที่สอน</label>
+        <select id="track-filter" onchange="filterData()">
+          <option value="ALL">โครงการทั้งหมด (ปกติ/พิเศษ/CyberSec)</option>
+          <option value="REGULAR">ภาคปกติ</option>
+          <option value="SPECIAL">ภาคพิเศษ</option>
+          <option value="CYBER">Cyber Security</option>
+        </select>
+      </div>
+
+      <div>
+        <label style="font-size:12px; color:#666; display:block; font-weight:600; margin-bottom:4px;">สถานะการประเมิน (ขั้นต่ำ 650 คะแนน)</label>
+        <select id="status-filter" onchange="filterData()">
+          <option value="ALL">สถานะทั้งหมด</option>
+          <option value="PASS">ผ่านเกณฑ์ (≥ 650 คะแนน)</option>
+          <option value="FAIL">ต่ำกว่าเกณฑ์ (< 650 คะแนน)</option>
+          <option value="PENDING">รอตรวจสอบเอกสาร</option>
+        </select>
+      </div>
+
+      <div>
+        <label style="font-size:12px; color:#666; display:block; font-weight:600; margin-bottom:4px;">ค้นหาอาจารย์</label>
+        <input type="text" id="search-lecturer" placeholder="พิมพ์ชื่ออาจารย์..." oninput="filterData()">
+      </div>
+
+      <button class="btn-export" onclick="exportCSV()">
+        <i class="fa fa-file-excel-o"></i> ส่งออกรายงาน (CSV)
+      </button>
+    </div>
+
+    <!-- Summary KPI Cards -->
+    <div class="kpi-grid">
+      <div class="kpi-card">
+        <div class="kpi-info">
+          <h4>อาจารย์ในสาขาวิชา</h4>
+          <div class="kpi-value" id="kpi-total-faculty">18 คน</div>
+          <div class="kpi-sub">สอนข้ามโครงการ 12 คน</div>
+        </div>
+        <div class="kpi-icon red"><i class="fa fa-users"></i></div>
+      </div>
+
+      <div class="kpi-card">
+        <div class="kpi-info">
+          <h4>ผ่านเกณฑ์ประเมิน (≥650)</h4>
+          <div class="kpi-value" id="kpi-pass-rate" style="color: #1e7e34;">88.8%</div>
+          <div class="kpi-sub">16 จาก 18 คนผ่านเกณฑ์</div>
+        </div>
+        <div class="kpi-icon green"><i class="fa fa-check-circle"></i></div>
+      </div>
+
+      <div class="kpi-card">
+        <div class="kpi-info">
+          <h4>คะแนนคำนวณเฉลี่ย</h4>
+          <div class="kpi-value" id="kpi-avg-score">1,245.5</div>
+          <div class="kpi-sub">คะแนนจริงเฉลี่ย 1,380.0</div>
+        </div>
+        <div class="kpi-icon blue"><i class="fa fa-bar-chart"></i></div>
+      </div>
+
+      <div class="kpi-card">
+        <div class="kpi-info">
+          <h4>รอตรวจสอบหลักฐาน</h4>
+          <div class="kpi-value" id="kpi-pending" style="color: #b06000;">2 รายการ</div>
+          <div class="kpi-sub">ต้องอนุมัติภายใน 5 วัน</div>
+        </div>
+        <div class="kpi-icon orange"><i class="fa fa-clock-o"></i></div>
+      </div>
+    </div>
+
+    <!-- Faculty Workload Table Card -->
+    <div class="table-card">
+      <div class="table-header">
+        <h3>รายการสรุปคะแนนภาระงานของอาจารย์รายบุคคล (สาขาวิชาวิทยาการคอมพิวเตอร์)</h3>
+        <span style="font-size: 12.5px; color:#666;">
+          <i class="fa fa-info-circle"></i> เกณฑ์ขั้นต่ำในการเลื่อนเงินเดือน: <b>650 คะแนน</b> | สอนบรรยาย/ปฏิบัติการไม่ต่ำกว่า <b>6.00 หน่วยกิต</b>
+        </span>
+      </div>
+
+      <div class="table-responsive">
+        <table class="dash-table">
+          <thead>
+            <tr>
+              <th>ชื่อ-สกุล / ตำแหน่ง</th>
+              <th>โครงการที่สอน</th>
+              <th>หน่วยกิตสอน</th>
+              <th>หมวด 1 (สอน)<br><small>เพดาน 900</small></th>
+              <th>หมวด 2 (วิชาการ)<br><small>เพดาน 900</small></th>
+              <th>หมวด 3 (บริหาร)<br><small>เพดาน 400</small></th>
+              <th>หมวด 4 (บริการ)<br><small>เพดาน 300</small></th>
+              <th>หมวด 5 (พิเศษ)<br><small>เพดาน 100</small></th>
+              <th>รวมคะแนนจริง</th>
+              <th>รวมคะแนนคำนวณ<br><small>(Max 2000)</small></th>
+              <th>สถานะ</th>
+              <th>การจัดการ</th>
+            </tr>
+          </thead>
+          <tbody id="workload-table-body">
+            <!-- JavaScript injected dynamic content -->
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+  </main>
+
+  <!-- Modal inspection form -->
+  <div class="modal-overlay" id="inspectModal">
+    <div class="modal-card">
+      <div class="modal-header">
+        <h3 id="modal-lecturer-name">รายละเอียดแบบฟอร์มภาระงาน - ผศ.ดร.ประภาพร รัตนธำรง</h3>
+        <button class="modal-close" onclick="closeModal()">&times;</button>
+      </div>
+      <div class="modal-body" id="modal-content">
+        <!-- Dynamic Content -->
+      </div>
+    </div>
+  </div>
+
+  <script>
+    // Data based on actual CS department & Form 2/2567 specifications
+    const lecturersData = [
+      {
+        id: "T001",
+        name: "ผศ.ดร.ประภาพร รัตนธำรง",
+        position: "ผู้ช่วยศาสตราจารย์",
+        tracks: ["REGULAR", "SPECIAL", "CYBER"],
+        credits: 9.00,
+        m1_actual: 1030.0, m1_calc: 900.0, // Teaching (Ceiling 900)
+        m2_actual: 140.0,  m2_calc: 140.0, // Research (Ceiling 900)
+        m3_actual: 90.0,   m3_calc: 90.0,  // Admin (Ceiling 400)
+        m4_actual: 330.0,  m4_calc: 300.0, // Service (Ceiling 300)
+        m5_actual: 0.0,    m5_calc: 0.0,   // Special (Ceiling 100)
+        drive_link: "https://drive.google.com/drive/folders/1NmneeidQrVatGKtikeQ6PqDAbJkLK_2s?usp=sharing",
+        status: "PASS",
+        details: {
+          teaching: [
+            { code: "CS222", name: "Algorithm Design", track: "ภาคปกติ", credits: 3.0, hours: 45, score: 200 },
+            { code: "CS232", name: "Data Structures", track: "ภาคพิเศษ", credits: 3.0, hours: 45, score: 200 },
+            { code: "CS333", name: "Cybersecurity Fundamentals", track: "Cyber Security", credits: 3.0, hours: 45, score: 200 },
+            { code: "CS403", name: "Senior Project", track: "ภาคปกติ", credits: 0.0, hours: 0, score: 90 },
+            { code: "CS304", name: "Cooperative Education", track: "ภาคปกติ", credits: 0.0, hours: 0, score: 120 }
+          ],
+          academic: [
+            { name: "Preserving Privacy in Cloud Systems (Q2)", role: "First Author (20%)", score: 50 },
+            { name: "InCIT 2025 Conference Presentation", role: "Presenter", score: 90 }
+          ],
+          admin: [
+            { name: "ผู้ประสานงานรายวิชา (CS222, CS232, CS333)", score: 40 },
+            { name: "อาจารย์ที่ปรึกษาทั่วไป ป.ตรี/โท", score: 50 }
+          ],
+          service: [
+            { name: "คณะกรรมการปรับปรุงหลักสูตร/คุมสอบ (10 คำสั่ง)", score: 105 },
+            { name: "วิทยากรภายนอก CS232/CS653 (ภาคพิเศษ) และอื่นๆ", score: 150 },
+            { name: "ผู้ประเมินบทความ CENTRA8", score: 45 }
+          ]
+        }
+      },
+      {
+        id: "T002",
+        name: "รศ.ดร.สมชาย ใจดี",
+        position: "รองศาสตราจารย์",
+        tracks: ["REGULAR", "CYBER"],
+        credits: 7.50,
+        m1_actual: 750.0,  m1_calc: 750.0,
+        m2_actual: 450.0,  m2_calc: 450.0,
+        m3_actual: 150.0,  m3_calc: 150.0,
+        m4_actual: 120.0,  m4_calc: 120.0,
+        m5_actual: 0.0,    m5_calc: 0.0,
+        drive_link: "#",
+        status: "PASS",
+        details: { teaching: [], academic: [], admin: [], service: [] }
+      },
+      {
+        id: "T003",
+        name: "อ.ดร.วิภา ปัญญางาม",
+        position: "อาจารย์",
+        tracks: ["SPECIAL"],
+        credits: 6.00,
+        m1_actual: 500.0,  m1_calc: 500.0,
+        m2_actual: 80.0,   m2_calc: 80.0,
+        m3_actual: 30.0,   m3_calc: 30.0,
+        m4_actual: 20.0,   m4_calc: 20.0,
+        m5_actual: 0.0,    m5_calc: 0.0,
+        drive_link: "#",
+        status: "FAIL", // < 650
+        details: { teaching: [], academic: [], admin: [], service: [] }
+      },
+      {
+        id: "T004",
+        name: "ผศ.กฤษดา วงศ์สวัสดิ์",
+        position: "ผู้ช่วยศาสตราจารย์",
+        tracks: ["REGULAR", "SPECIAL"],
+        credits: 9.00,
+        m1_actual: 820.0,  m1_calc: 820.0,
+        m2_actual: 200.0,  m2_calc: 200.0,
+        m3_actual: 100.0,  m3_calc: 100.0,
+        m4_actual: 180.0,  m4_calc: 180.0,
+        m5_actual: 0.0,    m5_calc: 0.0,
+        drive_link: "#",
+        status: "PENDING",
+        details: { teaching: [], academic: [], admin: [], service: [] }
+      }
+    ];
+
+    document.addEventListener("DOMContentLoaded", () => {
+      renderTable(lecturersData);
+    });
+
+    function renderTable(data) {
+      const tbody = document.getElementById("workload-table-body");
+      tbody.innerHTML = "";
+
+      data.forEach(item => {
+        const totalActual = item.m1_actual + item.m2_actual + item.m3_actual + item.m4_actual + item.m5_actual;
+        const totalCalc = item.m1_calc + item.m2_calc + item.m3_calc + item.m4_calc + item.m5_calc;
+
+        let tracksHTML = "";
+        if (item.tracks.includes("REGULAR")) tracksHTML += `<span class="track-tag track-regular">ภาคปกติ</span>`;
+        if (item.tracks.includes("SPECIAL")) tracksHTML += `<span class="track-tag track-special">ภาคพิเศษ</span>`;
+        if (item.tracks.includes("CYBER"))   tracksHTML += `<span class="track-tag track-cyber">CyberSec</span>`;
+
+        let statusBadge = "";
+        if (item.status === "PASS") {
+          statusBadge = `<span class="badge-status status-pass"><i class="fa fa-check-circle"></i> ผ่านเกณฑ์</span>`;
+        } else if (item.status === "FAIL") {
+          statusBadge = `<span class="badge-status status-fail"><i class="fa fa-times-circle"></i> ต่ำกว่าเกณฑ์</span>`;
+        } else {
+          statusBadge = `<span class="badge-status status-pending"><i class="fa fa-clock-o"></i> รอตรวจ</span>`;
+        }
+
+        const tr = document.createElement("tr");
+        tr.innerHTML = `
+          <td>
+            <b>${item.name}</b><br>
+            <small style="color:#666;">${item.position}</small>
+          </td>
+          <td>${tracksHTML}</td>
+          <td style="text-align:center;"><b>${item.credits.toFixed(2)}</b> นก.</td>
+          <td><b>${item.m1_calc.toFixed(1)}</b> <br><small style="color:#888;">(${item.m1_actual.toFixed(1)})</small></td>
+          <td><b>${item.m2_calc.toFixed(1)}</b> <br><small style="color:#888;">(${item.m2_actual.toFixed(1)})</small></td>
+          <td><b>${item.m3_calc.toFixed(1)}</b> <br><small style="color:#888;">(${item.m3_actual.toFixed(1)})</small></td>
+          <td><b>${item.m4_calc.toFixed(1)}</b> <br><small style="color:#888;">(${item.m4_actual.toFixed(1)})</small></td>
+          <td><b>${item.m5_calc.toFixed(1)}</b></td>
+          <td style="color:#555;">${totalActual.toFixed(1)}</td>
+          <td><b style="font-size:15px; color:#8C1D24;">${totalCalc.toFixed(1)}</b></td>
+          <td>${statusBadge}</td>
+          <td>
+            <button class="btn-action btn-inspect" onclick="openInspectModal('${item.id}')">
+              <i class="fa fa-search"></i> ตรวจสอบ
+            </button>
+          </td>
+        `;
+        tbody.appendChild(tr);
+      });
+    }
+
+    function filterData() {
+      const trackVal = document.getElementById("track-filter").value;
+      const statusVal = document.getElementById("status-filter").value;
+      const searchVal = document.getElementById("search-lecturer").value.toLowerCase();
+
+      const filtered = lecturersData.filter(item => {
+        const matchTrack = (trackVal === "ALL") || item.tracks.includes(trackVal);
+        const matchStatus = (statusVal === "ALL") || (item.status === statusVal);
+        const matchSearch = item.name.toLowerCase().includes(searchVal);
+        return matchTrack && matchStatus && matchSearch;
+      });
+
+      renderTable(filtered);
+    }
+
+    function openInspectModal(lecturerId) {
+      const lecturer = lecturersData.find(l => l.id === lecturerId);
+      if (!lecturer) return;
+
+      document.getElementById("modal-lecturer-name").innerText = `รายละเอียดแบบฟอร์มภาระงาน - ${lecturer.name}`;
+      
+      const totalActual = lecturer.m1_actual + lecturer.m2_actual + lecturer.m3_actual + lecturer.m4_actual + lecturer.m5_actual;
+      const totalCalc = lecturer.m1_calc + lecturer.m2_calc + lecturer.m3_calc + lecturer.m4_calc + lecturer.m5_calc;
+
+      let html = `
+        <div style="background:#f8fafc; padding:16px; border-radius:8px; margin-bottom:20px; border:1px solid #e2e8f0;">
+          <p style="margin:0 0 6px 0;"><b>ตำแหน่ง:</b> ${lecturer.position} | <b>สาขาวิชา:</b> วิทยาการคอมพิวเตอร์</p>
+          <p style="margin:0 0 6px 0;"><b>หลักฐานประกอบ (Drive/Folder):</b> <a href="${lecturer.drive_link}" target="_blank" style="color:#8C1D24; font-weight:600;"><i class="fa fa-external-link"></i> เปิดโฟลเดอร์ไดรฟ์เอกสารแนบ</a></p>
+          <p style="margin:0;"><b>สรุปคะแนนคำนวณ:</b> <span style="font-size:18px; font-weight:700; color:#8C1D24;">${totalCalc.toFixed(1)} / 2,000 คะแนน</span> (คะแนนจริง ${totalActual.toFixed(1)}) | เกณฑ์ขั้นต่ำ <b>650 คะแนน</b></p>
+        </div>
+
+        <h4 style="margin-bottom:8px; color:#1e293b;">สรุปคะแนนรายหมวดตามแบบฟอร์ม 2/2567</h4>
+        <table class="score-breakdown-table">
+          <thead>
+            <tr>
+              <th>หมวดภาระงาน</th>
+              <th>คะแนนจริง</th>
+              <th>คะแนนคำนวณ</th>
+              <th>เพดานคะแนน</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr><td>หมวด 1: งานสอน (รวม ${lecturer.credits.toFixed(2)} หน่วยกิต)</td><td>${lecturer.m1_actual.toFixed(1)}</td><td><b>${lecturer.m1_calc.toFixed(1)}</b></td><td>900</td></tr>
+            <tr><td>หมวด 2: งานวิชาการ</td><td>${lecturer.m2_actual.toFixed(1)}</td><td><b>${lecturer.m2_calc.toFixed(1)}</b></td><td>900</td></tr>
+            <tr><td>หมวด 3: งานบริหาร</td><td>${lecturer.m3_actual.toFixed(1)}</td><td><b>${lecturer.m3_calc.toFixed(1)}</b></td><td>400</td></tr>
+            <tr><td>หมวด 4: งานบริการวิชาการและอื่น ๆ</td><td>${lecturer.m4_actual.toFixed(1)}</td><td><b>${lecturer.m4_calc.toFixed(1)}</b></td><td>300</td></tr>
+            <tr><td>หมวด 5: คะแนนพิเศษ</td><td>${lecturer.m5_actual.toFixed(1)}</td><td><b>${lecturer.m5_calc.toFixed(1)}</b></td><td>100</td></tr>
+          </tbody>
+        </table>
+      `;
+
+      if (lecturer.details && lecturer.details.teaching && lecturer.details.teaching.length > 0) {
+        html += `
+          <h4 style="margin-top:20px; margin-bottom:8px; color:#1e293b;">รายละเอียดรายวิชาในหมวด 1 (งานสอน)</h4>
+          <table class="score-breakdown-table">
+            <thead>
+              <tr><th>รหัส-ชื่อวิชา</th><th>โครงการ/ภาค</th><th>หน่วยกิต/ชั่วโมง</th><th>คะแนน</th></tr>
+            </thead>
+            <tbody>
+        `;
+        lecturer.details.teaching.forEach(t => {
+          html += `<tr><td><b>${t.code}</b> ${t.name}</td><td>${t.track}</td><td>${t.credits} นก. (${t.hours} ชม.)</td><td>${t.score}</td></tr>`;
+        });
+        html += `</tbody></table>`;
+      }
+
+      html += `
+        <div style="margin-top:24px; display:flex; gap:12px;">
+          <button style="background:#15803d; color:white; border:none; padding:10px 20px; border-radius:6px; font-weight:700; cursor:pointer;" onclick="alert('อนุมัติแบบฟอร์มเรียบร้อยแล้ว'); closeModal();">
+            <i class="fa fa-check"></i> อนุมัติแบบฟอร์มภาระงาน
+          </button>
+          <button style="background:#b91c1c; color:white; border:none; padding:10px 20px; border-radius:6px; font-weight:700; cursor:pointer;" onclick="alert('ส่งข้อความแจ้งเตือนให้อาจารย์แก้ไข');">
+            <i class="fa fa-reply"></i> ส่งกลับแก้ไข
+          </button>
+        </div>
+      `;
+
+      document.getElementById("modal-content").innerHTML = html;
+      document.getElementById("inspectModal").style.display = "flex";
+    }
+
+    function closeModal() {
+      document.getElementById("inspectModal").style.display = "none";
+    }
+
+    function exportCSV() {
+      alert("ระบบกำลังส่งออกไฟล์รายงาน CSV สรุปคะแนนภาระงานอาจารย์...");
+    }
+  </script>
+</body>
+
+</html>
