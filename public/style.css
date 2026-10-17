@@ -498,3 +498,47 @@ body {
   background-color: #800000 !important;
   color: #ffffff !important;
 }
+/* =========================================================
+   สไตล์ปุ่มเข้าสู่ระบบ (Login Header Button)
+   ========================================================= */
+.header-right {
+  display: flex;
+  align-items: center;
+}
+
+.btn-login-header {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  background: linear-gradient(135deg, #ffffff 0%, #f8f9fa 100%);
+  color: #8C1D24 !important;
+  text-decoration: none !important;
+  padding: 8px 18px;
+  border-radius: 20px;
+  font-size: 13.5px;
+  font-weight: 700;
+  border: 1.5px solid rgba(255, 255, 255, 0.9);
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.15);
+  transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+  letter-spacing: 0.2px;
+}
+
+.btn-login-header i {
+  font-size: 14px;
+  color: #8C1D24;
+  transition: transform 0.2s ease;
+}
+
+/* เอฟเฟกต์เมื่อวางเมาส์บนปุ่ม */
+.btn-login-header:hover {
+  background: #5B0000;
+  color: #ffffff !important;
+  border-color: #5B0000;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.25);
+  transform: translateY(-1px);
+}
+
+.btn-login-header:hover i {
+  color: #ffffff;
+  transform: translateX(2px);
+}

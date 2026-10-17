@@ -1,0 +1,198 @@
+<!DOCTYPE html>
+<html lang="th">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>เข้าสู่ระบบ - FRWS</title>
+  <link rel="stylesheet" href="style.css">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Sarabun:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+  <style>
+    body {
+      background-color: #f4f4f6;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+    }
+
+    .login-wrapper {
+      flex: 1;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 40px 20px;
+    }
+
+    .login-card {
+      background: #ffffff;
+      width: 100%;
+      max-width: 420px;
+      padding: 36px 32px;
+      border-radius: 12px;
+      box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+      border: 1px solid #e8e8e8;
+    }
+
+    .login-header {
+      text-align: center;
+      margin-bottom: 28px;
+    }
+
+    .login-header img {
+      width: 64px;
+      height: 64px;
+      margin-bottom: 12px;
+    }
+
+    .login-header h2 {
+      font-size: 20px;
+      color: #8C1D24;
+      font-weight: 700;
+      margin-bottom: 6px;
+    }
+
+    .login-header p {
+      font-size: 13px;
+      color: #666;
+    }
+
+    .form-group {
+      margin-bottom: 20px;
+    }
+
+    .form-group label {
+      display: block;
+      font-size: 13.5px;
+      font-weight: 600;
+      color: #333;
+      margin-bottom: 8px;
+    }
+
+    .input-with-icon {
+      position: relative;
+    }
+
+    .input-with-icon i {
+      position: absolute;
+      left: 14px;
+      top: 50%;
+      transform: translateY(-50%);
+      color: #8C1D24;
+      font-size: 15px;
+    }
+
+    .input-with-icon input {
+      width: 100%;
+      padding: 10px 14px 10px 40px;
+      font-size: 14px;
+      border: 1px solid #ccc;
+      border-radius: 6px;
+      outline: none;
+      font-family: inherit;
+      transition: border-color 0.2s;
+    }
+
+    .input-with-icon input:focus {
+      border-color: #8C1D24;
+      box-shadow: 0 0 0 3px rgba(140, 29, 36, 0.1);
+    }
+
+    .btn-submit-login {
+      width: 100%;
+      background: #8C1D24;
+      color: #ffffff;
+      border: none;
+      padding: 12px;
+      font-size: 15px;
+      font-weight: 600;
+      border-radius: 6px;
+      cursor: pointer;
+      transition: background 0.2s;
+      margin-top: 10px;
+      font-family: inherit;
+    }
+
+    .btn-submit-login:hover {
+      background: #6b1419;
+    }
+
+    .login-footer-links {
+      margin-top: 24px;
+      text-align: center;
+      padding-top: 20px;
+      border-top: 1px solid #eee;
+    }
+
+    .btn-back-home {
+      color: #666;
+      text-decoration: none;
+      font-size: 13.5px;
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      transition: color 0.2s;
+    }
+
+    .btn-back-home:hover {
+      color: #8C1D24;
+    }
+  </style>
+</head>
+
+<body>
+
+  <!-- Header สั้นๆ -->
+  <header class="header">
+    <div class="header-left">
+      <img src="assets/Emblem_of_Thammasat_University.svg.webp" alt="TU Logo" class="header-logo">
+      <h1 class="header-title">
+        Faculty Research<br>& Workload Management System (FRWS)
+      </h1>
+    </div>
+  </header>
+
+  <!-- Login Form Container -->
+  <div class="login-wrapper">
+    <div class="login-card">
+      <div class="login-header">
+        <img src="assets/Emblem_of_Thammasat_University.svg.webp" alt="TU Logo">
+        <h2>เข้าสู่ระบบ FRWS</h2>
+        <p>กรอกข้อมูลบัญชีผู้ใช้งานเพื่อเข้าสู่ระบบบริหารจัดการ</p>
+      </div>
+
+      <form onsubmit="event.preventDefault(); alert('หน้า Login ตัวอย่าง (ยังไม่ได้เชื่อมต่อระบบหลังบ้าน)');">
+        <div class="form-group">
+          <label for="username">ชื่อผู้ใช้งาน / อีเมล</label>
+          <div class="input-with-icon">
+            <i class="fa fa-user"></i>
+            <input type="text" id="username" placeholder="เช่น user@tu.ac.th" required>
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label for="password">รหัสผ่าน</label>
+          <div class="input-with-icon">
+            <i class="fa fa-lock"></i>
+            <input type="password" id="password" placeholder="••••••••" required>
+          </div>
+        </div>
+
+        <button type="submit" class="btn-submit-login">
+          <i class="fa fa-sign-in"></i> เข้าสู่ระบบ
+        </button>
+      </form>
+
+      <div class="login-footer-links">
+        <a href="index.html" class="btn-back-home">
+          <i class="fa fa-arrow-left"></i> กลับสู่หน้าหลัก
+        </a>
+      </div>
+    </div>
+  </div>
+
+</body>
+
+</html>
