@@ -3,7 +3,7 @@ from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 
 from app.core.config import settings
-from app.routers import professors, publications, workloads
+from app.routers import professors, publications, workloads, auth
 
 # 1. สร้าง Instance ของ FastAPI พร้อมกำหนด Metadata
 app = FastAPI(
@@ -33,9 +33,11 @@ def root_check():
         "documentation": "/docs"
     }
 
-# 4. รวม Routers แต่ละโมดูลเข้ามาในแอปพลิเคชันหลัก
-app.include_router(professors.router, prefix="/api/professors", tags=["Professors"])
-app.include_router(publications.router, prefix="/api/publications", tags=["Publications"])
+# 4. รวม Routers แต่ละโมดูลเข้ามาในแอปพลิเคชันหลัก    
+app.include_router(professors.router, prefix="/api")
+app.include_router(publications.router, prefix="/api")
+app.include_router(workloads.router, prefix="/api")
+app.include_router(auth.router, prefix="/api")
 
 
 

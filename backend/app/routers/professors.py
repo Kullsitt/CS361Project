@@ -1,15 +1,17 @@
-from fastapi import APIRouter, Depends, HTTPException, Query
-from psycopg2.extras import RealDictCursor
 from typing import Optional
+from fastapi import APIRouter, Depends, HTTPException, Query, status
+from psycopg2.extras import RealDictCursor
 from app.core.database import get_db
 
-router = APIRouter()
+# กำหนด prefix="/professors" เพื่อให้สอดคล้องกับ prefix="/api" ใน main.py
+router = APIRouter(prefix="/professors", tags=["Professors"])
 
 # =================================================================
 # 1. ดึงรายชื่ออาจารย์ทั้งหมด (พร้อมสร้างชื่อเต็มและกรองตามภาควิชา/คณะ)
 # Endpoint: GET /api/professors
 # =================================================================
-@router.get("/", summary="ดึงรายชื่ออาจารย์ทั้งหมด")
+@router.get("", summary="ดึงรายชื่ออาจารย์ทั้งหมด")
+@router.get("/", include_in_schema=False)
 def get_all_professors(
     department: Optional[str] = Query(None, description="กรองตามภาควิชา"),
     faculty: Optional[str] = Query(None, description="กรองตามคณะ"),
@@ -19,7 +21,7 @@ def get_all_professors(
     try:
         query = """
             SELECT 
-                id,
+                id::text,
                 title,
                 first_name_th,
                 last_name_th,
@@ -74,7 +76,7 @@ def get_professor_by_id(prof_id: str, conn = Depends(get_db)):
     try:
         query = """
             SELECT 
-                id,
+                id::text,
                 title,
                 first_name_th,
                 last_name_th,
@@ -99,18 +101,17 @@ def get_professor_by_id(prof_id: str, conn = Depends(get_db)):
                 created_at,
                 updated_at
             FROM professors
-            WHERE id = %s::uuid;
+            WHERE id::text = %s;
         """
-        cursor.execute(query, (prof_id,))
+        cursor.execute(query, (str(prof_id),))
         professor = cursor.fetchone()
 
         if not professor:
             raise HTTPException(status_code=404, detail=f"ไม่พบอาจารย์รหัส ID: {prof_id}")
 
-        return {
-            "status": "success",
-            "data": professor
-        }
+        # ส่ง Object ของอาจารย์กลับไปตรงๆ เพื่อให้ Frontend (teacherScript.js) อ่านค่าได้ทันที
+        return professor
+
     except HTTPException as http_ex:
         raise http_ex
     except Exception as e:

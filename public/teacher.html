@@ -26,16 +26,6 @@
     </div>
   </header>
 
-  <!-- Navigation Bar -->
-  <nav class="navbar">
-    <a href="#about" class="nav-tab">About</a>
-    <a href="#expertise" class="nav-tab">Expertise</a>
-    <a href="#research-interests" class="nav-tab">Interests</a>
-    <a href="#education" class="nav-tab">Education</a>
-    <a href="#workloads-section" class="nav-tab">Workloads & Publications</a>
-    <a href="#contact" class="nav-tab">Contact</a>
-  </nav>
-
   <!-- Main Container -->
   <div class="teacher-page-container">
     <a href="index.html"
@@ -43,6 +33,8 @@
       &larr; Back to Faculty Members
     </a>
 
+    <div id="profile-actions"></div>
+    
     <!-- ABOUT SECTION -->
     <div id="about" class="section-title">About</div>
     <div class="profile-card" id="teacher-profile-card">
@@ -75,7 +67,7 @@
       <div class="info-card" id="t-education" style="margin: 0 0 8px 0; color: #666; font-size: 1rem;"></div>
     </div>
 
-    <!-- WORKLOADS & PUBLICATIONS SECTION (ปรับดีไซน์ใหม่ตรงตามรูปตัวอย่าง) -->
+    <!-- WORKLOADS & PUBLICATIONS SECTION -->
     <div id="workloads-section" class="workload-main-header">
       <div class="header-title-box">
         <div class="red-line-bar"></div>
@@ -86,23 +78,24 @@
       </div>
       <div class="term-filter-box">
         <label for="term-select">ภาค/ปีการศึกษา:</label>
-        <select id="term-select" onchange="filterWorkloads()">
+        <select id="term-select">
           <option value="all">ทั้งหมด (All Terms)</option>
         </select>
       </div>
     </div>
 
-    <!-- Sub Navigation Tabs (หมวดหมู่ 1-4) -->
+    <!-- Sub Navigation Tabs (หมวดหมู่ 1-5) -->
     <div class="workload-sub-tabs">
       <button class="sub-tab active" onclick="switchWorkloadTab('TEACHING', this)">1. งานสอน</button>
       <button class="sub-tab" onclick="switchWorkloadTab('ADVISING', this)">2. การดูแลนักศึกษา</button>
       <button class="sub-tab" onclick="switchWorkloadTab('RESEARCH', this)">3. งานวิจัย/วิชาการ</button>
-      <button class="sub-tab" onclick="switchWorkloadTab('SERVICE', this)">4. งานบริการและบริหาร</button>
+      <button class="sub-tab" onclick="switchWorkloadTab('ADMINISTRATIVE', this)">4. งานบริหาร</button>
+      <button class="sub-tab" onclick="switchWorkloadTab('SERVICE', this)">5. งานบริการและผลงานอื่น</button>
     </div>
 
     <!-- Search Box -->
     <div class="workload-search-box">
-      <input type="text" id="workload-search-input" placeholder="ค้นหาตามรหัสวิชา, ชื่องาน, หรือบทบาท..." oninput="filterWorkloads()">
+      <input type="text" id="search-input" placeholder="ค้นหาตามรหัสวิชา, ชื่องาน, หรือบทบาท...">
     </div>
 
     <!-- Dynamic Content Container -->
