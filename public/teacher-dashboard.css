@@ -31,3 +31,22 @@ input[readonly] {
   color: #616672;
   cursor: default;
 }
+.heading-actions{display:flex;flex-wrap:wrap;gap:10px;align-items:center}
+.workload-shortcut{display:inline-flex;align-items:center;justify-content:center;padding:11px 18px;border:1px solid var(--brand);border-radius:8px;text-decoration:none;color:var(--brand);background:#fff;font-weight:600}
+.workload-shortcut:hover{background:#fcf0f1}
+.workload-panel{margin-top:28px;padding:28px;background:#fff;border:1px solid var(--line);border-radius:14px}
+.workload-heading,.workload-list-heading{display:flex;justify-content:space-between;align-items:center;gap:16px}
+.workload-heading h2{margin:6px 0}.workload-heading .rank{white-space:nowrap}
+.workload-panel select{font:inherit;font-weight:400;font-size:14px;color:var(--ink);background:#fff;border:1px solid #d9dce2;border-radius:7px;padding:11px 12px;width:100%;min-width:0}
+.workload-panel select:focus{outline:2px solid #d8a8ac;border-color:var(--brand)}
+.workload-actions{display:flex;gap:10px;justify-content:flex-end;margin-top:20px}
+.workload-list-heading{border-top:1px solid var(--line);margin-top:28px;padding-top:24px}.workload-list-heading h3{font-size:18px}
+.workload-list-heading label{max-width:260px}.workload-empty{text-align:center;color:var(--muted);padding:36px 16px;border:1px dashed #d9dce2;border-radius:10px;margin-top:20px}
+.workload-record{border:1px solid var(--line);border-radius:10px;margin-top:16px;padding:20px;overflow-wrap:anywhere}.workload-record h4{font-size:17px;margin:8px 0}.workload-record details{margin-top:14px;font-size:14px;white-space:pre-wrap}.workload-record summary{cursor:pointer;color:var(--brand);padding:8px 0}.workload-record details p{margin:8px 0}.workload-record a{color:var(--brand)}
+.workload-footnote{margin-top:18px;font-size:12px}#workload-notice{background:#eaf5ef;color:#216342;padding:12px 16px;border-radius:8px;margin-top:20px}
+@media(max-width:540px){.workload-panel{padding:20px 16px}.workload-heading,.workload-list-heading{align-items:flex-start;flex-direction:column}.workload-list-heading label{max-width:none;width:100%}.workload-actions{flex-wrap:wrap}.workload-actions button{flex:1}.workload-record{padding:16px}}
+/* ===== START WORKLOAD_SCORE: สไตล์ช่องคะแนนและคะแนนบนการ์ด ===== */
+.score-panel{margin-top:24px;padding:20px;background:#fff8ee;border:1px solid #ebddc5;border-radius:10px}.score-panel .field-grid{margin-top:0}.score-panel .muted{margin-top:10px;font-size:12px}#live-score{display:flex;align-items:center;min-height:46px;font-size:24px;font-weight:700;color:var(--brand)}.record-score{color:var(--brand);font-weight:700;margin-top:12px}
+/* ===== END WORKLOAD_SCORE ===== */
+.role-guidance{margin-top:16px;padding:12px 16px;background:#f4f6f9;border-left:3px solid #8c1d24;border-radius:4px;line-height:1.8}
+.student-names-field{margin-top:20px}.student-names-summary{margin-top:12px;white-space:pre-line;font-size:14px;line-height:1.8}#live-score{background:#f0f1f4;border-color:#e3e5e9;cursor:default;width:100%;font-size:22px}

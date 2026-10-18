@@ -8,6 +8,9 @@
   <link rel="stylesheet" href="teacher-dashboard.css">
   <link href="https://fonts.googleapis.com/css2?family=Sarabun:wght@400;500;600;700&display=swap" rel="stylesheet">
   <script src="js/teacher-dashboard.js" defer></script>
+  <!-- WORKLOAD_SCORE: สูตรคะแนนและรายการบทบาท ใช้ร่วมกับ teacher-workload.js -->
+  <script src="js/workload-scoring.js" defer></script>
+  <script src="js/teacher-workload.js" defer></script>
 </head>
 <body>
   <header class="header">
@@ -15,7 +18,7 @@
     <a class="home-link" href="index.html">กลับหน้าหลัก ↗</a>
   </header>
   <main class="teacher-dash">
-    <div class="page-heading"><div><p class="eyebrow">MY DASHBOARD</p><h1>ข้อมูลส่วนตัวของฉัน</h1><p class="muted">ดูและจัดการข้อมูลประวัติ ความเชี่ยวชาญ และช่องทางติดต่อ</p></div><button id="edit" hidden>แก้ไขข้อมูลส่วนตัว</button></div>
+    <div class="page-heading"><div><p class="eyebrow">MY DASHBOARD</p><h1>ข้อมูลส่วนตัวของฉัน</h1><p class="muted">ดูและจัดการข้อมูลประวัติ ความเชี่ยวชาญ และช่องทางติดต่อ</p></div><div class="heading-actions"><a class="workload-shortcut" href="#my-workloads">＋ กรอกภาระงาน</a><button id="edit" hidden>แก้ไขข้อมูลส่วนตัว</button></div></div>
     <div id="notice" role="status" aria-live="polite" hidden></div>
     <div id="dashboard" class="profile-layout" hidden>
       <aside class="profile-panel">
@@ -49,6 +52,40 @@
         </form>
       </section>
     </div>
+    <section id="my-workloads" class="workload-panel" aria-labelledby="workload-heading">
+      <div class="workload-heading"><div><p class="eyebrow">MY WORKLOAD</p><h2 id="workload-heading">กรอกภาระงาน</h2><p class="muted">เพิ่มรายละเอียดการปฏิบัติงานและเอกสารอ้างอิงในแต่ละหมวด</p></div><span id="workload-count" class="rank">0 รายการ</span></div>
+      <div id="workload-notice" role="status" aria-live="polite" hidden></div>
+      <form id="workload-form">
+        <div class="field-grid">
+          <label>ภาคการศึกษา *<select name="semester" required><option value="1">ภาค 1</option><option value="2" selected>ภาค 2</option><option value="summer">ภาคฤดูร้อน</option></select></label>
+          <label>ปีการศึกษา (พ.ศ.) *<input name="year" type="number" min="2500" max="2700" value="2567" required></label>
+          <label>หมวดภาระงาน *<select name="category" id="workload-category" required></select></label>
+          <label>ประเภทหลัก *<select name="group" id="workload-group" required></select></label>
+          <label class="full">ประเภทย่อย *<select name="subtype" id="workload-subtype" required></select></label>
+          <label class="full">ชื่อวิชา / ชื่อผลงาน / ชื่อกิจกรรม *<input name="title" required maxlength="300" placeholder="ระบุชื่อรายการภาระงาน"></label>
+        </div>
+        <div id="workload-details" class="field-grid"></div>
+        <label id="student-names-field" class="student-names-field" hidden>ชื่อนักศึกษาที่ร่วมงาน / อยู่ในความดูแล<textarea name="student_names" rows="3" maxlength="5000" placeholder="กรอกชื่อ–นามสกุลนักศึกษา หนึ่งชื่อต่อบรรทัด"></textarea></label>
+        <p id="role-guidance" class="muted role-guidance" aria-live="polite"></p>
+        <!-- ===== START WORKLOAD_SCORE: ช่องคะแนนอัตโนมัติ (แก้ไขไม่ได้) =====
+             หากไม่ใช้คะแนน ให้แก้ส่วน WORKLOAD_SCORE ใน teacher-workload.js ด้วย
+             JavaScript คำนวณจากบทบาทและข้อมูลจริง ไม่อ่านคะแนนจากช่องนี้ไปบันทึก
+        -->
+        <div class="score-panel">
+          <label>คะแนนที่คำนวณได้<input id="live-score" readonly value="—" aria-describedby="score-help"></label>
+          <p id="score-help" class="muted" role="status" aria-live="polite">เลือกข้อมูลให้ครบเพื่อคำนวณคะแนน</p>
+        </div>
+        <!-- ===== END WORKLOAD_SCORE ===== -->
+        <div class="field-grid">
+          <label>ลิงก์หลักฐาน<input name="evidence_url" type="url" maxlength="2000" placeholder="https://…"></label>
+          <label class="full">เลือกไฟล์หลักฐาน<input name="attachments" type="file" multiple accept=".pdf,.png,.jpg,.jpeg,.doc,.docx,.xls,.xlsx"><span class="muted">เลือกไฟล์เพื่อแสดงชื่อในรายการ ยังไม่มีการอัปโหลดไฟล์</span><span id="selected-evidence" class="muted"></span></label>
+        </div>
+        <div class="workload-actions"><button type="button" id="workload-cancel" class="secondary">ล้างข้อมูล</button><button type="submit" id="workload-save">เพิ่มรายการภาระงาน</button></div>
+      </form>
+      <div class="workload-list-heading"><h3>รายการภาระงานของฉัน</h3><label>แสดงหมวด<select id="workload-filter"><option value="all">ทุกหมวด</option></select></label></div>
+      <div id="workload-list"></div>
+      <p class="muted workload-footnote">รายการอยู่เฉพาะหน้านี้และจะรีเซ็ตเมื่อรีเฟรช คะแนนยังไม่ใช่ผลประเมินที่อนุมัติ</p>
+    </section>
     <p class="page-footer">FRWS · ระบบจัดการข้อมูลผลงานวิจัยและภาระงานอาจารย์</p>
   </main>
 </body>
