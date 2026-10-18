@@ -17,7 +17,7 @@ app = FastAPI(
 # 2. ตั้งค่า CORS Middleware อนุญาตให้ Frontend (HTML/JS/React) เรียกใช้ API ได้
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=settings.CORS_ORIGINS,
+    allow_origins=["*"], # หรือใส่ Domain ของ Frontend
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],

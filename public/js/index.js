@@ -1,5 +1,5 @@
-// ดึง API_BASE_URL จาก config.js (ถ้าไม่มีจะใช้ค่า Default)
-const API_URL = typeof API_BASE_URL !== 'undefined' ? API_BASE_URL : 'http://localhost:8000/api';
+// ดึง API_BASE_URL จาก config.js (ถ้าไม่มีจะใช้ค่า IP ของ EC2)
+const API_URL = typeof API_BASE_URL !== 'undefined' ? API_BASE_URL : 'http://18.215.169.239/api';
 
 let currentTab = 'authors';
 let currentPage = 1;

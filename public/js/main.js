@@ -1,4 +1,4 @@
-const API_BASE_URL = 'http://localhost:8000/api';
+const API_BASE_URL = 'http://18.215.169.239/api';
 
 document.addEventListener('DOMContentLoaded', () => {
   renderAuthNav();

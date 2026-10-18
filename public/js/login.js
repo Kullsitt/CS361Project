@@ -1,4 +1,4 @@
-const API_URL = typeof API_BASE_URL !== 'undefined' ? API_BASE_URL : 'http://localhost:8000/api';
+const API_URL = typeof API_BASE_URL !== 'undefined' ? API_BASE_URL : 'http://18.215.169.239/api';
 
 document.addEventListener('DOMContentLoaded', () => {
   // 1. เช็กว่าผู้ใช้ล็อกอินไว้อยู่แล้วหรือไม่ ถ้ามี Token ให้ย้ายไปหน้าหลักทันที
