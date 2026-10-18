@@ -23,6 +23,13 @@ function renderAuthNav() {
       authNavSection.innerHTML = `
         <div class="user-menu" style="display: flex; align-items: center; gap: 12px;">
 
+          <a href="teacher-dashboard.html" class="dashboard-icon" title="ข้อมูลส่วนตัวอาจารย์" aria-label="ข้อมูลส่วนตัวอาจารย์">
+            <i class="fa fa-user-circle-o" aria-hidden="true"></i><span>Teacher Dashboard</span>
+          </a>
+          <a href="dashboard.html" class="dashboard-icon" title="แดชบอร์ดเจ้าหน้าที่" aria-label="แดชบอร์ดเจ้าหน้าที่">
+            <i class="fa fa-bar-chart" aria-hidden="true"></i><span>Officer Dashboard</span>
+          </a>
+
             <a href="teacher.html?id=${user.id}" class="profile-link" 
             style="display: flex; align-items: center; gap: 12px; color: #ffffff; text-decoration: none; font-size: 13.5px;">
             ${userName}</a>
@@ -55,6 +62,12 @@ function renderAuthNav() {
   } else {
     // กรณีผู้ใช้ยังไม่ได้เข้าสู่ระบบ
     authNavSection.innerHTML = `
+      <a href="teacher-dashboard.html" class="dashboard-icon" title="ข้อมูลส่วนตัวอาจารย์" aria-label="ข้อมูลส่วนตัวอาจารย์">
+        <i class="fa fa-user-circle-o" aria-hidden="true"></i><span>Teacher Dashboard</span>
+      </a>
+      <a href="dashboard.html" class="dashboard-icon" title="แดชบอร์ดเจ้าหน้าที่" aria-label="แดชบอร์ดเจ้าหน้าที่">
+        <i class="fa fa-bar-chart" aria-hidden="true"></i><span>Officer Dashboard</span>
+      </a>
       <a href="login.html" style="
         color: #ffffff;
         text-decoration: none;
