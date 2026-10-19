@@ -7,6 +7,7 @@
   <link rel="stylesheet" href="style.css">
   <link rel="stylesheet" href="teacher-dashboard.css">
   <link href="https://fonts.googleapis.com/css2?family=Sarabun:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <script src="js/dashboard-api.js" defer></script>
   <script src="js/teacher-dashboard.js" defer></script>
   <!-- WORKLOAD_SCORE: สูตรคะแนนและรายการบทบาท ใช้ร่วมกับ teacher-workload.js -->
   <script src="js/workload-scoring.js" defer></script>
@@ -62,7 +63,7 @@
           <label>หมวดภาระงาน *<select name="category" id="workload-category" required></select></label>
           <label>ประเภทหลัก *<select name="group" id="workload-group" required></select></label>
           <label class="full">ประเภทย่อย *<select name="subtype" id="workload-subtype" required></select></label>
-          <label class="full">ชื่อวิชา / ชื่อผลงาน / ชื่อกิจกรรม *<input name="title" required maxlength="300" placeholder="ระบุชื่อรายการภาระงาน"></label>
+          <label class="full">ชื่อวิชา / ชื่อผลงาน / ชื่อกิจกรรม *<input name="title" required maxlength="255" placeholder="ระบุชื่อรายการภาระงาน"></label>
         </div>
         <div id="workload-details" class="field-grid"></div>
         <label id="student-names-field" class="student-names-field" hidden>ชื่อนักศึกษาที่ร่วมงาน / อยู่ในความดูแล<textarea name="student_names" rows="3" maxlength="5000" placeholder="กรอกชื่อ–นามสกุลนักศึกษา หนึ่งชื่อต่อบรรทัด"></textarea></label>
@@ -84,7 +85,7 @@
       </form>
       <div class="workload-list-heading"><h3>รายการภาระงานของฉัน</h3><label>แสดงหมวด<select id="workload-filter"><option value="all">ทุกหมวด</option></select></label></div>
       <div id="workload-list"></div>
-      <p class="muted workload-footnote">รายการอยู่เฉพาะหน้านี้และจะรีเซ็ตเมื่อรีเฟรช คะแนนยังไม่ใช่ผลประเมินที่อนุมัติ</p>
+      <p class="muted workload-footnote">บันทึกรายการลงระบบเมื่อกดบันทึก คะแนนยังไม่ใช่ผลประเมินที่อนุมัติ</p>
     </section>
     <p class="page-footer">FRWS · ระบบจัดการข้อมูลผลงานวิจัยและภาระงานอาจารย์</p>
   </main>

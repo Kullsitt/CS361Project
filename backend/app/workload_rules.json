@@ -1,0 +1,1589 @@
+{
+  "1.1": {
+    "category": "teaching",
+    "subtype": "1.1 วิชาบรรยาย (ปริญญาตรี)",
+    "basis": "credits3",
+    "roles": [
+      {
+        "name": "ผู้สอนวิชาบรรยาย",
+        "weight": 1,
+        "available": true,
+        "fields": [
+          "course",
+          "role",
+          "hours",
+          "credits",
+          "students",
+          "share"
+        ],
+        "students": false
+      }
+    ]
+  },
+  "1.2": {
+    "category": "teaching",
+    "subtype": "1.2 วิชาปฏิบัติการ (ปริญญาตรี)",
+    "basis": "credits3",
+    "roles": [
+      {
+        "name": "ผู้สอนและเตรียมปฏิบัติการ",
+        "weight": 0.6,
+        "available": true,
+        "fields": [
+          "course",
+          "role",
+          "hours",
+          "credits",
+          "students",
+          "share"
+        ],
+        "students": false
+      },
+      {
+        "name": "ผู้ช่วยสอนปฏิบัติการ",
+        "weight": 0.5,
+        "available": true,
+        "fields": [
+          "course",
+          "role",
+          "hours",
+          "credits",
+          "students",
+          "share"
+        ],
+        "students": false
+      },
+      {
+        "name": "ผู้คุมวิชาปฏิบัติการนอกสถานที่",
+        "weight": 0.5,
+        "available": true,
+        "fields": [
+          "course",
+          "role",
+          "hours",
+          "credits",
+          "students",
+          "share"
+        ],
+        "students": false
+      }
+    ]
+  },
+  "1.3": {
+    "category": "teaching",
+    "subtype": "1.3 สัมมนา (ปริญญาตรี)",
+    "basis": "quantity",
+    "roles": [
+      {
+        "name": "อาจารย์ที่ปรึกษา",
+        "weight": 0.1,
+        "available": true,
+        "fields": [
+          "course",
+          "role",
+          "quantity",
+          "share"
+        ],
+        "students": false
+      },
+      {
+        "name": "กรรมการสอบสัมมนา",
+        "weight": 0.05,
+        "available": true,
+        "fields": [
+          "course",
+          "role",
+          "quantity",
+          "share"
+        ],
+        "students": false
+      }
+    ]
+  },
+  "1.4": {
+    "category": "teaching",
+    "subtype": "1.4 ซีเนียร์โปรเจก / ปัญหาพิเศษ",
+    "basis": "quantity",
+    "roles": [
+      {
+        "name": "อาจารย์ที่ปรึกษา",
+        "weight": 0.2,
+        "available": true,
+        "fields": [
+          "course",
+          "role",
+          "quantity",
+          "share"
+        ],
+        "students": true
+      },
+      {
+        "name": "อาจารย์ที่ปรึกษาร่วม",
+        "weight": 0.1,
+        "available": true,
+        "fields": [
+          "course",
+          "role",
+          "quantity",
+          "share"
+        ],
+        "students": true
+      },
+      {
+        "name": "กรรมการสอบ",
+        "weight": 0.05,
+        "available": true,
+        "fields": [
+          "course",
+          "role",
+          "quantity",
+          "share"
+        ],
+        "students": true
+      }
+    ]
+  },
+  "1.5": {
+    "category": "teaching",
+    "subtype": "1.5 สหกิจศึกษา",
+    "basis": "quantity",
+    "roles": [
+      {
+        "name": "อาจารย์ที่ปรึกษา",
+        "weight": 0.2,
+        "available": true,
+        "fields": [
+          "course",
+          "role",
+          "quantity",
+          "share"
+        ],
+        "students": false
+      },
+      {
+        "name": "อาจารย์ที่ปรึกษาร่วม",
+        "weight": 0.1,
+        "available": true,
+        "fields": [
+          "course",
+          "role",
+          "quantity",
+          "share"
+        ],
+        "students": false
+      },
+      {
+        "name": "กรรมการตรวจผลงาน",
+        "weight": 0.05,
+        "available": true,
+        "fields": [
+          "course",
+          "role",
+          "quantity",
+          "share"
+        ],
+        "students": false
+      }
+    ]
+  },
+  "1.6": {
+    "category": "teaching",
+    "subtype": "1.6 วิชาบรรยาย (โท / เอก)",
+    "basis": "credits3",
+    "roles": [
+      {
+        "name": "ผู้สอนวิชาบรรยาย",
+        "weight": 1.1,
+        "available": true,
+        "fields": [
+          "course",
+          "role",
+          "hours",
+          "credits",
+          "students",
+          "share"
+        ],
+        "students": false
+      }
+    ]
+  },
+  "1.7": {
+    "category": "teaching",
+    "subtype": "1.7 วิชาปฏิบัติการ (โท / เอก)",
+    "basis": "credits3",
+    "roles": [
+      {
+        "name": "ผู้สอนและเตรียมปฏิบัติการ",
+        "weight": 0.6,
+        "available": true,
+        "fields": [
+          "course",
+          "role",
+          "hours",
+          "credits",
+          "students",
+          "share"
+        ],
+        "students": false
+      },
+      {
+        "name": "ผู้ช่วยสอนปฏิบัติการ",
+        "weight": 0.5,
+        "available": true,
+        "fields": [
+          "course",
+          "role",
+          "hours",
+          "credits",
+          "students",
+          "share"
+        ],
+        "students": false
+      }
+    ]
+  },
+  "1.8": {
+    "category": "teaching",
+    "subtype": "1.8 สัมมนา (โท / เอก)",
+    "basis": "quantity",
+    "roles": [
+      {
+        "name": "อาจารย์ที่ปรึกษา",
+        "weight": 0.15,
+        "available": true,
+        "fields": [
+          "course",
+          "role",
+          "quantity",
+          "share"
+        ],
+        "students": false
+      },
+      {
+        "name": "กรรมการสอบวิชาสัมมนา",
+        "weight": 0.075,
+        "available": true,
+        "fields": [
+          "course",
+          "role",
+          "quantity",
+          "share"
+        ],
+        "students": false
+      }
+    ]
+  },
+  "1.9": {
+    "category": "teaching",
+    "subtype": "1.9 วิทยานิพนธ์",
+    "basis": "credits",
+    "roles": [
+      {
+        "name": "ที่ปรึกษาหลัก",
+        "weight": 0.1,
+        "available": true,
+        "fields": [
+          "course",
+          "role",
+          "credits",
+          "share"
+        ],
+        "students": true
+      },
+      {
+        "name": "ที่ปรึกษาร่วม",
+        "weight": 0.05,
+        "available": true,
+        "fields": [
+          "course",
+          "role",
+          "credits",
+          "share"
+        ],
+        "students": true
+      }
+    ]
+  },
+  "1.10": {
+    "category": "teaching",
+    "subtype": "1.10 ปัญหาพิเศษ (โท / เอก)",
+    "basis": "quantity",
+    "roles": [
+      {
+        "name": "ที่ปรึกษาหลัก",
+        "weight": 0.225,
+        "available": true,
+        "fields": [
+          "course",
+          "role",
+          "quantity",
+          "share"
+        ],
+        "students": true
+      },
+      {
+        "name": "ที่ปรึกษาร่วม",
+        "weight": 0.1125,
+        "available": true,
+        "fields": [
+          "course",
+          "role",
+          "quantity",
+          "share"
+        ],
+        "students": true
+      }
+    ]
+  },
+  "1.11": {
+    "category": "teaching",
+    "subtype": "1.11 สารนิพนธ์ / ค้นคว้าอิสระ",
+    "basis": "credits",
+    "roles": [
+      {
+        "name": "ที่ปรึกษาหลัก",
+        "weight": 0.05,
+        "available": true,
+        "fields": [
+          "course",
+          "role",
+          "credits",
+          "share"
+        ],
+        "students": true
+      },
+      {
+        "name": "ที่ปรึกษาร่วม",
+        "weight": 0.025,
+        "available": true,
+        "fields": [
+          "course",
+          "role",
+          "credits",
+          "share"
+        ],
+        "students": true
+      }
+    ]
+  },
+  "2.1": {
+    "category": "academic",
+    "subtype": "2.1 รายงานวิจัยฉบับสมบูรณ์",
+    "basis": "single",
+    "roles": [
+      {
+        "name": "ทุนวิจัยจากต่างประเทศ",
+        "weight": 1,
+        "available": true,
+        "fields": [
+          "role",
+          "share",
+          "source"
+        ],
+        "students": false
+      },
+      {
+        "name": "ทุนวิจัยในประเทศนอก มธ.",
+        "weight": 0.5,
+        "available": true,
+        "fields": [
+          "role",
+          "share",
+          "source"
+        ],
+        "students": false
+      },
+      {
+        "name": "ทุนวิจัยภายใน มธ.",
+        "weight": 0.25,
+        "available": true,
+        "fields": [
+          "role",
+          "share",
+          "source"
+        ],
+        "students": false
+      },
+      {
+        "name": "งานวิจัยที่ได้รับการสนับสนุนจากคณะฯ",
+        "weight": 0.125,
+        "available": true,
+        "fields": [
+          "role",
+          "share",
+          "source"
+        ],
+        "students": false
+      }
+    ]
+  },
+  "2.2": {
+    "category": "academic",
+    "subtype": "2.2 รายงานความก้าวหน้า",
+    "basis": "single",
+    "roles": [
+      {
+        "name": "รายงานความก้าวหน้าประจำปีของโครงการต่อเนื่อง (ทุกชนิดทุน)",
+        "weight": 0.05,
+        "available": true,
+        "fields": [
+          "role",
+          "share",
+          "source"
+        ],
+        "students": false
+      }
+    ]
+  },
+  "2.3.1": {
+    "category": "academic",
+    "subtype": "2.3.1 บทความวิจัยนานาชาติ",
+    "basis": "single",
+    "roles": [
+      {
+        "name": "บทความวิจัย Tier 1",
+        "weight": 2.5,
+        "available": true,
+        "fields": [
+          "role",
+          "share",
+          "source"
+        ],
+        "students": false
+      },
+      {
+        "name": "บทความวิจัย Q1",
+        "weight": 2.25,
+        "available": true,
+        "fields": [
+          "role",
+          "share",
+          "source"
+        ],
+        "students": false
+      },
+      {
+        "name": "บทความวิจัย Q2",
+        "weight": 2,
+        "available": true,
+        "fields": [
+          "role",
+          "share",
+          "source"
+        ],
+        "students": false
+      },
+      {
+        "name": "บทความวิจัย Q3",
+        "weight": 1.75,
+        "available": true,
+        "fields": [
+          "role",
+          "share",
+          "source"
+        ],
+        "students": false
+      },
+      {
+        "name": "บทความวิจัย Q4",
+        "weight": 1.5,
+        "available": true,
+        "fields": [
+          "role",
+          "share",
+          "source"
+        ],
+        "students": false
+      },
+      {
+        "name": "บทความวิจัยที่ไม่มี Q",
+        "weight": 1.25,
+        "available": true,
+        "fields": [
+          "role",
+          "share",
+          "source"
+        ],
+        "students": false
+      }
+    ]
+  },
+  "2.3.2": {
+    "category": "academic",
+    "subtype": "2.3.2 Short Communication / บทความปริทัศน์",
+    "basis": "single",
+    "roles": [
+      {
+        "name": "Short Communication / บทความวิชาการ Tier 1",
+        "weight": 1.25,
+        "available": true,
+        "fields": [
+          "role",
+          "share",
+          "source"
+        ],
+        "students": false
+      },
+      {
+        "name": "Short Communication / บทความวิชาการ Q1",
+        "weight": 1.125,
+        "available": true,
+        "fields": [
+          "role",
+          "share",
+          "source"
+        ],
+        "students": false
+      },
+      {
+        "name": "Short Communication / บทความวิชาการ Q2",
+        "weight": 1,
+        "available": true,
+        "fields": [
+          "role",
+          "share",
+          "source"
+        ],
+        "students": false
+      },
+      {
+        "name": "Short Communication / บทความวิชาการ Q3",
+        "weight": 0.875,
+        "available": true,
+        "fields": [
+          "role",
+          "share",
+          "source"
+        ],
+        "students": false
+      },
+      {
+        "name": "Short Communication / บทความวิชาการ Q4",
+        "weight": 0.75,
+        "available": true,
+        "fields": [
+          "role",
+          "share",
+          "source"
+        ],
+        "students": false
+      }
+    ]
+  },
+  "2.3.3": {
+    "category": "academic",
+    "subtype": "2.3.3 วารสารในฐานข้อมูล TCI",
+    "basis": "single",
+    "roles": [
+      {
+        "name": "บทความวิจัย กลุ่ม 1",
+        "weight": 0.75,
+        "available": true,
+        "fields": [
+          "role",
+          "share",
+          "source"
+        ],
+        "students": false
+      },
+      {
+        "name": "บทความวิจัย กลุ่ม 2",
+        "weight": 0.5,
+        "available": true,
+        "fields": [
+          "role",
+          "share",
+          "source"
+        ],
+        "students": false
+      },
+      {
+        "name": "บทความวิชาการ กลุ่ม 1",
+        "weight": 0.375,
+        "available": true,
+        "fields": [
+          "role",
+          "share",
+          "source"
+        ],
+        "students": false
+      },
+      {
+        "name": "บทความวิชาการ กลุ่ม 2",
+        "weight": 0.25,
+        "available": true,
+        "fields": [
+          "role",
+          "share",
+          "source"
+        ],
+        "students": false
+      }
+    ]
+  },
+  "2.3.4": {
+    "category": "academic",
+    "subtype": "2.3.4 วารสารนานาชาติอื่น / Proceedings / Data Article",
+    "basis": "single",
+    "roles": [
+      {
+        "name": "บทความวิจัย",
+        "weight": 0.75,
+        "available": true,
+        "fields": [
+          "role",
+          "share",
+          "source"
+        ],
+        "students": false
+      },
+      {
+        "name": "Short Communication",
+        "weight": 0.375,
+        "available": true,
+        "fields": [
+          "role",
+          "share",
+          "source"
+        ],
+        "students": false
+      },
+      {
+        "name": "บทความวิชาการทั่วไป",
+        "weight": 0.375,
+        "available": true,
+        "fields": [
+          "role",
+          "share",
+          "source"
+        ],
+        "students": false
+      },
+      {
+        "name": "Data Article",
+        "weight": 0.75,
+        "available": true,
+        "fields": [
+          "role",
+          "share",
+          "source"
+        ],
+        "students": false
+      }
+    ]
+  },
+  "2.3.5": {
+    "category": "academic",
+    "subtype": "2.3.5 วารสารระดับชาติอื่น / Proceedings",
+    "basis": "single",
+    "roles": [
+      {
+        "name": "บทความวิจัย",
+        "weight": 0.4,
+        "available": true,
+        "fields": [
+          "role",
+          "share",
+          "source"
+        ],
+        "students": false
+      },
+      {
+        "name": "Short Communication",
+        "weight": 0.2,
+        "available": true,
+        "fields": [
+          "role",
+          "share",
+          "source"
+        ],
+        "students": false
+      },
+      {
+        "name": "บทความวิชาการทั่วไป",
+        "weight": 0.2,
+        "available": true,
+        "fields": [
+          "role",
+          "share",
+          "source"
+        ],
+        "students": false
+      }
+    ]
+  },
+  "2.4.1": {
+    "category": "academic",
+    "subtype": "2.4.1 นำเสนอผลงานระดับนานาชาติ",
+    "basis": "single",
+    "roles": [
+      {
+        "name": "แบบบรรยาย",
+        "weight": 0.75,
+        "available": true,
+        "fields": [
+          "role",
+          "share",
+          "source"
+        ],
+        "students": false
+      },
+      {
+        "name": "แบบโปสเตอร์",
+        "weight": 0.375,
+        "available": true,
+        "fields": [
+          "role",
+          "share",
+          "source"
+        ],
+        "students": false
+      }
+    ]
+  },
+  "2.4.2": {
+    "category": "academic",
+    "subtype": "2.4.2 นำเสนอผลงานระดับชาติ / สถาบัน",
+    "basis": "single",
+    "roles": [
+      {
+        "name": "แบบบรรยาย",
+        "weight": 0.5,
+        "available": true,
+        "fields": [
+          "role",
+          "share",
+          "source"
+        ],
+        "students": false
+      },
+      {
+        "name": "แบบโปสเตอร์",
+        "weight": 0.25,
+        "available": true,
+        "fields": [
+          "role",
+          "share",
+          "source"
+        ],
+        "students": false
+      }
+    ]
+  },
+  "2.5": {
+    "category": "academic",
+    "subtype": "2.5 สิทธิบัตร / สิ่งประดิษฐ์",
+    "basis": "single",
+    "roles": [
+      {
+        "name": "ยื่นจดทะเบียนสิทธิบัตร / อนุสิทธิบัตร ในประเทศ / ต่างประเทศ",
+        "weight": 0.1,
+        "available": true,
+        "fields": [
+          "role",
+          "share"
+        ],
+        "students": false
+      },
+      {
+        "name": "ทะเบียนสิทธิบัตรในต่างประเทศ",
+        "weight": 2.75,
+        "available": true,
+        "fields": [
+          "role",
+          "share"
+        ],
+        "students": false
+      },
+      {
+        "name": "ทะเบียนสิทธิบัตรภายในประเทศ",
+        "weight": 2.25,
+        "available": true,
+        "fields": [
+          "role",
+          "share"
+        ],
+        "students": false
+      },
+      {
+        "name": "ข้อ 4 — ข้อความและน้ำหนักใน PDF ถูกตัด",
+        "weight": "",
+        "available": false,
+        "fields": [
+          "role",
+          "share"
+        ],
+        "students": false
+      }
+    ]
+  },
+  "2.6.1": {
+    "category": "academic",
+    "subtype": "2.6.1 หนังสือ / ตำรา",
+    "basis": "single",
+    "roles": [
+      {
+        "name": "หนังสือหรือตำรา",
+        "weight": 2,
+        "available": true,
+        "fields": [
+          "role",
+          "share",
+          "source"
+        ],
+        "students": false
+      },
+      {
+        "name": "หนังสือแปลหรือตำราแปล",
+        "weight": 1.5,
+        "available": true,
+        "fields": [
+          "role",
+          "share",
+          "source"
+        ],
+        "students": false
+      }
+    ]
+  },
+  "2.6.2": {
+    "category": "academic",
+    "subtype": "2.6.2 Book Chapter",
+    "basis": "quantity",
+    "roles": [
+      {
+        "name": "Book Chapter",
+        "weight": 0.4,
+        "available": true,
+        "fields": [
+          "role",
+          "share",
+          "source",
+          "quantity"
+        ],
+        "students": false
+      }
+    ]
+  },
+  "2.7": {
+    "category": "academic",
+    "subtype": "2.7 เอกสารและสื่อการสอน",
+    "basis": "single",
+    "roles": [
+      {
+        "name": "เอกสารคำสอน",
+        "weight": 0.5,
+        "available": true,
+        "fields": [
+          "role",
+          "share"
+        ],
+        "students": false
+      },
+      {
+        "name": "เอกสารประกอบการสอน",
+        "weight": 0.4,
+        "available": true,
+        "fields": [
+          "role",
+          "share"
+        ],
+        "students": false
+      },
+      {
+        "name": "คู่มือปฏิบัติการ",
+        "weight": 0.4,
+        "available": true,
+        "fields": [
+          "role",
+          "share"
+        ],
+        "students": false
+      },
+      {
+        "name": "งานสร้างอุปกรณ์ / เครื่องมือ / ชุดทดลอง",
+        "weight": 0.5,
+        "available": true,
+        "fields": [
+          "role",
+          "share"
+        ],
+        "students": false
+      },
+      {
+        "name": "สื่อการสอนที่เป็นนวัตกรรมใหม่",
+        "weight": 0.5,
+        "available": true,
+        "fields": [
+          "role",
+          "share"
+        ],
+        "students": false
+      },
+      {
+        "name": "การแจ้งมีลิขสิทธิ์",
+        "weight": 0.05,
+        "available": true,
+        "fields": [
+          "role",
+          "share"
+        ],
+        "students": false
+      }
+    ]
+  },
+  "2.8.1": {
+    "category": "academic",
+    "subtype": "2.8.1 ทุนวิจัยภายนอก",
+    "basis": "single",
+    "roles": [
+      {
+        "name": "งบประมาณตั้งแต่ 20 ล้านบาท",
+        "weight": 2.25,
+        "available": true,
+        "fields": [
+          "role",
+          "share",
+          "source",
+          "budget"
+        ],
+        "students": false
+      },
+      {
+        "name": "งบประมาณตั้งแต่ 15 ล้าน แต่ไม่ถึง 20 ล้านบาท",
+        "weight": 2,
+        "available": true,
+        "fields": [
+          "role",
+          "share",
+          "source",
+          "budget"
+        ],
+        "students": false
+      },
+      {
+        "name": "งบประมาณตั้งแต่ 10 ล้าน แต่ไม่ถึง 15 ล้านบาท",
+        "weight": 1.75,
+        "available": true,
+        "fields": [
+          "role",
+          "share",
+          "source",
+          "budget"
+        ],
+        "students": false
+      },
+      {
+        "name": "งบประมาณตั้งแต่ 5 ล้าน แต่ไม่ถึง 10 ล้านบาท",
+        "weight": 1.5,
+        "available": true,
+        "fields": [
+          "role",
+          "share",
+          "source",
+          "budget"
+        ],
+        "students": false
+      },
+      {
+        "name": "งบประมาณตั้งแต่ 1 ล้าน แต่ไม่ถึง 5 ล้านบาท",
+        "weight": 1.25,
+        "available": true,
+        "fields": [
+          "role",
+          "share",
+          "source",
+          "budget"
+        ],
+        "students": false
+      },
+      {
+        "name": "งบประมาณตั้งแต่ 5 แสน แต่ไม่ถึง 1 ล้านบาท",
+        "weight": 1,
+        "available": true,
+        "fields": [
+          "role",
+          "share",
+          "source",
+          "budget"
+        ],
+        "students": false
+      },
+      {
+        "name": "งบประมาณตั้งแต่ 1 แสน แต่ไม่ถึง 5 แสนบาท",
+        "weight": 0.75,
+        "available": true,
+        "fields": [
+          "role",
+          "share",
+          "source",
+          "budget"
+        ],
+        "students": false
+      },
+      {
+        "name": "งบประมาณน้อยกว่า 1 แสนบาท",
+        "weight": 0.375,
+        "available": true,
+        "fields": [
+          "role",
+          "share",
+          "source",
+          "budget"
+        ],
+        "students": false
+      }
+    ]
+  },
+  "2.8.2": {
+    "category": "academic",
+    "subtype": "2.8.2 ทุนวิจัยอื่น",
+    "basis": "single",
+    "roles": [
+      {
+        "name": "งบประมาณตั้งแต่ 5 ล้านบาท",
+        "weight": 1,
+        "available": true,
+        "fields": [
+          "role",
+          "share",
+          "source",
+          "budget"
+        ],
+        "students": false
+      },
+      {
+        "name": "งบประมาณตั้งแต่ 1 ล้าน แต่ไม่ถึง 5 ล้านบาท",
+        "weight": 0.75,
+        "available": true,
+        "fields": [
+          "role",
+          "share",
+          "source",
+          "budget"
+        ],
+        "students": false
+      },
+      {
+        "name": "งบประมาณตั้งแต่ 5 แสน แต่ไม่ถึง 1 ล้านบาท",
+        "weight": 0.625,
+        "available": true,
+        "fields": [
+          "role",
+          "share",
+          "source",
+          "budget"
+        ],
+        "students": false
+      },
+      {
+        "name": "งบประมาณตั้งแต่ 1 แสน แต่ไม่ถึง 5 แสนบาท",
+        "weight": 0.5,
+        "available": true,
+        "fields": [
+          "role",
+          "share",
+          "source",
+          "budget"
+        ],
+        "students": false
+      },
+      {
+        "name": "งบประมาณน้อยกว่า 1 แสนบาท",
+        "weight": 0.25,
+        "available": true,
+        "fields": [
+          "role",
+          "share",
+          "source",
+          "budget"
+        ],
+        "students": false
+      }
+    ]
+  },
+  "2.9": {
+    "category": "academic",
+    "subtype": "2.9 รางวัลทางวิชาการ",
+    "basis": "quantity",
+    "roles": [
+      {
+        "name": "รางวัลระดับนานาชาติ",
+        "weight": 1,
+        "available": true,
+        "fields": [
+          "role",
+          "share",
+          "source",
+          "quantity"
+        ],
+        "students": false
+      },
+      {
+        "name": "รางวัลระดับชาติ",
+        "weight": 0.5,
+        "available": true,
+        "fields": [
+          "role",
+          "share",
+          "source",
+          "quantity"
+        ],
+        "students": false
+      },
+      {
+        "name": "รางวัลระดับสถาบัน",
+        "weight": 0.25,
+        "available": true,
+        "fields": [
+          "role",
+          "share",
+          "source",
+          "quantity"
+        ],
+        "students": false
+      },
+      {
+        "name": "รางวัลในฐานะที่ปรึกษาโครงงาน / วิทยานิพนธ์ / โครงการ",
+        "weight": 0.125,
+        "available": true,
+        "fields": [
+          "role",
+          "share",
+          "source",
+          "quantity"
+        ],
+        "students": true
+      },
+      {
+        "name": "ส่งนักศึกษาเข้าประกวด เมื่อเสร็จสิ้นและไม่ได้รับรางวัล",
+        "weight": 0.05,
+        "available": true,
+        "fields": [
+          "role",
+          "share",
+          "source",
+          "quantity"
+        ],
+        "students": true
+      }
+    ]
+  },
+  "2.10": {
+    "category": "academic",
+    "subtype": "2.10 การนำผลงานวิจัยไปใช้ประโยชน์",
+    "basis": "single",
+    "roles": [
+      {
+        "name": "ผลงานที่นำไปใช้ประโยชน์ได้จริง ระดับนานาชาติ",
+        "weight": 1,
+        "available": true,
+        "fields": [
+          "role",
+          "share",
+          "source"
+        ],
+        "students": false
+      },
+      {
+        "name": "ผลงานที่นำไปใช้ประโยชน์ได้จริง ภายในประเทศ (นอก มธ.)",
+        "weight": 0.5,
+        "available": true,
+        "fields": [
+          "role",
+          "share",
+          "source"
+        ],
+        "students": false
+      },
+      {
+        "name": "ผลงานที่นำไปใช้ประโยชน์ได้จริง ระดับคณะ / ภายใน มธ.",
+        "weight": 0.25,
+        "available": true,
+        "fields": [
+          "role",
+          "share",
+          "source"
+        ],
+        "students": false
+      }
+    ]
+  },
+  "3.1": {
+    "category": "admin",
+    "subtype": "3.1 งานบริหารในตำแหน่ง",
+    "basis": "single",
+    "roles": [
+      {
+        "name": "คณบดี",
+        "weight": "",
+        "available": true,
+        "fields": [
+          "role"
+        ],
+        "students": false
+      },
+      {
+        "name": "รองคณบดี",
+        "weight": "",
+        "available": true,
+        "fields": [
+          "role"
+        ],
+        "students": false
+      },
+      {
+        "name": "หัวหน้าสาขาวิชา",
+        "weight": "",
+        "available": true,
+        "fields": [
+          "role"
+        ],
+        "students": false
+      },
+      {
+        "name": "ผู้ช่วยคณบดี",
+        "weight": "",
+        "available": true,
+        "fields": [
+          "role"
+        ],
+        "students": false
+      },
+      {
+        "name": "กรรมการบริหาร",
+        "weight": 0.25,
+        "available": true,
+        "fields": [
+          "role"
+        ],
+        "students": false
+      }
+    ]
+  },
+  "3.2": {
+    "category": "admin",
+    "subtype": "3.2 งานบริหารระดับสาขาวิชา",
+    "basis": "direct",
+    "roles": [
+      {
+        "name": "ผู้ช่วย / รองหัวหน้าสาขา / เลขา / ผู้ช่วยเลขา",
+        "weight": "",
+        "available": true,
+        "fields": [
+          "role"
+        ],
+        "students": false
+      },
+      {
+        "name": "กรรมการประจำสาขาวิชา",
+        "weight": "",
+        "available": true,
+        "fields": [
+          "role"
+        ],
+        "students": false
+      }
+    ]
+  },
+  "3.3": {
+    "category": "admin",
+    "subtype": "3.3 ผู้ประสานงานประจำวิชา",
+    "basis": "quantity",
+    "roles": [
+      {
+        "name": "ผู้ประสานงานวิชาที่มีผู้สอน 1 คน",
+        "weight": 0.05,
+        "available": true,
+        "fields": [
+          "role",
+          "course",
+          "quantity"
+        ],
+        "students": false
+      },
+      {
+        "name": "ผู้ประสานงานวิชาที่มีผู้สอนรวม 2–4 คน",
+        "weight": 0.1,
+        "available": true,
+        "fields": [
+          "role",
+          "course",
+          "quantity"
+        ],
+        "students": false
+      },
+      {
+        "name": "ผู้ประสานงานวิชาที่มีผู้สอนรวม 5 คนขึ้นไป",
+        "weight": 0.15,
+        "available": true,
+        "fields": [
+          "role",
+          "course",
+          "quantity"
+        ],
+        "students": false
+      },
+      {
+        "name": "คะแนนเพิ่ม: ผู้ประสานงานวิชาที่มีนักศึกษามากกว่า 300 คน",
+        "weight": 0.05,
+        "available": true,
+        "fields": [
+          "role",
+          "course",
+          "quantity",
+          "students"
+        ],
+        "students": false
+      }
+    ]
+  },
+  "3.4": {
+    "category": "admin",
+    "subtype": "3.4 ผู้ประสานงานฝึกงาน / ฝึกภาคสนาม",
+    "basis": "quantity",
+    "roles": [
+      {
+        "name": "ผู้ประสานงานฝึกงาน / ฝึกภาคสนาม",
+        "weight": 0.25,
+        "available": true,
+        "fields": [
+          "role",
+          "course",
+          "quantity",
+          "share"
+        ],
+        "students": false
+      }
+    ]
+  },
+  "3.5": {
+    "category": "admin",
+    "subtype": "3.5 อาจารย์ที่ปรึกษา / PostMaster / PostDoc / Visiting Professor",
+    "basis": "single",
+    "roles": [
+      {
+        "name": "อาจารย์ที่ปรึกษาทั่วไป (ปริญญาตรี โท และเอก)",
+        "weight": 0.125,
+        "available": true,
+        "fields": [
+          "role"
+        ],
+        "students": true
+      },
+      {
+        "name": "อาจารย์ที่ปรึกษา PostMaster / PostDoc",
+        "weight": 0.125,
+        "available": true,
+        "fields": [
+          "role"
+        ],
+        "students": true
+      },
+      {
+        "name": "งานเชิญ Visiting Professor / Invited Speaker",
+        "weight": 0.125,
+        "available": true,
+        "fields": [
+          "role"
+        ],
+        "students": false
+      }
+    ]
+  },
+  "4.1.1": {
+    "category": "service",
+    "subtype": "4.1.1 คณะทำงาน / กรรมการระดับคณะหรือสาขา",
+    "basis": "quantity",
+    "roles": [
+      {
+        "name": "ประธาน / เลขานุการ",
+        "weight": 0.075,
+        "available": true,
+        "fields": [
+          "role",
+          "organization",
+          "quantity"
+        ],
+        "students": false
+      },
+      {
+        "name": "คณะทำงาน",
+        "weight": 0.05,
+        "available": true,
+        "fields": [
+          "role",
+          "organization",
+          "quantity"
+        ],
+        "students": false
+      }
+    ]
+  },
+  "4.2.1": {
+    "category": "service",
+    "subtype": "4.2.1 กรรมการ / คณะทำงานนอกคณะ",
+    "basis": "quantity",
+    "roles": [
+      {
+        "name": "ประธาน / เลขานุการ",
+        "weight": 0.075,
+        "available": true,
+        "fields": [
+          "role",
+          "organization",
+          "quantity"
+        ],
+        "students": false
+      },
+      {
+        "name": "กรรมการ",
+        "weight": 0.05,
+        "available": true,
+        "fields": [
+          "role",
+          "organization",
+          "quantity"
+        ],
+        "students": false
+      }
+    ]
+  },
+  "4.2.2": {
+    "category": "service",
+    "subtype": "4.2.2 ตำแหน่งบริหารนอกคณะใน มธ.",
+    "basis": "single",
+    "roles": [
+      {
+        "name": "ตำแหน่งบริหารนอกคณะใน มธ. (อธิการบดี / รองอธิการบดี / ผู้ช่วยอธิการบดี / ผู้อำนวยการสำนักหรือสถาบัน / ผู้อำนวยการโครงการ / รองผู้อำนวยการ)",
+        "weight": 0.2,
+        "available": true,
+        "fields": [
+          "role",
+          "organization"
+        ],
+        "students": false
+      }
+    ]
+  },
+  "4.3": {
+    "category": "service",
+    "subtype": "4.3 บริการวิชาการแก่สังคม",
+    "basis": "quantity",
+    "roles": [
+      {
+        "name": "วิทยากร / ที่ปรึกษา / ผู้ทรงคุณวุฒิของทางราชการ (หน่วยงานภายนอก) ที่ได้รับอนุญาตจากคณะ",
+        "weight": 0.075,
+        "available": true,
+        "fields": [
+          "role",
+          "organization",
+          "quantity",
+          "share"
+        ],
+        "students": false
+      },
+      {
+        "name": "อาจารย์ที่ปรึกษาวิทยานิพนธ์ร่วม / สารนิพนธ์ / กรรมการสอบโครงร่าง / กรรมการสอบ",
+        "weight": 0.075,
+        "available": true,
+        "fields": [
+          "role",
+          "organization",
+          "quantity",
+          "share"
+        ],
+        "students": true
+      },
+      {
+        "name": "เอกสารหรือบทความวิชาการในหนังสือพิมพ์ / สื่อสิ่งพิมพ์ / สื่อออนไลน์",
+        "weight": 0.075,
+        "available": true,
+        "fields": [
+          "role",
+          "organization",
+          "quantity",
+          "share"
+        ],
+        "students": false
+      },
+      {
+        "name": "งานบริการวิชาการอื่นของทางราชการที่ไม่ใช่งานสอน / ให้สัมภาษณ์สื่อ",
+        "weight": 0.075,
+        "available": true,
+        "fields": [
+          "role",
+          "organization",
+          "quantity",
+          "share"
+        ],
+        "students": false
+      }
+    ]
+  },
+  "4.4": {
+    "category": "service",
+    "subtype": "4.4 ประเมินผลงานทางวิชาการ",
+    "basis": "quantity",
+    "roles": [
+      {
+        "name": "ผู้ประเมินระดับนานาชาติ",
+        "weight": 0.075,
+        "available": true,
+        "fields": [
+          "role",
+          "organization",
+          "quantity"
+        ],
+        "students": false
+      },
+      {
+        "name": "ผู้ประเมินระดับประเทศ",
+        "weight": 0.05,
+        "available": true,
+        "fields": [
+          "role",
+          "organization",
+          "quantity"
+        ],
+        "students": false
+      }
+    ]
+  },
+  "4.5": {
+    "category": "service",
+    "subtype": "4.5 ประเมินตำแหน่งทางวิชาการ",
+    "basis": "quantity",
+    "roles": [
+      {
+        "name": "ผู้ประเมินตำแหน่งทางวิชาการ",
+        "weight": 0.1,
+        "available": true,
+        "fields": [
+          "role",
+          "organization",
+          "quantity"
+        ],
+        "students": false
+      }
+    ]
+  },
+  "4.6": {
+    "category": "service",
+    "subtype": "4.6 บรรณาธิการ / Editor",
+    "basis": "quantity",
+    "roles": [
+      {
+        "name": "บรรณาธิการ / Editor",
+        "weight": 0.1,
+        "available": true,
+        "fields": [
+          "role",
+          "organization",
+          "quantity"
+        ],
+        "students": false
+      }
+    ]
+  }
+}

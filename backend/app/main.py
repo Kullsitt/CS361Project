@@ -4,7 +4,7 @@ from fastapi.middleware.cors import CORSMiddleware
 from fastapi.staticfiles import StaticFiles  # <-- เพิ่มการ import StaticFiles
 
 from app.core.config import settings
-from app.routers import professors, publications, workloads, auth
+from app.routers import professors, publications, workloads, auth, dashboard_workloads, dashboard_profile
 
 app = FastAPI(
     title="Faculty Workload Management System API",
@@ -27,6 +27,8 @@ app.include_router(professors.router, prefix="/api")
 app.include_router(publications.router, prefix="/api")
 app.include_router(workloads.router, prefix="/api")
 app.include_router(auth.router, prefix="/api")
+app.include_router(dashboard_workloads.router, prefix="/api")
+app.include_router(dashboard_profile.router, prefix="/api")
 
 @app.get("/api/health", tags=["Health Check"])
 def root_check():

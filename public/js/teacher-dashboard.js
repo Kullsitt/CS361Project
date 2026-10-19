@@ -1,4 +1,4 @@
-const API_URL = typeof API_BASE_URL !== 'undefined' ? API_BASE_URL : 'http://34.236.42.23/api';
+const API_URL = window.DashboardAPI.base;
 
 (async () => {
   // 1. ตรวจสอบการเข้าสู่ระบบ (Authentication Check)
@@ -18,6 +18,9 @@ const API_URL = typeof API_BASE_URL !== 'undefined' ? API_BASE_URL : 'http://34.
 
   let profile = {};
   let editing = false;
+  let saving = false;
+  let loaded = false;
+  const displayValue = value => Array.isArray(value) ? value.join('\n') : value ?? '';
   let profId = null;
 
   // อ่าน ID ของอาจารย์ที่เก็บบันทึกไว้ตอน Login
@@ -34,17 +37,24 @@ const API_URL = typeof API_BASE_URL !== 'undefined' ? API_BASE_URL : 'http://34.
   // 2. ฟังก์ชันดึงข้อมูลโปรไฟล์จาก Backend (FastAPI + RDS)
   async function fetchProfile() {
     try {
-      if (!profId) {
-        throw new Error('ไม่พบ ID ของอาจารย์ในเซสชัน กรุณาเข้าสู่ระบบใหม่อีกครั้ง');
-      }
-
-      const response = await fetch(`${API_URL}/professors/${profId}`, {
+      let response = await fetch(`${API_URL}/profile/me`, {
         method: 'GET',
         headers: {
           'Authorization': `Bearer ${token}`,
           'Content-Type': 'application/json'
         }
       });
+
+      // The deployed API may still predate /profile/me. Its public profile GET
+      // can display the existing record while the new write API is deployed.
+      if (response.status === 404 && profId) {
+        const error = await response.clone().json().catch(() => ({}));
+        if (error.detail === 'Not Found') {
+          response = await fetch(`${API_URL}/professors/${encodeURIComponent(profId)}`, {
+            headers: {Authorization: `Bearer ${token}`}
+          });
+        }
+      }
 
       // จัดการกรณี Token หมดอายุ
       if (response.status === 401 || response.status === 403) {
@@ -64,6 +74,7 @@ const API_URL = typeof API_BASE_URL !== 'undefined' ? API_BASE_URL : 'http://34.
       }
 
       profile = await response.json();
+      loaded = true;
       render();
       document.getElementById('dashboard').hidden = false;
 
@@ -78,7 +89,7 @@ const API_URL = typeof API_BASE_URL !== 'undefined' ? API_BASE_URL : 'http://34.
     for (const name of allInputNames) {
       const input = form.elements.namedItem(name);
       if (input) {
-        input.value = profile[name] || '';
+        input.value = displayValue(profile[name]);
         input.setCustomValidity('');
       }
     }
@@ -101,7 +112,10 @@ const API_URL = typeof API_BASE_URL !== 'undefined' ? API_BASE_URL : 'http://34.
     if (avatarEl) {
       if (profile.profile_url && profile.profile_url.trim() !== '') {
         // หากมี profile_url ใน Database ให้สร้างแท็ก <img> มาแสดงรูป
-        avatarEl.innerHTML = `<img src="${profile.profile_url}" alt="Profile Picture" style="width: 100%; height: 100%; object-fit: cover; border-radius: 50%;">`;
+        const image = document.createElement('img');
+        if (/^https?:\/\//i.test(profile.profile_url)) image.src = profile.profile_url;
+        image.alt = 'รูปอาจารย์'; image.style.cssText = 'width:100%;height:100%;object-fit:cover;border-radius:50%';
+        avatarEl.replaceChildren(image);
       } else {
         // หากไม่มี URL ให้แสดงตัวอักษรแรกของชื่อตามเดิม
         avatarEl.textContent = Array.from(profile.first_name_th || 'อ')[0];
@@ -112,7 +126,7 @@ const API_URL = typeof API_BASE_URL !== 'undefined' ? API_BASE_URL : 'http://34.
   function setEditing(value) {
     editing = value;
     fields.disabled = !value;
-    edit.hidden = value;
+    edit.hidden = value || !loaded;
     document.getElementById('actions').hidden = !value;
     document.getElementById('edit-hint').hidden = !value;
     document.getElementById('save-state').textContent = 'ข้อมูลจะเปลี่ยนแปลงเมื่อกดบันทึก';
@@ -121,7 +135,7 @@ const API_URL = typeof API_BASE_URL !== 'undefined' ? API_BASE_URL : 'http://34.
   function dirty() {
     return editing && inputNames.some(name => {
       const input = form.elements.namedItem(name);
-      return input && input.value !== (profile[name] || '');
+      return input && input.value !== displayValue(profile[name]);
     });
   }
 
@@ -135,6 +149,7 @@ const API_URL = typeof API_BASE_URL !== 'undefined' ? API_BASE_URL : 'http://34.
 
   // Event Listeners
   edit.addEventListener('click', () => {
+    if (!loaded || saving) return;
     notice.hidden = true;
     setEditing(true);
     const firstNameInput = form.elements.namedItem('first_name_th');
@@ -156,7 +171,7 @@ const API_URL = typeof API_BASE_URL !== 'undefined' ? API_BASE_URL : 'http://34.
   // 4. จัดการการบันทึกข้อมูล (PUT /professors/{profId})
   form.addEventListener('submit', async event => {
     event.preventDefault();
-    if (!editing) return;
+    if (!editing || saving) return;
 
     for (const name of inputNames) {
       const input = form.elements.namedItem(name);
@@ -173,8 +188,12 @@ const API_URL = typeof API_BASE_URL !== 'undefined' ? API_BASE_URL : 'http://34.
 
     const updatedData = Object.fromEntries(inputNames.map(name => [name, form.elements.namedItem(name).value]));
 
+    saving = true;
+    fields.disabled = true;
+    const buttons = [...document.getElementById('actions').querySelectorAll('button')];
+    buttons.forEach(button => { button.disabled = true; });
     try {
-      const response = await fetch(`${API_URL}/professors/${profId}`, {
+      const response = await fetch(`${API_URL}/profile/me`, {
         method: 'PUT',
         headers: {
           'Authorization': `Bearer ${token}`,
@@ -185,6 +204,9 @@ const API_URL = typeof API_BASE_URL !== 'undefined' ? API_BASE_URL : 'http://34.
 
       if (!response.ok) {
         const errorData = await response.json().catch(() => ({}));
+        if (response.status === 404 && errorData.detail === 'Not Found') {
+          throw new Error('เซิร์ฟเวอร์ยังไม่มี API บันทึกข้อมูลส่วนตัว ต้องอัปเดต Backend ก่อน ข้อมูลที่กรอกยังอยู่ในฟอร์ม');
+        }
         throw new Error(errorData.detail || 'ไม่สามารถบันทึกข้อมูลลงฐานข้อมูลได้');
       }
 
@@ -197,6 +219,9 @@ const API_URL = typeof API_BASE_URL !== 'undefined' ? API_BASE_URL : 'http://34.
     } catch (error) {
       console.error('Save Profile Error:', error);
       showMessage(error.message, 'error');
+    } finally {
+      saving = false; fields.disabled = !editing;
+      buttons.forEach(button => { button.disabled = false; });
     }
   });
 

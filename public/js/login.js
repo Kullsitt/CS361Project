@@ -1,4 +1,5 @@
-const API_URL = typeof API_BASE_URL !== 'undefined' ? API_BASE_URL : 'http://34.236.42.23/api';
+const API_URL = typeof API_BASE_URL !== 'undefined' ? API_BASE_URL
+  : ['localhost', '127.0.0.1'].includes(location.hostname) ? '/api' : 'http://34.236.42.23/api';
 
 document.addEventListener('DOMContentLoaded', () => {
   // 1. เช็กว่าผู้ใช้ล็อกอินไว้อยู่แล้วหรือไม่ ถ้ามี Token ให้ย้ายไปหน้าหลักทันที

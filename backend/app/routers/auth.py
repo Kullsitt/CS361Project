@@ -16,7 +16,7 @@ SECRET_KEY = getattr(settings, "SECRET_KEY", "your_super_secret_jwt_key_change_i
 ALGORITHM = "HS256"
 ACCESS_TOKEN_EXPIRE_MINUTES = 60 * 24
 
-oauth2_scheme = OAuth2PasswordBearer(tokenUrl="/api/auth/login")
+oauth2_scheme = OAuth2PasswordBearer(tokenUrl="/api/login")
 
 def verify_password(plain_password: str, hashed_password: str) -> bool:
     if not hashed_password:

@@ -1,6 +1,6 @@
 (async () => {
   // 1. กำหนด API_URL ให้อยู่ใน Scope ของฟังก์ชัน
-  const API_URL = typeof API_BASE_URL !== 'undefined' ? API_BASE_URL : 'http://34.236.42.23/api';
+  const API_URL = window.DashboardAPI.base;
   const token = localStorage.getItem('token');
   let profId = null;
 
@@ -43,6 +43,7 @@
   const scoring = window.WorkloadScoring;
 
   let records = [];
+  let busy = false;
   let editingId = null;
   let attachments = [];
   let changed = false;
@@ -95,7 +96,7 @@
         input.value = values.role || config.roles[0]?.[0] || '';
       } else {
         input.type = type === 'text' ? 'text' : 'number';
-        if (type === 'text') input.maxLength = 300;
+        if (type === 'text') input.maxLength = name === 'course' ? 20 : name === 'organization' ? 255 : 300;
         else { input.min = '0'; input.step = type === 'integer' ? '1' : '0.01'; if (type === 'percent') input.max = '100'; }
         input.value = values[name] ?? (name === 'share' ? '100' : name === 'quantity' ? '1' : '');
         input.required = name === 'share' || (name === 'quantity' && config.basis === 'quantity') || (name === 'credits' && ['credits', 'credits3'].includes(config.basis));
@@ -206,6 +207,7 @@
       render();
     } catch (err) {
       console.error('Fetch Workloads Error:', err);
+      announce('โหลดรายการไม่สำเร็จ กรุณารีเฟรชเพื่อลองใหม่');
     }
   }
 
@@ -230,7 +232,7 @@
       const type = document.createElement('p'); type.className = 'muted'; type.textContent = (record.subtype || '').replace(/^\d+(?:\.\d+)*\s+/, '');
       const summary = document.createElement('p'); summary.className = 'muted';
       
-      summary.textContent = activeSchema(record.subtype, record.role, record.category)
+      summary.textContent = (record.subtype ? activeSchema(record.subtype, record.role, record.category) : [])
         .filter(([key]) => record[key] != null && record[key] !== '')
         .map(([key, label]) => `${scoring.fieldLabel(record.subtype, key, label)}: ${record[key]}`).join(' · ');
       
@@ -249,7 +251,7 @@
         const p = document.createElement('p'); p.textContent = `ไฟล์ที่เลือก: ${Array.isArray(record.attachments) ? record.attachments.join(', ') : record.attachments}`;
         more.append(p);
       }
-      if (record.evidence_url) { 
+      if (record.evidence_url && /^https?:\/\//i.test(record.evidence_url)) {
         const a = document.createElement('a'); a.href = record.evidence_url; a.target = '_blank'; a.rel = 'noopener noreferrer'; a.textContent = 'เปิดลิงก์หลักฐาน ↗'; 
         more.append(a); 
       }
@@ -260,7 +262,15 @@
       // ปุ่มแก้ไข
       const editBtn = document.createElement('button'); editBtn.type = 'button'; editBtn.className = 'secondary'; editBtn.textContent = 'แก้ไข';
       editBtn.dataset.action = 'edit'; editBtn.dataset.id = record.id; editBtn.setAttribute('aria-label', `แก้ไข ${record.title}`); 
+      editBtn.disabled = record.editable === false;
+      if (record.editable === false) editBtn.title = 'รายการเดิมที่ยังไม่ระบุประเภท หรือผ่านการพิจารณาแล้ว';
       actions.append(editBtn);
+      const deleteBtn = document.createElement('button');
+      deleteBtn.type = 'button'; deleteBtn.className = 'secondary'; deleteBtn.textContent = 'ลบ';
+      deleteBtn.dataset.action = 'delete'; deleteBtn.dataset.id = record.id;
+      deleteBtn.disabled = record.deletable === false;
+      deleteBtn.setAttribute('aria-label', `ลบ ${record.title}`);
+      actions.append(deleteBtn);
 
       card.append(actions); 
       list.append(card);
@@ -302,6 +312,7 @@
   // 📤 2. ส่งข้อมูลบันทึก / แก้ไข ไปยัง API (Backend)
   form.addEventListener('submit', async event => {
     event.preventDefault();
+    if (busy) return;
     const names = [...common, ...activeSchema().map(([name]) => name)];
     for (const name of names) { 
       const input = form.elements.namedItem(name); 
@@ -321,16 +332,17 @@
 
     const isEditing = editingId !== null;
     const payload = {
-      professor_id: profId,
       ...Object.fromEntries(names.map(name => [name, form.elements.namedItem(name)?.value || ''])),
-      score: result.score || 0,
-      score_status: result.status,
       attachments: attachments
     };
 
+    busy = true;
+    const controls = [...form.querySelectorAll('input, select, textarea, button')];
+    const disabled = controls.map(control => control.disabled);
+    controls.forEach(control => { control.disabled = true; });
     try {
       const targetEndpoint = isEditing 
-        ? `${API_URL}/workloads/${editingId}` 
+        ? `${API_URL}/workloads/${encodeURIComponent(editingId)}`
         : `${API_URL}/workloads`;
 
       const method = isEditing ? 'PUT' : 'POST';
@@ -357,6 +369,10 @@
     } catch (err) {
       console.error('Save Workload Error:', err);
       announce(err.message);
+    } finally {
+      controls.forEach((control, index) => { if (control.isConnected) control.disabled = disabled[index]; });
+      busy = false;
+      updateScore();
     }
   });
 
@@ -365,9 +381,23 @@
   if (filter) filter.addEventListener('change', render);
 
   // ✏️ 3. จัดการปุ่มแก้ไขในตาราง
-  list.addEventListener('click', event => {
+  list.addEventListener('click', async event => {
+    if (busy) return;
     const button = event.target.closest('button[data-action]'); if (!button) return;
     const record = records.find(item => String(item.id) === String(button.dataset.id)); if (!record) return;
+
+    if (button.dataset.action === 'delete') {
+      if (!window.confirm(`ต้องการลบ "${record.title}" หรือไม่?`)) return;
+      busy = true; button.disabled = true;
+      try {
+        await window.DashboardAPI.request(`/workloads/${encodeURIComponent(record.id)}`, {method: 'DELETE'});
+        records = records.filter(item => item.id !== record.id);
+        if (editingId === record.id) reset();
+        render(); announce('ลบรายการภาระงานแล้ว');
+      } catch (error) { announce(error.message); button.disabled = false; }
+      finally { busy = false; }
+      return;
+    }
 
     if (button.dataset.action === 'edit') {
       if (changed && !window.confirm('มีข้อมูลที่ยังไม่ได้บันทึก ต้องการเปลี่ยนไปแก้ไขรายการนี้หรือไม่?')) return;
@@ -377,7 +407,7 @@
       
       for (const name of common) {
         if (form.elements.namedItem(name)) {
-          form.elements.namedItem(name).value = record[name] || '';
+          form.elements.namedItem(name).value = record[name] ?? '';
         }
       }
       
@@ -400,6 +430,9 @@
   });
 
   // โหลดข้อมูลเมื่อเริ่มต้น
+  window.addEventListener('beforeunload', event => {
+    if (changed || busy) { event.preventDefault(); event.returnValue = ''; }
+  });
   details(); 
   await fetchWorkloads();
 })();

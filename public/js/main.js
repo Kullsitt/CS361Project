@@ -1,4 +1,5 @@
-const API_BASE_URL = 'http://34.236.42.23/api';
+const API_BASE_URL = ['localhost', '127.0.0.1'].includes(location.hostname)
+  ? '/api' : 'http://34.236.42.23/api';
 
 document.addEventListener('DOMContentLoaded', () => {
   renderAuthNav();

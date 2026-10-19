@@ -1,8 +1,9 @@
 import os
+from pathlib import Path
 from dotenv import load_dotenv
 
 # โหลดไฟล์ .env จากไดเรกทอรี backend/
-load_dotenv()
+load_dotenv(Path(__file__).resolve().parents[2] / '.env')
 
 class Settings:
     # Database Settings (AWS RDS PostgreSQL)
