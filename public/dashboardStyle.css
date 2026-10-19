@@ -348,3 +348,50 @@ body {
 @media (max-width: 640px) {
   .kpi-grid { grid-template-columns: 1fr; }
 }
+/* =========================================================
+   ปรับแต่ง Dashboard ขยายเต็มจอ + ย่อขนาดตารางไม่ให้ล้นขวา
+   ========================================================= */
+
+/* ขยาย Container ให้กว้าง 98% ของหน้าจอ */
+.dash-container {
+  max-width: 98% !important;
+  width: 98% !important;
+  margin: 16px auto !important;
+  padding: 0 10px !important;
+}
+
+/* ตั้งค่าให้ตารางกระจายความกว้างพอดีกับพื้นที่ */
+.dash-table {
+  width: 100% !important;
+  table-layout: auto !important;
+  font-size: 12px !important; /* ปรับย่อขนาดฟอนต์ของตาราง */
+}
+
+/* กระชับ Padding ขอบเซลล์ในตาราง */
+.dash-table th, 
+.dash-table td {
+  padding: 8px 4px !important;
+  text-align: center !important;
+  white-space: nowrap !important;
+}
+
+/* คอลัมน์แรก (ชื่อ-ตำแหน่งอาจารย์) ตั้งค่าให้ชิดซ้ายและยอมให้ขึ้นบรรทัดใหม่ได้ */
+.dash-table th:first-child,
+.dash-table td:first-child {
+  text-align: left !important;
+  min-width: 150px !important;
+  white-space: normal !important;
+}
+
+/* ปรับปุ่มตรวจสอบให้มีขนาดกะทัดรัด */
+.btn-action {
+  padding: 4px 8px !important;
+  font-size: 11px !important;
+}
+
+/* ย่อยขนาด Badge สถานะ */
+.badge-status {
+  padding: 3px 8px !important;
+  font-size: 11px !important;
+}
+```[cite: 4]
