@@ -293,7 +293,7 @@ function renderWorkloadCards(itemsToRender = state.rawWorkloads) {
             ${hoursLabel ? `<span class="badge-hours" style="background: #e3f2fd; color: #0d47a1; padding: 3px 8px; border-radius: 4px; font-size: 12px; font-weight: 500;">${hoursLabel}</span>` : ''}
           </div>
           <div class="wl-title" style="font-size: 16px; font-weight: 600;">
-            <a href="workload.html?id=${encodeURIComponent(item.id)}" style="color: #111; text-decoration: none;">${courseCode}${escapeHtml(displayTitle)}</a>
+            <span style="color: #111; text-decoration: none;">${courseCode}</span>
           </div>
           ${subText ? `<div class="wl-subtext" style="color: #627d98; font-size: 13px; margin-top: 6px;">${subText}</div>` : ''}
         </div>
@@ -326,7 +326,7 @@ function switchWorkloadTab(category, btnEl) {
 // =========================================================================
 document.addEventListener('DOMContentLoaded', () => {
   loadTeacherProfileData();
-  renderEditButton();
+
 
   // ผูก Event ช่องค้นหา (ตรวจสอบ ID ใน HTML ให้ตรงกับ search-input)
   const searchInput = document.getElementById('search-input');
