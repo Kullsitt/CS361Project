@@ -2,7 +2,23 @@
 
 let globalLecturersData = [];
 
+// ฟังก์ชันช่วยดึง API Base URL อย่างปลอดภัย
+function getApiBaseUrl() {
+    if (typeof API_BASE_URL !== 'undefined') return API_BASE_URL;
+    if (typeof window.API_BASE_URL !== 'undefined') return window.API_BASE_URL;
+    return 'http://34.236.42.23/api';
+}
+
 document.addEventListener('DOMContentLoaded', () => {
+    // ผูก Event Listener สำหรับส่วน Filter และ Search
+    const termFilter = document.getElementById('term-filter');
+    const statusFilter = document.getElementById('status-filter');
+    const searchInput = document.getElementById('search-lecturer');
+
+    if (termFilter) termFilter.addEventListener('change', filterData);
+    if (statusFilter) statusFilter.addEventListener('change', filterData);
+    if (searchInput) searchInput.addEventListener('input', filterData);
+
     loadDashboardData();
 });
 
@@ -17,17 +33,40 @@ async function loadDashboardData() {
     if (year) params.append('academic_year', year);
     if (semester) params.append('semester', semester);
     if (statusVal !== 'ALL') params.append('status', statusVal);
-    if (searchVal) params.append('search', searchVal);
+    if (searchVal) params.append('search', searchVal.trim());
+
+    const baseUrl = getApiBaseUrl();
+    const token = localStorage.getItem('token') || localStorage.getItem('access_token');
+    const headers = { 'Content-Type': 'application/json' };
+    if (token) headers['Authorization'] = `Bearer ${token}`;
 
     try {
-        const response = await fetch(`${API_BASE_URL}/workloads/officer/dashboard?${params.toString()}`);
+        const response = await fetch(`${baseUrl}/workloads/officer/dashboard?${params.toString()}`, {
+            method: 'GET',
+            headers: headers
+        });
+
         if (!response.ok) throw new Error('ไม่สามารถดึงข้อมูลภาระงานได้');
 
-        globalLecturersData = await response.json();
+        const resData = await response.json();
+        
+        // รองรับ Response ทั้งแบบ Array ตรงๆ และแบบ Object { summary: {...}, submissions: [...] }
+        if (Array.isArray(resData)) {
+            globalLecturersData = resData;
+        } else if (resData && Array.isArray(resData.submissions)) {
+            globalLecturersData = resData.submissions;
+        } else {
+            globalLecturersData = [];
+        }
+
         updateKPIs(globalLecturersData);
         renderTable(globalLecturersData);
     } catch (error) {
         console.error('Error loading dashboard data:', error);
+        const tbody = document.getElementById('workload-table-body');
+        if (tbody) {
+            tbody.innerHTML = `<tr><td colspan="12" style="text-align:center; color:#dc2626; padding:20px;">เกิดข้อผิดพลาดในการดึงข้อมูล: ${error.message}</td></tr>`;
+        }
     }
 }
 
@@ -40,7 +79,7 @@ function updateKPIs(data) {
 
     data.forEach(item => {
         const totalActual = Number(item.m1_actual || 0) + Number(item.m2_actual || 0) + Number(item.m3_actual || 0) + Number(item.m4_actual || 0) + Number(item.m5_actual || 0);
-        const totalCalc = Number(item.m1_calc || 0) + Number(item.m2_calc || 0) + Number(item.m3_calc || 0) + Number(item.m4_calc || 0) + Number(item.m5_calc || 0);
+        const totalCalc = Number(item.m1_calc || 0) + Number(item.m2_calc || 0) + Number(item.m3_calc || 0) + Number(item.m4_calc || 0) + Number(item.m5_calc || 0) || Number(item.total_score || 0);
 
         totalActualScoreSum += totalActual;
         totalCalcScoreSum += totalCalc;
@@ -79,8 +118,13 @@ function renderTable(data) {
     }
 
     tbody.innerHTML = data.map(item => {
+        // จัดการชื่อและตำแหน่งให้รองรับทั้ง DB Schema และ Mock Field
+        const name = item.name || `${item.title || ''}${item.first_name_th || ''} ${item.last_name_th || ''}`.trim() || 'ไม่ระบุชื่อ';
+        const position = item.position || item.academic_rank || 'อาจารย์';
+        const profId = item.id || item.submission_id || item.professor_id;
+
         const totalActual = Number(item.m1_actual || 0) + Number(item.m2_actual || 0) + Number(item.m3_actual || 0) + Number(item.m4_actual || 0) + Number(item.m5_actual || 0);
-        const totalCalc = Number(item.m1_calc || 0) + Number(item.m2_calc || 0) + Number(item.m3_calc || 0) + Number(item.m4_calc || 0) + Number(item.m5_calc || 0);
+        const totalCalc = Number(item.m1_calc || 0) + Number(item.m2_calc || 0) + Number(item.m3_calc || 0) + Number(item.m4_calc || 0) + Number(item.m5_calc || 0) || Number(item.total_score || 0);
 
         let statusBadge = '';
         if (totalCalc >= 650 || item.status === 'PASS' || item.status === 'APPROVED') {
@@ -94,8 +138,8 @@ function renderTable(data) {
         return `
             <tr>
                 <td>
-                    <b>${item.name}</b><br>
-                    <small style="color:#666;">${item.position}</small>
+                    <b>${name}</b><br>
+                    <small style="color:#666;">${position}</small>
                 </td>
                 <td><span class="track-tag track-regular">ภาคปกติ</span></td>
                 <td style="text-align:center;"><b>${Number(item.credits || 0).toFixed(2)}</b> นก.</td>
@@ -108,7 +152,7 @@ function renderTable(data) {
                 <td><b style="font-size:15px; color:#8C1D24;">${totalCalc.toFixed(1)}</b></td>
                 <td>${statusBadge}</td>
                 <td>
-                    <button class="btn-action btn-inspect" onclick="openInspectModal('${item.id}')">
+                    <button class="btn-action btn-inspect" onclick="openInspectModal('${profId}')">
                         <i class="fa fa-search"></i> ตรวจสอบ
                     </button>
                 </td>
@@ -122,17 +166,20 @@ function filterData() {
 }
 
 async function openInspectModal(profId) {
-    const lecturer = globalLecturersData.find(l => l.id === profId);
+    const lecturer = globalLecturersData.find(l => (l.id === profId || l.submission_id === profId || l.professor_id === profId));
     if (!lecturer) return;
 
-    document.getElementById("modal-lecturer-name").innerText = `รายละเอียดแบบฟอร์มภาระงาน - ${lecturer.name}`;
+    const name = lecturer.name || `${lecturer.title || ''}${lecturer.first_name_th || ''} ${lecturer.last_name_th || ''}`.trim() || 'ไม่ระบุชื่อ';
+    const position = lecturer.position || lecturer.academic_rank || 'อาจารย์';
+
+    document.getElementById("modal-lecturer-name").innerText = `รายละเอียดแบบฟอร์มภาระงาน - ${name}`;
 
     const totalActual = Number(lecturer.m1_actual || 0) + Number(lecturer.m2_actual || 0) + Number(lecturer.m3_actual || 0) + Number(lecturer.m4_actual || 0) + Number(lecturer.m5_actual || 0);
-    const totalCalc = Number(lecturer.m1_calc || 0) + Number(lecturer.m2_calc || 0) + Number(lecturer.m3_calc || 0) + Number(lecturer.m4_calc || 0) + Number(lecturer.m5_calc || 0);
+    const totalCalc = Number(lecturer.m1_calc || 0) + Number(lecturer.m2_calc || 0) + Number(lecturer.m3_calc || 0) + Number(lecturer.m4_calc || 0) + Number(lecturer.m5_calc || 0) || Number(lecturer.total_score || 0);
 
     let html = `
       <div style="background:#f8fafc; padding:16px; border-radius:8px; margin-bottom:20px; border:1px solid #e2e8f0;">
-        <p style="margin:0 0 6px 0;"><b>ตำแหน่ง:</b> ${lecturer.position} | <b>สาขาวิชา:</b> วิทยาการคอมพิวเตอร์</p>
+        <p style="margin:0 0 6px 0;"><b>ตำแหน่ง:</b> ${position} | <b>สาขาวิชา:</b> วิทยาการคอมพิวเตอร์</p>
         <p style="margin:0;"><b>สรุปคะแนนคำนวณ:</b> <span style="font-size:18px; font-weight:700; color:#8C1D24;">${totalCalc.toFixed(1)} / 2,000 คะแนน</span> (คะแนนจริง ${totalActual.toFixed(1)}) | เกณฑ์ขั้นต่ำ <b>650 คะแนน</b></p>
       </div>
 
@@ -151,8 +198,13 @@ async function openInspectModal(profId) {
       </table>
     `;
 
+    const baseUrl = getApiBaseUrl();
+    const token = localStorage.getItem('token') || localStorage.getItem('access_token');
+    const headers = { 'Content-Type': 'application/json' };
+    if (token) headers['Authorization'] = `Bearer ${token}`;
+
     try {
-        const res = await fetch(`${API_BASE_URL}/workloads/officer/inspect/${profId}`);
+        const res = await fetch(`${baseUrl}/workloads/officer/inspect/${profId}`, { headers });
         if (res.ok) {
             const details = await res.json();
             if (details.teaching && details.teaching.length > 0) {
@@ -163,7 +215,7 @@ async function openInspectModal(profId) {
                     <tbody>
                 `;
                 details.teaching.forEach(t => {
-                    html += `<tr><td><b>${t.code}</b> ${t.name}</td><td>${t.hours || 0} ชม.</td><td>${t.credits || 0} นก.</td><td>${t.score || 0}</td></tr>`;
+                    html += `<tr><td><b>${t.code || ''}</b> ${t.name || ''}</td><td>${t.hours || 0} ชม.</td><td>${t.credits || 0} นก.</td><td>${t.score || 0}</td></tr>`;
                 });
                 html += `</tbody></table>`;
             }
@@ -172,13 +224,14 @@ async function openInspectModal(profId) {
         console.error("Error fetching inspect details:", e);
     }
 
-    if (lecturer.submission_id) {
+    const submissionId = lecturer.submission_id || lecturer.id;
+    if (submissionId) {
         html += `
           <div style="margin-top:24px; display:flex; gap:12px;">
-            <button style="background:#15803d; color:white; border:none; padding:10px 20px; border-radius:6px; font-weight:700; cursor:pointer;" onclick="changeSubmissionStatus('${lecturer.submission_id}', 'APPROVED')">
+            <button style="background:#15803d; color:white; border:none; padding:10px 20px; border-radius:6px; font-weight:700; cursor:pointer;" onclick="changeSubmissionStatus('${submissionId}', 'APPROVED')">
               <i class="fa fa-check"></i> อนุมัติแบบฟอร์มภาระงาน
             </button>
-            <button style="background:#b91c1c; color:white; border:none; padding:10px 20px; border-radius:6px; font-weight:700; cursor:pointer;" onclick="changeSubmissionStatus('${lecturer.submission_id}', 'REJECTED')">
+            <button style="background:#b91c1c; color:white; border:none; padding:10px 20px; border-radius:6px; font-weight:700; cursor:pointer;" onclick="changeSubmissionStatus('${submissionId}', 'REJECTED')">
               <i class="fa fa-reply"></i> ส่งกลับแก้ไข
             </button>
           </div>
@@ -190,10 +243,15 @@ async function openInspectModal(profId) {
 }
 
 async function changeSubmissionStatus(subId, statusVal) {
+    const baseUrl = getApiBaseUrl();
+    const token = localStorage.getItem('token') || localStorage.getItem('access_token');
+    const headers = { 'Content-Type': 'application/json' };
+    if (token) headers['Authorization'] = `Bearer ${token}`;
+
     try {
-        const res = await fetch(`${API_BASE_URL}/workloads/submissions/${subId}/status`, {
+        const res = await fetch(`${baseUrl}/workloads/submissions/${subId}/status`, {
             method: 'PATCH',
-            headers: { 'Content-Type': 'application/json' },
+            headers: headers,
             body: JSON.stringify({ status: statusVal })
         });
         if (res.ok) {
