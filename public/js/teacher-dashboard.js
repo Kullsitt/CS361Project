@@ -1,4 +1,4 @@
-const API_URL = window.DashboardAPI.base;
+const API_URL = typeof API_BASE_URL !== 'undefined' ? API_BASE_URL : 'http://34.236.42.23/api';
 
 (async () => {
   // 1. ตรวจสอบการเข้าสู่ระบบ (Authentication Check)

@@ -1,6 +1,6 @@
 (async () => {
   // 1. กำหนด API_URL ให้อยู่ใน Scope ของฟังก์ชัน
-  const API_URL = window.DashboardAPI.base;
+const API_URL = typeof API_BASE_URL !== 'undefined' ? API_BASE_URL : 'http://34.236.42.23/api';
   const token = localStorage.getItem('token');
   let profId = null;
 
