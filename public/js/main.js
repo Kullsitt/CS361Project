@@ -5,7 +5,7 @@ document.addEventListener('DOMContentLoaded', () => {
 });
 
 /**
- * ตรวจสอบ Token และ Role เพื่อแสดงผล Navbar ขวาบนตามสิทธิ์ของผู้ใช้ (Scope V3)
+ * ตรวจสอบ Token, Role และหน้าปัจจุบัน เพื่อแสดงผล Navbar ขวาบนอย่างถูกต้อง
  */
 function renderAuthNav() {
   const authNavSection = document.getElementById('auth-nav-section');
@@ -13,50 +13,97 @@ function renderAuthNav() {
 
   const token = localStorage.getItem('token');
   const userStr = localStorage.getItem('user');
+  
+  // ดึงชื่อไฟล์หน้าปัจจุบัน (เช่น index.html หรือ dashboard.html)
+  const currentPage = window.location.pathname.split('/').pop() || 'index.html';
 
-  // 1. กรณีผู้ใช้เข้าสู่ระบบแล้ว (Authenticated User)
   if (token && userStr) {
     try {
       const user = JSON.parse(userStr);
       const userName = user.name || user.email || 'ผู้ใช้งาน';
-      const role = (user.role || '').toLowerCase(); // แปลงเป็นตัวพิมพ์เล็กเพื่อความแม่นยำ
+      const role = (user.role || '').toLowerCase().trim();
 
-      let dashboardButtonHtml = '';
+      const isOfficer = role === 'officer' || role === 'staff' || userName.includes('เจ้าหน้าที่');
+      const isTeacher = role === 'teacher' || role === 'professor';
+      const isAdmin = role === 'admin';
 
-      // เช็ก Role เพื่อเลือกแสดงเฉพาะ Dashboard ที่มีสิทธิ์เข้าถึง
-      if (role === 'officer') {
-        dashboardButtonHtml = `
-          <a href="dashboard.html" class="dashboard-icon" title="แดชบอร์ดเจ้าหน้าที่" aria-label="แดชบอร์ดเจ้าหน้าที่">
-            <i class="fa fa-bar-chart" aria-hidden="true"></i><span>Officer Dashboard</span>
+      let userNavContent = '';
+
+      // 1. กรณีเปิดอยู่ในหน้า Dashboard (dashboard.html หรือ teacher-dashboard.html): แสดงปุ่ม "กลับหน้าหลัก"
+      if (currentPage === 'dashboard.html' || currentPage === 'teacher-dashboard.html') {
+        userNavContent = `
+          <a href="index.html" class="btn-home" style="
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            color: #ffffff;
+            background-color: rgba(255, 255, 255, 0.2);
+            border: 1px solid rgba(255, 255, 255, 0.4);
+            padding: 6px 14px;
+            border-radius: 6px;
+            text-decoration: none;
+            font-size: 13.5px;
+            font-weight: 500;
+            transition: all 0.2s ease;
+          ">
+            <i class="fa fa-home" aria-hidden="true"></i>
+            <span>กลับหน้าหลัก</span>
           </a>
         `;
-      } else if (role === 'teacher' || role === 'professor') {
-        dashboardButtonHtml = `
-          <a href="teacher-dashboard.html" class="dashboard-icon" title="ข้อมูลส่วนตัวอาจารย์" aria-label="ข้อมูลส่วนตัวอาจารย์">
-            <i class="fa fa-user-circle-o" aria-hidden="true"></i><span>Teacher Dashboard</span>
-          </a>
-        `;
-      } else if (role === 'admin') {
-        // กรณี Admin แสดงทั้งสอง Dashboard
-        dashboardButtonHtml = `
-          <a href="teacher-dashboard.html" class="dashboard-icon" title="ข้อมูลส่วนตัวอาจารย์">
-            <i class="fa fa-user-circle-o" aria-hidden="true"></i><span>Teacher Dashboard</span>
-          </a>
-          <a href="dashboard.html" class="dashboard-icon" title="แดชบอร์ดเจ้าหน้าที่">
-            <i class="fa fa-bar-chart" aria-hidden="true"></i><span>Officer Dashboard</span>
-          </a>
-        `;
+      } 
+      // 2. กรณีอยู่หน้า index.html: แสดงปุ่มเข้า Dashboard ตามสิทธิ์
+      else {
+        if (isOfficer) {
+          userNavContent = `
+            <a href="dashboard.html" class="btn-dashboard-officer" style="
+              display: inline-flex;
+              align-items: center;
+              gap: 6px;
+              color: #ffffff;
+              background-color: rgba(255, 255, 255, 0.2);
+              border: 1px solid rgba(255, 255, 255, 0.4);
+              padding: 6px 14px;
+              border-radius: 6px;
+              text-decoration: none;
+              font-size: 13.5px;
+              font-weight: 500;
+              transition: all 0.2s ease;
+            ">
+              <i class="fa fa-tachometer" aria-hidden="true"></i>
+              <span>แดชบอร์ดการจัดการภาระงาน</span>
+            </a>
+          `;
+        } else if (isTeacher) {
+          userNavContent = `
+            <a href="teacher-dashboard.html" style="color: #ffffff; text-decoration: none; font-size: 13.5px; font-weight: 500; display: inline-flex; align-items: center; gap: 6px;">
+              <i class="fa fa-user-circle-o"></i> Teacher Dashboard
+            </a>
+            <a href="teacher.html?id=${user.id || ''}" class="profile-link" style="color: #ffffff; text-decoration: none; font-size: 13.5px; font-weight: 500; display: inline-flex; align-items: center; gap: 6px;">
+              <i class="fa fa-user"></i> ${userName}
+            </a>
+          `;
+        } else if (isAdmin) {
+          userNavContent = `
+            <a href="dashboard.html" style="color: #ffffff; text-decoration: none; font-size: 13.5px; font-weight: 500; display: inline-flex; align-items: center; gap: 6px;">
+              <i class="fa fa-tachometer"></i> แดชบอร์ดการจัดการภาระงาน
+            </a>
+            <a href="teacher-dashboard.html" style="color: #ffffff; text-decoration: none; font-size: 13.5px; font-weight: 500; display: inline-flex; align-items: center; gap: 6px;">
+              <i class="fa fa-user-circle-o"></i> Teacher Dashboard
+            </a>
+          `;
+        } else {
+          userNavContent = `
+            <a href="dashboard.html" style="color: #ffffff; text-decoration: none; font-size: 13.5px; font-weight: 500; display: inline-flex; align-items: center; gap: 6px;">
+              <i class="fa fa-tachometer"></i> แดชบอร์ดการจัดการภาระงาน
+            </a>
+          `;
+        }
       }
 
-      // แสดง Navbar สำหรับคนที่ Login แล้ว
+      // แสดงผลบน Navbar
       authNavSection.innerHTML = `
         <div class="user-menu" style="display: flex; align-items: center; gap: 12px;">
-          ${dashboardButtonHtml}
-          
-          <a href="teacher.html?id=${user.id || ''}" class="profile-link" 
-             style="display: flex; align-items: center; gap: 6px; color: #ffffff; text-decoration: none; font-size: 13.5px; font-weight: 500;">
-             <i class="fa fa-user"></i> ${userName}
-          </a>
+          ${userNavContent}
 
           <button id="logout-btn" type="button" style="
             background-color: rgba(255, 255, 255, 0.15);
@@ -66,6 +113,9 @@ function renderAuthNav() {
             border-radius: 6px;
             cursor: pointer;
             font-size: 13.5px;
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
             transition: all 0.2s ease;
           ">
             <i class="fa fa-sign-out"></i> ออกจากระบบ
@@ -83,7 +133,7 @@ function renderAuthNav() {
       handleLogout();
     }
   } else {
-    // 2. กรณี Guest (ยังไม่ได้เข้าสู่ระบบ): แสดงเฉพาะปุ่ม "เข้าสู่ระบบ"
+    // กรณีไม่ได้เข้าสู่ระบบ
     authNavSection.innerHTML = `
       <a href="login.html" class="btn-login-header" style="
         color: #ffffff;
@@ -114,7 +164,7 @@ function handleLogout() {
 }
 
 /**
- * Helper Function สำหรับยิง API ที่ต้องแนบ Bearer Token
+ * Helper Function สำหรับยิง API
  */
 async function fetchWithAuth(url, options = {}) {
   const token = localStorage.getItem('token');

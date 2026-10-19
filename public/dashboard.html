@@ -6,6 +6,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Dashboard เจ้าหน้าที่ - ระบบติดตามภาระงานอาจารย์ CS (FRWS)</title>
   
+  <!-- นำเข้าไฟล์ CSS หลัก และ CSS ของ Dashboard -->
   <link rel="stylesheet" href="style.css">
   <link rel="stylesheet" href="dashboardStyle.css">
 
@@ -25,14 +26,9 @@
         Faculty Research<br>& Workload Management System (FRWS)
       </h1>
     </div>
-    <div class="header-right" id="auth-nav-section">
-      <span style="color: white; font-size: 13.5px; margin-right: 15px;">
-        <i class="fa fa-user-circle"></i> เจ้าหน้าที่สาขาวิชา (Officer)
-      </span>
-      <a href="index.html" class="btn-login-header">
-        <i class="fa fa-sign-out"></i> ออกจากระบบ
-      </a>
-    </div>
+    
+    <!-- auth-nav-section สำหรับให้ main.js เรนเดอร์ปุ่ม "กลับหน้าหลัก" และ "ออกจากระบบ" อัตโนมัติ -->
+    <div class="header-right" id="auth-nav-section"></div>
   </header>
 
   <!-- Main Container -->
@@ -75,7 +71,7 @@
         <select id="status-filter" onchange="filterData()">
           <option value="ALL">สถานะทั้งหมด</option>
           <option value="PASS">ผ่านเกณฑ์ (≥ 650 คะแนน)</option>
-          <option value="FAIL">ต่ำกว่าเกณฑ์ (< 650 คะแนน)</option>
+          <option value="FAIL">ต่ำกว่าเกณฑ์ (&lt; 650 คะแนน)</option>
           <option value="PENDING">รอตรวจสอบเอกสาร</option>
         </select>
       </div>
@@ -96,7 +92,7 @@
         <div class="kpi-info">
           <h4>อาจารย์ในสาขาวิชา</h4>
           <div class="kpi-value" id="kpi-total-faculty">0 คน</div>
-          <div class="kpi-sub" id="kpi-total-sub">กำลังโหลด...</div>
+          <div class="kpi-sub">สอนข้ามโครงการ - คน</div>
         </div>
         <div class="kpi-icon red"><i class="fa fa-users"></i></div>
       </div>
@@ -105,7 +101,7 @@
         <div class="kpi-info">
           <h4>ผ่านเกณฑ์ประเมิน (≥650)</h4>
           <div class="kpi-value" id="kpi-pass-rate" style="color: #1e7e34;">0%</div>
-          <div class="kpi-sub" id="kpi-pass-sub">กำลังโหลด...</div>
+          <div class="kpi-sub" id="kpi-pass-count">0 คนผ่านเกณฑ์</div>
         </div>
         <div class="kpi-icon green"><i class="fa fa-check-circle"></i></div>
       </div>
@@ -114,7 +110,7 @@
         <div class="kpi-info">
           <h4>คะแนนคำนวณเฉลี่ย</h4>
           <div class="kpi-value" id="kpi-avg-score">0.0</div>
-          <div class="kpi-sub" id="kpi-avg-sub">กำลังโหลด...</div>
+          <div class="kpi-sub" id="kpi-actual-avg">คะแนนจริงเฉลี่ย 0.0</div>
         </div>
         <div class="kpi-icon blue"><i class="fa fa-bar-chart"></i></div>
       </div>
@@ -123,7 +119,7 @@
         <div class="kpi-info">
           <h4>รอตรวจสอบหลักฐาน</h4>
           <div class="kpi-value" id="kpi-pending" style="color: #b06000;">0 รายการ</div>
-          <div class="kpi-sub" id="kpi-pending-sub">รายการที่ต้องตรวจ</div>
+          <div class="kpi-sub">ต้องอนุมัติภายใน 5 วัน</div>
         </div>
         <div class="kpi-icon orange"><i class="fa fa-clock-o"></i></div>
       </div>
@@ -157,7 +153,7 @@
             </tr>
           </thead>
           <tbody id="workload-table-body">
-            <!-- JavaScript injected dynamic content -->
+            <!-- JavaScript ใน dashboard.js จะเรนเดอร์ข้อมูลให้อัตโนมัติ -->
           </tbody>
         </table>
       </div>
@@ -166,7 +162,7 @@
   </main>
 
   <!-- Modal inspection form -->
-  <div class="modal-overlay" id="inspectModal" style="display: none;">
+  <div class="modal-overlay" id="inspectModal">
     <div class="modal-card">
       <div class="modal-header">
         <h3 id="modal-lecturer-name">รายละเอียดแบบฟอร์มภาระงาน</h3>
@@ -178,7 +174,9 @@
     </div>
   </div>
 
+  <!-- สคริปต์หลักในการจัดการ Session / API Base / Navbar -->
   <script src="js/main.js"></script>
+  <!-- สคริปต์ควบคุมการทำงานของหน้า Officer Dashboard -->
   <script src="js/dashboard.js"></script>
 </body>
 
