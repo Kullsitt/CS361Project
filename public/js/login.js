@@ -1,4 +1,4 @@
-const API_URL = typeof API_BASE_URL !== 'undefined' ? API_BASE_URL : 'http://18.215.169.239/api';
+const API_URL = typeof API_BASE_URL !== 'undefined' ? API_BASE_URL : 'http://54.83.108.19/api';
 
 document.addEventListener('DOMContentLoaded', () => {
   // 1. เช็กว่าผู้ใช้ล็อกอินไว้อยู่แล้วหรือไม่ ถ้ามี Token ให้ย้ายไปหน้าหลักทันที
@@ -41,8 +41,8 @@ document.addEventListener('DOMContentLoaded', () => {
     const password = document.getElementById('password').value;
 
     try {
-      // 4. ยิง Fetch API ไปที่ /api/auth/login
-      const response = await fetch(`${API_URL}/auth/login`, {
+      // 4. ยิง Fetch API ไปที่ /api/login
+      const response = await fetch(`${API_URL}/login`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json'
