@@ -2,10 +2,16 @@ from typing import Optional
 from uuid import UUID
 from fastapi import APIRouter, Depends, Query, HTTPException, status
 from psycopg2.extras import RealDictCursor
+from pydantic import BaseModel
 from app.core.database import get_db
 
 router = APIRouter(prefix="/workloads", tags=["Workloads"])
 
+class StatusUpdatePayload(BaseModel):
+    status: str  # 'PASS', 'FAIL', 'PENDING', 'APPROVED', 'REJECTED'
+
+
+# ---------------- 1. ดึงข้อมูลภาระงานแยกตามหมวดหมู่ ----------------
 @router.get("/by-category", summary="ดึงข้อมูลภาระงานแยกตามหมวดหมู่ (ไม่รวมงานวิจัย)")
 def get_workloads_by_category(
     professor_id: str = Query(..., description="ID ของอาจารย์ (professor_id)"),
@@ -16,21 +22,12 @@ def get_workloads_by_category(
     try:
         cat = category.upper()
 
-        # ---------------- 1. งานสอน (TEACHING) ----------------
         if cat == "TEACHING":
             query = """
                 SELECT 
-                    tw.id::text, 
-                    tw.course_code, 
-                    tw.course_name_th, 
-                    tw.section, 
-                    tw.credits, 
-                    tw.student_count, 
-                    tw.workload_hours, 
-                    tw.is_selected, 
-                    tw.score, 
-                    ws.semester, 
-                    ws.academic_year
+                    tw.id::text, tw.course_code, tw.course_name_th, tw.section, 
+                    tw.credits, tw.student_count, tw.workload_hours, tw.is_selected, 
+                    tw.score, ws.semester, ws.academic_year
                 FROM teaching_workloads tw
                 JOIN workload_submissions ws ON ws.id = tw.submission_id
                 WHERE ws.professor_id::text = %s
@@ -38,7 +35,6 @@ def get_workloads_by_category(
             """
             params = (str(professor_id),)
 
-        # ---------------- 2. การดูแลนักศึกษา (ADVISING) ----------------
         elif cat == "ADVISING":
             query = """
                 SELECT 
@@ -62,7 +58,6 @@ def get_workloads_by_category(
             """
             params = (str(professor_id), str(professor_id))
 
-        # ---------------- 3. งานบริหาร (ADMINISTRATIVE) ----------------
         elif cat == "ADMINISTRATIVE":
             query = """
                 SELECT 
@@ -75,7 +70,6 @@ def get_workloads_by_category(
             """
             params = (str(professor_id),)
 
-        # ---------------- 4. งานบริการวิชาการ & คะแนนพิเศษ (SERVICE / EXTRA) ----------------
         elif cat in ["SERVICE", "EXTRA"]:
             query = """
                 SELECT 
@@ -111,12 +105,9 @@ def get_workloads_by_category(
         )
     finally:
         cursor.close()
-from pydantic import BaseModel
-
-class StatusUpdatePayload(BaseModel):
-    status: str  # 'PASS', 'FAIL', 'PENDING', 'APPROVED', 'REJECTED'
 
 
+# ---------------- 2. Officer Dashboard (คำนวณสรุปรายอาจารย์) ----------------
 @router.get("/officer/dashboard", summary="ดึงข้อมูลสรุปภาระงานอาจารย์ทั้งหมดสำหรับ Officer")
 def get_officer_dashboard(
     academic_year: Optional[int] = Query(None),
@@ -186,8 +177,7 @@ def get_officer_dashboard(
         query += " ORDER BY p.first_name_th ASC;"
 
         cursor.execute(query, params)
-        lecturers = cursor.fetchall()
-        return lecturers
+        return cursor.fetchall()
 
     except Exception as e:
         raise HTTPException(
@@ -198,11 +188,11 @@ def get_officer_dashboard(
         cursor.close()
 
 
-@router.get("/officer/inspect/{professor_id}", summary="ดึงรายละเอียดภาระงานรายวิชา/ผลงานของอาจารย์เฉพาะคน")
+# ---------------- 3. ตรวจสอบรายละเอียดภาระงานอาจารย์ ----------------
+@router.get("/officer/inspect/{professor_id}", summary="ดึงรายละเอียดภาระงานรายวิชาเฉพาะอาจารย์")
 def inspect_professor_workload(professor_id: str, conn = Depends(get_db)):
     cursor = conn.cursor(cursor_factory=RealDictCursor)
     try:
-        # ดึงรายวิชาการสอน
         teaching_query = """
             SELECT tw.course_code AS code, tw.course_name_th AS name, tw.section, 
                    tw.credits, tw.workload_hours AS hours, tw.score
@@ -223,6 +213,7 @@ def inspect_professor_workload(professor_id: str, conn = Depends(get_db)):
         cursor.close()
 
 
+# ---------------- 4. อัปเดตสถานะการอนุมัติภาระงาน ----------------
 @router.patch("/submissions/{submission_id}/status", summary="อัปเดตสถานะการอนุมัติภาระงาน")
 def update_submission_status(submission_id: str, payload: StatusUpdatePayload, conn = Depends(get_db)):
     cursor = conn.cursor(cursor_factory=RealDictCursor)

@@ -1,3 +1,5 @@
+// public/js/dashboard.js
+
 let globalLecturersData = [];
 
 document.addEventListener('DOMContentLoaded', () => {
@@ -18,7 +20,6 @@ async function loadDashboardData() {
     if (searchVal) params.append('search', searchVal);
 
     try {
-        // ใช้ fetchWithAuth หรือ fetch เรียก API
         const response = await fetch(`${API_BASE_URL}/workloads/officer/dashboard?${params.toString()}`);
         if (!response.ok) throw new Error('ไม่สามารถดึงข้อมูลภาระงานได้');
 
@@ -35,9 +36,13 @@ function updateKPIs(data) {
     let passCount = 0;
     let pendingCount = 0;
     let totalCalcScoreSum = 0;
+    let totalActualScoreSum = 0;
 
     data.forEach(item => {
-        const totalCalc = (item.m1_calc || 0) + (item.m2_calc || 0) + (item.m3_calc || 0) + (item.m4_calc || 0) + (item.m5_calc || 0);
+        const totalActual = Number(item.m1_actual || 0) + Number(item.m2_actual || 0) + Number(item.m3_actual || 0) + Number(item.m4_actual || 0) + Number(item.m5_actual || 0);
+        const totalCalc = Number(item.m1_calc || 0) + Number(item.m2_calc || 0) + Number(item.m3_calc || 0) + Number(item.m4_calc || 0) + Number(item.m5_calc || 0);
+
+        totalActualScoreSum += totalActual;
         totalCalcScoreSum += totalCalc;
 
         if (totalCalc >= 650 || item.status === 'PASS' || item.status === 'APPROVED') {
@@ -49,12 +54,19 @@ function updateKPIs(data) {
     });
 
     const passRate = totalFaculty > 0 ? ((passCount / totalFaculty) * 100).toFixed(1) : '0.0';
-    const avgScore = totalFaculty > 0 ? (totalCalcScoreSum / totalFaculty).toFixed(1) : '0.0';
+    const avgCalc = totalFaculty > 0 ? (totalCalcScoreSum / totalFaculty).toFixed(1) : '0.0';
+    const avgActual = totalFaculty > 0 ? (totalActualScoreSum / totalFaculty).toFixed(1) : '0.0';
 
+    // อัปเดตตัวเลขหลัก
     if (document.getElementById('kpi-total-faculty')) document.getElementById('kpi-total-faculty').innerText = `${totalFaculty} คน`;
     if (document.getElementById('kpi-pass-rate')) document.getElementById('kpi-pass-rate').innerText = `${passRate}%`;
-    if (document.getElementById('kpi-avg-score')) document.getElementById('kpi-avg-score').innerText = avgScore;
+    if (document.getElementById('kpi-avg-score')) document.getElementById('kpi-avg-score').innerText = avgCalc;
     if (document.getElementById('kpi-pending')) document.getElementById('kpi-pending').innerText = `${pendingCount} รายการ`;
+
+    // อัปเดตข้อความย่อยบรรทัดล่าง
+    if (document.getElementById('kpi-total-sub')) document.getElementById('kpi-total-sub').innerText = `อาจารย์ในระบบทั้งหมด`;
+    if (document.getElementById('kpi-pass-sub')) document.getElementById('kpi-pass-sub').innerText = `${passCount} จาก ${totalFaculty} คนผ่านเกณฑ์`;
+    if (document.getElementById('kpi-avg-sub')) document.getElementById('kpi-avg-sub').innerText = `คะแนนจริงเฉลี่ย ${avgActual}`;
 }
 
 function renderTable(data) {
@@ -67,8 +79,8 @@ function renderTable(data) {
     }
 
     tbody.innerHTML = data.map(item => {
-        const totalActual = (item.m1_actual || 0) + (item.m2_actual || 0) + (item.m3_actual || 0) + (item.m4_actual || 0) + (item.m5_actual || 0);
-        const totalCalc = (item.m1_calc || 0) + (item.m2_calc || 0) + (item.m3_calc || 0) + (item.m4_calc || 0) + (item.m5_calc || 0);
+        const totalActual = Number(item.m1_actual || 0) + Number(item.m2_actual || 0) + Number(item.m3_actual || 0) + Number(item.m4_actual || 0) + Number(item.m5_actual || 0);
+        const totalCalc = Number(item.m1_calc || 0) + Number(item.m2_calc || 0) + Number(item.m3_calc || 0) + Number(item.m4_calc || 0) + Number(item.m5_calc || 0);
 
         let statusBadge = '';
         if (totalCalc >= 650 || item.status === 'PASS' || item.status === 'APPROVED') {
@@ -115,8 +127,8 @@ async function openInspectModal(profId) {
 
     document.getElementById("modal-lecturer-name").innerText = `รายละเอียดแบบฟอร์มภาระงาน - ${lecturer.name}`;
 
-    const totalActual = (lecturer.m1_actual || 0) + (lecturer.m2_actual || 0) + (lecturer.m3_actual || 0) + (lecturer.m4_actual || 0) + (lecturer.m5_actual || 0);
-    const totalCalc = (lecturer.m1_calc || 0) + (lecturer.m2_calc || 0) + (lecturer.m3_calc || 0) + (lecturer.m4_calc || 0) + (lecturer.m5_calc || 0);
+    const totalActual = Number(lecturer.m1_actual || 0) + Number(lecturer.m2_actual || 0) + Number(lecturer.m3_actual || 0) + Number(lecturer.m4_actual || 0) + Number(lecturer.m5_actual || 0);
+    const totalCalc = Number(lecturer.m1_calc || 0) + Number(lecturer.m2_calc || 0) + Number(lecturer.m3_calc || 0) + Number(lecturer.m4_calc || 0) + Number(lecturer.m5_calc || 0);
 
     let html = `
       <div style="background:#f8fafc; padding:16px; border-radius:8px; margin-bottom:20px; border:1px solid #e2e8f0;">

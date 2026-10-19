@@ -6,7 +6,6 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Dashboard เจ้าหน้าที่ - ระบบติดตามภาระงานอาจารย์ CS (FRWS)</title>
   
-  <!-- นำเข้าไฟล์ CSS หลัก และ CSS ของ Dashboard -->
   <link rel="stylesheet" href="style.css">
   <link rel="stylesheet" href="dashboardStyle.css">
 
@@ -26,7 +25,7 @@
         Faculty Research<br>& Workload Management System (FRWS)
       </h1>
     </div>
-    <div class="header-right">
+    <div class="header-right" id="auth-nav-section">
       <span style="color: white; font-size: 13.5px; margin-right: 15px;">
         <i class="fa fa-user-circle"></i> เจ้าหน้าที่สาขาวิชา (Officer)
       </span>
@@ -96,8 +95,8 @@
       <div class="kpi-card">
         <div class="kpi-info">
           <h4>อาจารย์ในสาขาวิชา</h4>
-          <div class="kpi-value" id="kpi-total-faculty">18 คน</div>
-          <div class="kpi-sub">สอนข้ามโครงการ 12 คน</div>
+          <div class="kpi-value" id="kpi-total-faculty">0 คน</div>
+          <div class="kpi-sub" id="kpi-total-sub">กำลังโหลด...</div>
         </div>
         <div class="kpi-icon red"><i class="fa fa-users"></i></div>
       </div>
@@ -105,8 +104,8 @@
       <div class="kpi-card">
         <div class="kpi-info">
           <h4>ผ่านเกณฑ์ประเมิน (≥650)</h4>
-          <div class="kpi-value" id="kpi-pass-rate" style="color: #1e7e34;">88.8%</div>
-          <div class="kpi-sub">16 จาก 18 คนผ่านเกณฑ์</div>
+          <div class="kpi-value" id="kpi-pass-rate" style="color: #1e7e34;">0%</div>
+          <div class="kpi-sub" id="kpi-pass-sub">กำลังโหลด...</div>
         </div>
         <div class="kpi-icon green"><i class="fa fa-check-circle"></i></div>
       </div>
@@ -114,8 +113,8 @@
       <div class="kpi-card">
         <div class="kpi-info">
           <h4>คะแนนคำนวณเฉลี่ย</h4>
-          <div class="kpi-value" id="kpi-avg-score">1,245.5</div>
-          <div class="kpi-sub">คะแนนจริงเฉลี่ย 1,380.0</div>
+          <div class="kpi-value" id="kpi-avg-score">0.0</div>
+          <div class="kpi-sub" id="kpi-avg-sub">กำลังโหลด...</div>
         </div>
         <div class="kpi-icon blue"><i class="fa fa-bar-chart"></i></div>
       </div>
@@ -123,8 +122,8 @@
       <div class="kpi-card">
         <div class="kpi-info">
           <h4>รอตรวจสอบหลักฐาน</h4>
-          <div class="kpi-value" id="kpi-pending" style="color: #b06000;">2 รายการ</div>
-          <div class="kpi-sub">ต้องอนุมัติภายใน 5 วัน</div>
+          <div class="kpi-value" id="kpi-pending" style="color: #b06000;">0 รายการ</div>
+          <div class="kpi-sub" id="kpi-pending-sub">รายการที่ต้องตรวจ</div>
         </div>
         <div class="kpi-icon orange"><i class="fa fa-clock-o"></i></div>
       </div>
@@ -167,10 +166,10 @@
   </main>
 
   <!-- Modal inspection form -->
-  <div class="modal-overlay" id="inspectModal">
+  <div class="modal-overlay" id="inspectModal" style="display: none;">
     <div class="modal-card">
       <div class="modal-header">
-        <h3 id="modal-lecturer-name">รายละเอียดแบบฟอร์มภาระงาน - ผศ.ดร.ประภาพร รัตนธำรง</h3>
+        <h3 id="modal-lecturer-name">รายละเอียดแบบฟอร์มภาระงาน</h3>
         <button class="modal-close" onclick="closeModal()">&times;</button>
       </div>
       <div class="modal-body" id="modal-content">
@@ -179,14 +178,8 @@
     </div>
   </div>
 
-<!-- ในไฟล์ public/dashboard.html ด้านล่างก่อนปิด </body> -->
-
-  <!-- สคริปต์หลักในการดึง API_BASE_URL และ Session Management -->
   <script src="js/main.js"></script>
-  <!-- สคริปต์หลักของหน้า Officer Dashboard -->
   <script src="js/dashboard.js"></script>
-</body>
-</html>
 </body>
 
 </html>
