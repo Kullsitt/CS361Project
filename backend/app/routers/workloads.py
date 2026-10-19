@@ -25,7 +25,7 @@ def get_workloads_by_category(
         if cat == "TEACHING":
             query = """
                 SELECT 
-                    tw.id::text, tw.course_code, tw.course_name_th, tw.section, 
+                    tw.id::text, tw.course_code, tw.course_code AS title, tw.section,
                     tw.credits, tw.student_count, tw.workload_hours, tw.is_selected, 
                     tw.score, ws.semester, ws.academic_year
                 FROM teaching_workloads tw
@@ -194,7 +194,7 @@ def inspect_professor_workload(professor_id: str, conn = Depends(get_db)):
     cursor = conn.cursor(cursor_factory=RealDictCursor)
     try:
         teaching_query = """
-            SELECT tw.course_code AS code, tw.course_name_th AS name, tw.section, 
+            SELECT tw.course_code AS code, tw.course_code AS name, tw.section,
                    tw.credits, tw.workload_hours AS hours, tw.score
             FROM teaching_workloads tw
             JOIN workload_submissions ws ON ws.id = tw.submission_id

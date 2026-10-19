@@ -12,7 +12,7 @@ COMMON = {
 }
 # Existing semantic columns are used first; migration adds only missing fields.
 MAPPINGS = {
-    'teaching_workloads': dict(COMMON, title='course_name_th', course='course_code', role='role_type', credits='credits', students='student_count', hours='workload_hours', share='contribution_percent', quantity='item_count'),
+    'teaching_workloads': dict(COMMON, title='course_code', course='course_code', role='role_type', credits='credits', students='student_count', hours='workload_hours', share='contribution_percent', quantity='item_count'),
     'student_project_supervisions': dict(COMMON, title='workload_title', course='course_code', role='role_type', quantity='project_count', share='contribution_percent', student_names='student_names'),
     'thesis_supervisions': dict(COMMON, title='workload_title', course='course_code', role='role_type', credits='registered_credit', share='contribution_percent', student_names='student_name'),
     'academic_work_items': dict(COMMON, title='title', role='role_type', share='contribution_percent', source='source_name', budget='budget_amount', quantity='item_count', student_names='student_names'),
@@ -89,6 +89,9 @@ def validate(data):
             result[name] = text(data.get(name, ''), name, {'course':20, 'organization':255}.get(name, 1000))
     if role['students']:
         result['student_names'] = text(data.get('student_names', ''), 'ชื่อนักศึกษา', 10000)
+    if table_for(code) == 'teaching_workloads':
+        result['course'] = text(result.get('course') or result['title'], 'รหัสวิชา', 20)
+        result['title'] = result['course']
     weight = role['weight']
     if code == '1.1':
         count = result['students']

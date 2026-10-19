@@ -11,8 +11,12 @@ try:
     with conn.cursor() as cur:
         if '--apply' in sys.argv:
             cur.execute((root / 'backend/migrations/001_dashboard_fields.sql').read_text(encoding='utf-8'))
+            if '--remove-course-name' in sys.argv:
+                cur.execute((root / 'backend/migrations/002_remove_course_name.sql').read_text(encoding='utf-8'))
             conn.commit()
             print('Dashboard migration committed. Existing rows preserved.')
+            if '--remove-course-name' in sys.argv:
+                print('Removed course_name_th column and its stored values; course_code retained.')
         else:
             conn.set_session(readonly=True)
             missing = []

@@ -1,6 +1,6 @@
 (async () => {
   // 1. กำหนด API_URL ให้อยู่ใน Scope ของฟังก์ชัน
-  const API_URL = window.DashboardAPI.base;
+  const API_URL = typeof API_BASE_URL !== 'undefined' ? API_BASE_URL : 'http://34.236.42.23/api';
   const token = localStorage.getItem('token');
   let profId = null;
 
@@ -53,7 +53,7 @@
   function activeSchema(type = subtype.value, role = form.elements.role?.value, categoryKey = category.value) {
     if (!scoring) return [];
     const visible = scoring.fields(type, role);
-    return schemas[categoryKey].filter(([name]) => visible.includes(name));
+    return schemas[categoryKey].filter(([name]) => name !== 'course' && visible.includes(name));
   }
 
   function detailValues() {
@@ -137,6 +137,9 @@
 
   function updateScore() {
     if (!scoring) return;
+    const usesCourse = scoring.fields(subtype.value, form.elements.role?.value).includes('course');
+    form.elements.title.maxLength = usesCourse ? 20 : 255;
+    form.elements.title.placeholder = usesCourse ? 'ระบุรหัสวิชา เช่น CS361 (ไม่เกิน 20 ตัวอักษร)' : 'ระบุชื่อผลงานหรือชื่อกิจกรรม';
     const result = currentScore();
     const liveScore = document.getElementById('live-score');
     if (liveScore) {
@@ -157,11 +160,13 @@
     if (!withStudents && form.elements.student_names) form.elements.student_names.value = '';
   }
 
-  function announce(message) { 
+  function announce(message, kind = 'info', popup = false) {
     if (notice) {
       notice.textContent = message; 
+      notice.dataset.kind = kind;
       notice.hidden = false; 
     }
+    if (popup) window.showDashboardResult(message, kind);
   }
 
   function reset() {
@@ -207,7 +212,7 @@
       render();
     } catch (err) {
       console.error('Fetch Workloads Error:', err);
-      announce('โหลดรายการไม่สำเร็จ กรุณารีเฟรชเพื่อลองใหม่');
+      announce('โหลดรายการไม่สำเร็จ กรุณารีเฟรชเพื่อลองใหม่', 'error');
     }
   }
 
@@ -322,17 +327,22 @@
       }
     }
 
-    if (!form.elements.title.value) form.elements.title.setCustomValidity('กรุณาระบุชื่อรายการภาระงาน');
+    if (!form.elements.title.value) form.elements.title.setCustomValidity('กรุณาระบุรหัสวิชา ชื่อผลงาน หรือชื่อกิจกรรม');
+    if (form.elements.title.value.length > form.elements.title.maxLength) {
+      form.elements.title.setCustomValidity(`กรุณากรอกไม่เกิน ${form.elements.title.maxLength} ตัวอักษร`);
+    }
     const url = form.elements.evidence_url;
     if (url && url.value && !/^https?:\/\//i.test(url.value)) url.setCustomValidity('กรุณาใช้ลิงก์ http:// หรือ https://');
     if (!form.reportValidity()) return;
 
     const result = currentScore();
-    if (!['calculated', 'pending'].includes(result.status)) { announce('กรุณาเลือกบทบาทและกรอกข้อมูลของงานให้ครบถ้วน'); return; }
+    if (!['calculated', 'pending'].includes(result.status)) { announce('กรุณาเลือกบทบาทและกรอกข้อมูลของงานให้ครบถ้วน', 'error', true); return; }
 
     const isEditing = editingId !== null;
     const payload = {
       ...Object.fromEntries(names.map(name => [name, form.elements.namedItem(name)?.value || ''])),
+      ...(scoring.fields(subtype.value, form.elements.role?.value).includes('course')
+        ? {course: form.elements.title.value} : {}),
       attachments: attachments
     };
 
@@ -361,14 +371,14 @@
         throw new Error(errJson.detail || 'ไม่สามารถบันทึกข้อมูลภาระงานลงฐานข้อมูลได้');
       }
 
-      announce(isEditing ? 'แก้ไขรายการภาระงานเรียบร้อยแล้ว' : 'เพิ่มรายการภาระงานเรียบร้อยแล้ว');
+      announce(isEditing ? 'แก้ไขรายการภาระงานเรียบร้อยแล้ว' : 'เพิ่มรายการภาระงานเรียบร้อยแล้ว', 'success', true);
       filter.value = 'all'; 
       reset(); 
       await fetchWorkloads(); // โหลดข้อมูลใหม่จาก DB
 
     } catch (err) {
       console.error('Save Workload Error:', err);
-      announce(err.message);
+      announce(err.message, 'error', true);
     } finally {
       controls.forEach((control, index) => { if (control.isConnected) control.disabled = disabled[index]; });
       busy = false;
@@ -393,8 +403,8 @@
         await window.DashboardAPI.request(`/workloads/${encodeURIComponent(record.id)}`, {method: 'DELETE'});
         records = records.filter(item => item.id !== record.id);
         if (editingId === record.id) reset();
-        render(); announce('ลบรายการภาระงานแล้ว');
-      } catch (error) { announce(error.message); button.disabled = false; }
+        render(); announce('ลบรายการภาระงานแล้ว', 'success', true);
+      } catch (error) { announce(error.message, 'error', true); button.disabled = false; }
       finally { busy = false; }
       return;
     }
@@ -409,6 +419,9 @@
         if (form.elements.namedItem(name)) {
           form.elements.namedItem(name).value = record[name] ?? '';
         }
+      }
+      if (scoring.fields(record.subtype, record.role).includes('course') && record.course) {
+        form.elements.title.value = record.course;
       }
       
       updateScore();
@@ -425,7 +438,7 @@
       if (cancelBtn) cancelBtn.textContent = 'ยกเลิกการแก้ไข';
       
       announce('กำลังแก้ไข: ' + record.title); 
-      if (form.elements.title) form.elements.title.focus();
+      form.elements.title.focus();
     }
   });
 

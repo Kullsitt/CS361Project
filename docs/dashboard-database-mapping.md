@@ -15,7 +15,7 @@ Create or reuse a submission for the owner, academic year, and semester in a tra
 | Personal profile fields | Same-name columns in `professors` |
 | Academic year / semester | `workload_submissions.academic_year` / `semester` |
 | Lecture/lab course code | `teaching_workloads.course_code` |
-| Lecture/lab title | `teaching_workloads.course_name_th` |
+| Lecture/lab display title | Derived from `teaching_workloads.course_code` (one field) |
 | Credits / student count / hours | `teaching_workloads.credits` / `student_count` / `workload_hours` |
 | Student project course / role / count | `student_project_supervisions.course_code` / `role_type` / `project_count` |
 | Thesis course / student name / role / registered credits | `thesis_supervisions.course_code` / `student_name` / `role_type` / `registered_credit` |

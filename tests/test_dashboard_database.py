@@ -47,6 +47,7 @@ def main():
                 cur.execute('SELECT pg_my_temp_schema() = relnamespace FROM pg_class WHERE oid = %s::regclass', (table,))
                 assert cur.fetchone()[0], f'Unsafe target: {table}'
             cur.execute((root / 'backend/migrations/001_dashboard_fields.sql').read_text(encoding='utf-8'))
+            cur.execute((root / 'backend/migrations/002_remove_course_name.sql').read_text(encoding='utf-8'))
             owner, other = str(uuid4()), str(uuid4())
             for who in (owner, other):
                 cur.execute("INSERT INTO professors (id, first_name_th, last_name_th, email) VALUES (%s, 'Test', 'Dashboard', %s)", (who, who + '@example.com'))
@@ -71,7 +72,7 @@ def main():
                     assert loaded[field] == expected[field], (code, field)
                 assert loaded.get('student_names') == expected.get('student_names'), code
                 changed = update_workload(created['id'], dict(payload, title='Updated'), user, db)
-                assert changed['title'] == 'Updated'
+                assert changed['title'] == (payload['course'] if created['id'].startswith('teaching_workloads:') else 'Updated')
                 try:
                     delete_workload(created['id'], {'id': other}, db)
                     raise AssertionError('Ownership check missing')

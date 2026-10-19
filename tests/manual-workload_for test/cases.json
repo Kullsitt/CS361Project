@@ -1,0 +1,5974 @@
+{
+  "version": 1,
+  "scope": "Teacher dashboard UI mockup only",
+  "source_commit": "29d1e00",
+  "all_user_results": "NOT_RUN",
+  "counts": {
+    "role_cases": 115,
+    "boundaries": 31,
+    "flows": 30,
+    "known_gaps": 4,
+    "total": 180
+  },
+  "role_cases": [
+    {
+      "id": "W001",
+      "category": "teaching",
+      "category_label": "1. งานสอน",
+      "main_type": "วิชาบรรยาย",
+      "subtype": "1.1 วิชาบรรยาย (ปริญญาตรี)",
+      "subtype_label": "วิชาบรรยาย (ปริญญาตรี)",
+      "role": "ผู้สอนวิชาบรรยาย",
+      "common": {
+        "semester": "2",
+        "year": "2567",
+        "title": "ทดสอบภาระงาน W001",
+        "evidence_url": "https://example.com",
+        "role_note": "ข้อมูลสมมติ W001"
+      },
+      "inputs": {
+        "course": "CS999",
+        "hours": "45",
+        "credits": "3",
+        "students": "125",
+        "share": "50"
+      },
+      "expected": {
+        "score": 110,
+        "display": "110.00",
+        "status": "calculated",
+        "student_names_visible": false,
+        "visible_fields": [
+          {
+            "name": "course",
+            "label": "รหัสวิชา"
+          },
+          {
+            "name": "role",
+            "label": "หน้าที่ / บทบาท"
+          },
+          {
+            "name": "hours",
+            "label": "จำนวนชั่วโมง"
+          },
+          {
+            "name": "credits",
+            "label": "หน่วยกิต"
+          },
+          {
+            "name": "students",
+            "label": "จำนวนนักศึกษา"
+          },
+          {
+            "name": "share",
+            "label": "สัดส่วนความรับผิดชอบ (%)"
+          }
+        ],
+        "save_allowed": true
+      },
+      "actual_result": "",
+      "verdict": "NOT_RUN"
+    },
+    {
+      "id": "W002",
+      "category": "teaching",
+      "category_label": "1. งานสอน",
+      "main_type": "วิชาปฏิบัติการ",
+      "subtype": "1.2 วิชาปฏิบัติการ (ปริญญาตรี)",
+      "subtype_label": "วิชาปฏิบัติการ (ปริญญาตรี)",
+      "role": "ผู้สอนและเตรียมปฏิบัติการ",
+      "common": {
+        "semester": "2",
+        "year": "2567",
+        "title": "ทดสอบภาระงาน W002",
+        "evidence_url": "https://example.com",
+        "role_note": "ข้อมูลสมมติ W002"
+      },
+      "inputs": {
+        "course": "CS999",
+        "hours": "45",
+        "credits": "3",
+        "students": "125",
+        "share": "50"
+      },
+      "expected": {
+        "score": 60,
+        "display": "60.00",
+        "status": "calculated",
+        "student_names_visible": false,
+        "visible_fields": [
+          {
+            "name": "course",
+            "label": "รหัสวิชา"
+          },
+          {
+            "name": "role",
+            "label": "หน้าที่ / บทบาท"
+          },
+          {
+            "name": "hours",
+            "label": "จำนวนชั่วโมง"
+          },
+          {
+            "name": "credits",
+            "label": "หน่วยกิต"
+          },
+          {
+            "name": "students",
+            "label": "จำนวนนักศึกษา"
+          },
+          {
+            "name": "share",
+            "label": "สัดส่วนความรับผิดชอบ (%)"
+          }
+        ],
+        "save_allowed": true
+      },
+      "actual_result": "",
+      "verdict": "NOT_RUN"
+    },
+    {
+      "id": "W003",
+      "category": "teaching",
+      "category_label": "1. งานสอน",
+      "main_type": "วิชาปฏิบัติการ",
+      "subtype": "1.2 วิชาปฏิบัติการ (ปริญญาตรี)",
+      "subtype_label": "วิชาปฏิบัติการ (ปริญญาตรี)",
+      "role": "ผู้ช่วยสอนปฏิบัติการ",
+      "common": {
+        "semester": "2",
+        "year": "2567",
+        "title": "ทดสอบภาระงาน W003",
+        "evidence_url": "https://example.com",
+        "role_note": "ข้อมูลสมมติ W003"
+      },
+      "inputs": {
+        "course": "CS999",
+        "hours": "45",
+        "credits": "3",
+        "students": "125",
+        "share": "50"
+      },
+      "expected": {
+        "score": 50,
+        "display": "50.00",
+        "status": "calculated",
+        "student_names_visible": false,
+        "visible_fields": [
+          {
+            "name": "course",
+            "label": "รหัสวิชา"
+          },
+          {
+            "name": "role",
+            "label": "หน้าที่ / บทบาท"
+          },
+          {
+            "name": "hours",
+            "label": "จำนวนชั่วโมง"
+          },
+          {
+            "name": "credits",
+            "label": "หน่วยกิต"
+          },
+          {
+            "name": "students",
+            "label": "จำนวนนักศึกษา"
+          },
+          {
+            "name": "share",
+            "label": "สัดส่วนความรับผิดชอบ (%)"
+          }
+        ],
+        "save_allowed": true
+      },
+      "actual_result": "",
+      "verdict": "NOT_RUN"
+    },
+    {
+      "id": "W004",
+      "category": "teaching",
+      "category_label": "1. งานสอน",
+      "main_type": "วิชาปฏิบัติการ",
+      "subtype": "1.2 วิชาปฏิบัติการ (ปริญญาตรี)",
+      "subtype_label": "วิชาปฏิบัติการ (ปริญญาตรี)",
+      "role": "ผู้คุมวิชาปฏิบัติการนอกสถานที่",
+      "common": {
+        "semester": "2",
+        "year": "2567",
+        "title": "ทดสอบภาระงาน W004",
+        "evidence_url": "https://example.com",
+        "role_note": "ข้อมูลสมมติ W004"
+      },
+      "inputs": {
+        "course": "CS999",
+        "hours": "45",
+        "credits": "3",
+        "students": "125",
+        "share": "50"
+      },
+      "expected": {
+        "score": 50,
+        "display": "50.00",
+        "status": "calculated",
+        "student_names_visible": false,
+        "visible_fields": [
+          {
+            "name": "course",
+            "label": "รหัสวิชา"
+          },
+          {
+            "name": "role",
+            "label": "หน้าที่ / บทบาท"
+          },
+          {
+            "name": "hours",
+            "label": "จำนวนชั่วโมง"
+          },
+          {
+            "name": "credits",
+            "label": "หน่วยกิต"
+          },
+          {
+            "name": "students",
+            "label": "จำนวนนักศึกษา"
+          },
+          {
+            "name": "share",
+            "label": "สัดส่วนความรับผิดชอบ (%)"
+          }
+        ],
+        "save_allowed": true
+      },
+      "actual_result": "",
+      "verdict": "NOT_RUN"
+    },
+    {
+      "id": "W005",
+      "category": "teaching",
+      "category_label": "1. งานสอน",
+      "main_type": "สัมมนา",
+      "subtype": "1.3 สัมมนา (ปริญญาตรี)",
+      "subtype_label": "สัมมนา (ปริญญาตรี)",
+      "role": "อาจารย์ที่ปรึกษา",
+      "common": {
+        "semester": "2",
+        "year": "2567",
+        "title": "ทดสอบภาระงาน W005",
+        "evidence_url": "https://example.com",
+        "role_note": "ข้อมูลสมมติ W005"
+      },
+      "inputs": {
+        "course": "CS999",
+        "quantity": "2",
+        "share": "50"
+      },
+      "expected": {
+        "score": 20,
+        "display": "20.00",
+        "status": "calculated",
+        "student_names_visible": false,
+        "visible_fields": [
+          {
+            "name": "course",
+            "label": "รหัสวิชา"
+          },
+          {
+            "name": "role",
+            "label": "หน้าที่ / บทบาท"
+          },
+          {
+            "name": "quantity",
+            "label": "จำนวนเรื่อง / โครงงาน"
+          },
+          {
+            "name": "share",
+            "label": "สัดส่วนความรับผิดชอบ (%)"
+          }
+        ],
+        "save_allowed": true
+      },
+      "actual_result": "",
+      "verdict": "NOT_RUN"
+    },
+    {
+      "id": "W006",
+      "category": "teaching",
+      "category_label": "1. งานสอน",
+      "main_type": "สัมมนา",
+      "subtype": "1.3 สัมมนา (ปริญญาตรี)",
+      "subtype_label": "สัมมนา (ปริญญาตรี)",
+      "role": "กรรมการสอบสัมมนา",
+      "common": {
+        "semester": "2",
+        "year": "2567",
+        "title": "ทดสอบภาระงาน W006",
+        "evidence_url": "https://example.com",
+        "role_note": "ข้อมูลสมมติ W006"
+      },
+      "inputs": {
+        "course": "CS999",
+        "quantity": "2",
+        "share": "50"
+      },
+      "expected": {
+        "score": 10,
+        "display": "10.00",
+        "status": "calculated",
+        "student_names_visible": false,
+        "visible_fields": [
+          {
+            "name": "course",
+            "label": "รหัสวิชา"
+          },
+          {
+            "name": "role",
+            "label": "หน้าที่ / บทบาท"
+          },
+          {
+            "name": "quantity",
+            "label": "จำนวนเรื่อง / โครงงาน"
+          },
+          {
+            "name": "share",
+            "label": "สัดส่วนความรับผิดชอบ (%)"
+          }
+        ],
+        "save_allowed": true
+      },
+      "actual_result": "",
+      "verdict": "NOT_RUN"
+    },
+    {
+      "id": "W007",
+      "category": "teaching",
+      "category_label": "1. งานสอน",
+      "main_type": "โครงงาน / ปัญหาพิเศษ",
+      "subtype": "1.4 ซีเนียร์โปรเจก / ปัญหาพิเศษ",
+      "subtype_label": "ซีเนียร์โปรเจก / ปัญหาพิเศษ",
+      "role": "อาจารย์ที่ปรึกษา",
+      "common": {
+        "semester": "2",
+        "year": "2567",
+        "title": "ทดสอบภาระงาน W007",
+        "evidence_url": "https://example.com",
+        "role_note": "ข้อมูลสมมติ W007"
+      },
+      "inputs": {
+        "course": "CS999",
+        "quantity": "2",
+        "share": "50",
+        "student_names": "นายทดสอบ หนึ่ง\nนางสาวตัวอย่าง สอง"
+      },
+      "expected": {
+        "score": 40,
+        "display": "40.00",
+        "status": "calculated",
+        "student_names_visible": true,
+        "visible_fields": [
+          {
+            "name": "course",
+            "label": "รหัสวิชา"
+          },
+          {
+            "name": "role",
+            "label": "หน้าที่ / บทบาท"
+          },
+          {
+            "name": "quantity",
+            "label": "จำนวนเรื่อง / โครงงาน"
+          },
+          {
+            "name": "share",
+            "label": "สัดส่วนความรับผิดชอบ (%)"
+          }
+        ],
+        "save_allowed": true
+      },
+      "actual_result": "",
+      "verdict": "NOT_RUN"
+    },
+    {
+      "id": "W008",
+      "category": "teaching",
+      "category_label": "1. งานสอน",
+      "main_type": "โครงงาน / ปัญหาพิเศษ",
+      "subtype": "1.4 ซีเนียร์โปรเจก / ปัญหาพิเศษ",
+      "subtype_label": "ซีเนียร์โปรเจก / ปัญหาพิเศษ",
+      "role": "อาจารย์ที่ปรึกษาร่วม",
+      "common": {
+        "semester": "2",
+        "year": "2567",
+        "title": "ทดสอบภาระงาน W008",
+        "evidence_url": "https://example.com",
+        "role_note": "ข้อมูลสมมติ W008"
+      },
+      "inputs": {
+        "course": "CS999",
+        "quantity": "2",
+        "share": "50",
+        "student_names": "นายทดสอบ หนึ่ง\nนางสาวตัวอย่าง สอง"
+      },
+      "expected": {
+        "score": 20,
+        "display": "20.00",
+        "status": "calculated",
+        "student_names_visible": true,
+        "visible_fields": [
+          {
+            "name": "course",
+            "label": "รหัสวิชา"
+          },
+          {
+            "name": "role",
+            "label": "หน้าที่ / บทบาท"
+          },
+          {
+            "name": "quantity",
+            "label": "จำนวนเรื่อง / โครงงาน"
+          },
+          {
+            "name": "share",
+            "label": "สัดส่วนความรับผิดชอบ (%)"
+          }
+        ],
+        "save_allowed": true
+      },
+      "actual_result": "",
+      "verdict": "NOT_RUN"
+    },
+    {
+      "id": "W009",
+      "category": "teaching",
+      "category_label": "1. งานสอน",
+      "main_type": "โครงงาน / ปัญหาพิเศษ",
+      "subtype": "1.4 ซีเนียร์โปรเจก / ปัญหาพิเศษ",
+      "subtype_label": "ซีเนียร์โปรเจก / ปัญหาพิเศษ",
+      "role": "กรรมการสอบ",
+      "common": {
+        "semester": "2",
+        "year": "2567",
+        "title": "ทดสอบภาระงาน W009",
+        "evidence_url": "https://example.com",
+        "role_note": "ข้อมูลสมมติ W009"
+      },
+      "inputs": {
+        "course": "CS999",
+        "quantity": "2",
+        "share": "50",
+        "student_names": "นายทดสอบ หนึ่ง\nนางสาวตัวอย่าง สอง"
+      },
+      "expected": {
+        "score": 10,
+        "display": "10.00",
+        "status": "calculated",
+        "student_names_visible": true,
+        "visible_fields": [
+          {
+            "name": "course",
+            "label": "รหัสวิชา"
+          },
+          {
+            "name": "role",
+            "label": "หน้าที่ / บทบาท"
+          },
+          {
+            "name": "quantity",
+            "label": "จำนวนเรื่อง / โครงงาน"
+          },
+          {
+            "name": "share",
+            "label": "สัดส่วนความรับผิดชอบ (%)"
+          }
+        ],
+        "save_allowed": true
+      },
+      "actual_result": "",
+      "verdict": "NOT_RUN"
+    },
+    {
+      "id": "W010",
+      "category": "teaching",
+      "category_label": "1. งานสอน",
+      "main_type": "สหกิจศึกษา",
+      "subtype": "1.5 สหกิจศึกษา",
+      "subtype_label": "สหกิจศึกษา",
+      "role": "อาจารย์ที่ปรึกษา",
+      "common": {
+        "semester": "2",
+        "year": "2567",
+        "title": "ทดสอบภาระงาน W010",
+        "evidence_url": "https://example.com",
+        "role_note": "ข้อมูลสมมติ W010"
+      },
+      "inputs": {
+        "course": "CS999",
+        "quantity": "2",
+        "share": "50"
+      },
+      "expected": {
+        "score": 40,
+        "display": "40.00",
+        "status": "calculated",
+        "student_names_visible": false,
+        "visible_fields": [
+          {
+            "name": "course",
+            "label": "รหัสวิชา"
+          },
+          {
+            "name": "role",
+            "label": "หน้าที่ / บทบาท"
+          },
+          {
+            "name": "quantity",
+            "label": "จำนวนเรื่อง / โครงงาน"
+          },
+          {
+            "name": "share",
+            "label": "สัดส่วนความรับผิดชอบ (%)"
+          }
+        ],
+        "save_allowed": true
+      },
+      "actual_result": "",
+      "verdict": "NOT_RUN"
+    },
+    {
+      "id": "W011",
+      "category": "teaching",
+      "category_label": "1. งานสอน",
+      "main_type": "สหกิจศึกษา",
+      "subtype": "1.5 สหกิจศึกษา",
+      "subtype_label": "สหกิจศึกษา",
+      "role": "อาจารย์ที่ปรึกษาร่วม",
+      "common": {
+        "semester": "2",
+        "year": "2567",
+        "title": "ทดสอบภาระงาน W011",
+        "evidence_url": "https://example.com",
+        "role_note": "ข้อมูลสมมติ W011"
+      },
+      "inputs": {
+        "course": "CS999",
+        "quantity": "2",
+        "share": "50"
+      },
+      "expected": {
+        "score": 20,
+        "display": "20.00",
+        "status": "calculated",
+        "student_names_visible": false,
+        "visible_fields": [
+          {
+            "name": "course",
+            "label": "รหัสวิชา"
+          },
+          {
+            "name": "role",
+            "label": "หน้าที่ / บทบาท"
+          },
+          {
+            "name": "quantity",
+            "label": "จำนวนเรื่อง / โครงงาน"
+          },
+          {
+            "name": "share",
+            "label": "สัดส่วนความรับผิดชอบ (%)"
+          }
+        ],
+        "save_allowed": true
+      },
+      "actual_result": "",
+      "verdict": "NOT_RUN"
+    },
+    {
+      "id": "W012",
+      "category": "teaching",
+      "category_label": "1. งานสอน",
+      "main_type": "สหกิจศึกษา",
+      "subtype": "1.5 สหกิจศึกษา",
+      "subtype_label": "สหกิจศึกษา",
+      "role": "กรรมการตรวจผลงาน",
+      "common": {
+        "semester": "2",
+        "year": "2567",
+        "title": "ทดสอบภาระงาน W012",
+        "evidence_url": "https://example.com",
+        "role_note": "ข้อมูลสมมติ W012"
+      },
+      "inputs": {
+        "course": "CS999",
+        "quantity": "2",
+        "share": "50"
+      },
+      "expected": {
+        "score": 10,
+        "display": "10.00",
+        "status": "calculated",
+        "student_names_visible": false,
+        "visible_fields": [
+          {
+            "name": "course",
+            "label": "รหัสวิชา"
+          },
+          {
+            "name": "role",
+            "label": "หน้าที่ / บทบาท"
+          },
+          {
+            "name": "quantity",
+            "label": "จำนวนเรื่อง / โครงงาน"
+          },
+          {
+            "name": "share",
+            "label": "สัดส่วนความรับผิดชอบ (%)"
+          }
+        ],
+        "save_allowed": true
+      },
+      "actual_result": "",
+      "verdict": "NOT_RUN"
+    },
+    {
+      "id": "W013",
+      "category": "teaching",
+      "category_label": "1. งานสอน",
+      "main_type": "วิชาบรรยาย",
+      "subtype": "1.6 วิชาบรรยาย (โท / เอก)",
+      "subtype_label": "วิชาบรรยาย (โท / เอก)",
+      "role": "ผู้สอนวิชาบรรยาย",
+      "common": {
+        "semester": "2",
+        "year": "2567",
+        "title": "ทดสอบภาระงาน W013",
+        "evidence_url": "https://example.com",
+        "role_note": "ข้อมูลสมมติ W013"
+      },
+      "inputs": {
+        "course": "CS999",
+        "hours": "45",
+        "credits": "3",
+        "students": "125",
+        "share": "50"
+      },
+      "expected": {
+        "score": 110,
+        "display": "110.00",
+        "status": "calculated",
+        "student_names_visible": false,
+        "visible_fields": [
+          {
+            "name": "course",
+            "label": "รหัสวิชา"
+          },
+          {
+            "name": "role",
+            "label": "หน้าที่ / บทบาท"
+          },
+          {
+            "name": "hours",
+            "label": "จำนวนชั่วโมง"
+          },
+          {
+            "name": "credits",
+            "label": "หน่วยกิต"
+          },
+          {
+            "name": "students",
+            "label": "จำนวนนักศึกษา"
+          },
+          {
+            "name": "share",
+            "label": "สัดส่วนความรับผิดชอบ (%)"
+          }
+        ],
+        "save_allowed": true
+      },
+      "actual_result": "",
+      "verdict": "NOT_RUN"
+    },
+    {
+      "id": "W014",
+      "category": "teaching",
+      "category_label": "1. งานสอน",
+      "main_type": "วิชาปฏิบัติการ",
+      "subtype": "1.7 วิชาปฏิบัติการ (โท / เอก)",
+      "subtype_label": "วิชาปฏิบัติการ (โท / เอก)",
+      "role": "ผู้สอนและเตรียมปฏิบัติการ",
+      "common": {
+        "semester": "2",
+        "year": "2567",
+        "title": "ทดสอบภาระงาน W014",
+        "evidence_url": "https://example.com",
+        "role_note": "ข้อมูลสมมติ W014"
+      },
+      "inputs": {
+        "course": "CS999",
+        "hours": "45",
+        "credits": "3",
+        "students": "125",
+        "share": "50"
+      },
+      "expected": {
+        "score": 60,
+        "display": "60.00",
+        "status": "calculated",
+        "student_names_visible": false,
+        "visible_fields": [
+          {
+            "name": "course",
+            "label": "รหัสวิชา"
+          },
+          {
+            "name": "role",
+            "label": "หน้าที่ / บทบาท"
+          },
+          {
+            "name": "hours",
+            "label": "จำนวนชั่วโมง"
+          },
+          {
+            "name": "credits",
+            "label": "หน่วยกิต"
+          },
+          {
+            "name": "students",
+            "label": "จำนวนนักศึกษา"
+          },
+          {
+            "name": "share",
+            "label": "สัดส่วนความรับผิดชอบ (%)"
+          }
+        ],
+        "save_allowed": true
+      },
+      "actual_result": "",
+      "verdict": "NOT_RUN"
+    },
+    {
+      "id": "W015",
+      "category": "teaching",
+      "category_label": "1. งานสอน",
+      "main_type": "วิชาปฏิบัติการ",
+      "subtype": "1.7 วิชาปฏิบัติการ (โท / เอก)",
+      "subtype_label": "วิชาปฏิบัติการ (โท / เอก)",
+      "role": "ผู้ช่วยสอนปฏิบัติการ",
+      "common": {
+        "semester": "2",
+        "year": "2567",
+        "title": "ทดสอบภาระงาน W015",
+        "evidence_url": "https://example.com",
+        "role_note": "ข้อมูลสมมติ W015"
+      },
+      "inputs": {
+        "course": "CS999",
+        "hours": "45",
+        "credits": "3",
+        "students": "125",
+        "share": "50"
+      },
+      "expected": {
+        "score": 50,
+        "display": "50.00",
+        "status": "calculated",
+        "student_names_visible": false,
+        "visible_fields": [
+          {
+            "name": "course",
+            "label": "รหัสวิชา"
+          },
+          {
+            "name": "role",
+            "label": "หน้าที่ / บทบาท"
+          },
+          {
+            "name": "hours",
+            "label": "จำนวนชั่วโมง"
+          },
+          {
+            "name": "credits",
+            "label": "หน่วยกิต"
+          },
+          {
+            "name": "students",
+            "label": "จำนวนนักศึกษา"
+          },
+          {
+            "name": "share",
+            "label": "สัดส่วนความรับผิดชอบ (%)"
+          }
+        ],
+        "save_allowed": true
+      },
+      "actual_result": "",
+      "verdict": "NOT_RUN"
+    },
+    {
+      "id": "W016",
+      "category": "teaching",
+      "category_label": "1. งานสอน",
+      "main_type": "สัมมนา",
+      "subtype": "1.8 สัมมนา (โท / เอก)",
+      "subtype_label": "สัมมนา (โท / เอก)",
+      "role": "อาจารย์ที่ปรึกษา",
+      "common": {
+        "semester": "2",
+        "year": "2567",
+        "title": "ทดสอบภาระงาน W016",
+        "evidence_url": "https://example.com",
+        "role_note": "ข้อมูลสมมติ W016"
+      },
+      "inputs": {
+        "course": "CS999",
+        "quantity": "2",
+        "share": "50"
+      },
+      "expected": {
+        "score": 30,
+        "display": "30.00",
+        "status": "calculated",
+        "student_names_visible": false,
+        "visible_fields": [
+          {
+            "name": "course",
+            "label": "รหัสวิชา"
+          },
+          {
+            "name": "role",
+            "label": "หน้าที่ / บทบาท"
+          },
+          {
+            "name": "quantity",
+            "label": "จำนวนเรื่อง / โครงงาน"
+          },
+          {
+            "name": "share",
+            "label": "สัดส่วนความรับผิดชอบ (%)"
+          }
+        ],
+        "save_allowed": true
+      },
+      "actual_result": "",
+      "verdict": "NOT_RUN"
+    },
+    {
+      "id": "W017",
+      "category": "teaching",
+      "category_label": "1. งานสอน",
+      "main_type": "สัมมนา",
+      "subtype": "1.8 สัมมนา (โท / เอก)",
+      "subtype_label": "สัมมนา (โท / เอก)",
+      "role": "กรรมการสอบวิชาสัมมนา",
+      "common": {
+        "semester": "2",
+        "year": "2567",
+        "title": "ทดสอบภาระงาน W017",
+        "evidence_url": "https://example.com",
+        "role_note": "ข้อมูลสมมติ W017"
+      },
+      "inputs": {
+        "course": "CS999",
+        "quantity": "2",
+        "share": "50"
+      },
+      "expected": {
+        "score": 15,
+        "display": "15.00",
+        "status": "calculated",
+        "student_names_visible": false,
+        "visible_fields": [
+          {
+            "name": "course",
+            "label": "รหัสวิชา"
+          },
+          {
+            "name": "role",
+            "label": "หน้าที่ / บทบาท"
+          },
+          {
+            "name": "quantity",
+            "label": "จำนวนเรื่อง / โครงงาน"
+          },
+          {
+            "name": "share",
+            "label": "สัดส่วนความรับผิดชอบ (%)"
+          }
+        ],
+        "save_allowed": true
+      },
+      "actual_result": "",
+      "verdict": "NOT_RUN"
+    },
+    {
+      "id": "W018",
+      "category": "teaching",
+      "category_label": "1. งานสอน",
+      "main_type": "วิทยานิพนธ์",
+      "subtype": "1.9 วิทยานิพนธ์",
+      "subtype_label": "วิทยานิพนธ์",
+      "role": "ที่ปรึกษาหลัก",
+      "common": {
+        "semester": "2",
+        "year": "2567",
+        "title": "ทดสอบภาระงาน W018",
+        "evidence_url": "https://example.com",
+        "role_note": "ข้อมูลสมมติ W018"
+      },
+      "inputs": {
+        "course": "CS999",
+        "credits": "3",
+        "share": "50",
+        "student_names": "นายทดสอบ หนึ่ง\nนางสาวตัวอย่าง สอง"
+      },
+      "expected": {
+        "score": 30,
+        "display": "30.00",
+        "status": "calculated",
+        "student_names_visible": true,
+        "visible_fields": [
+          {
+            "name": "course",
+            "label": "รหัสวิชา"
+          },
+          {
+            "name": "role",
+            "label": "หน้าที่ / บทบาท"
+          },
+          {
+            "name": "credits",
+            "label": "หน่วยกิต"
+          },
+          {
+            "name": "share",
+            "label": "สัดส่วนความรับผิดชอบ (%)"
+          }
+        ],
+        "save_allowed": true
+      },
+      "actual_result": "",
+      "verdict": "NOT_RUN"
+    },
+    {
+      "id": "W019",
+      "category": "teaching",
+      "category_label": "1. งานสอน",
+      "main_type": "วิทยานิพนธ์",
+      "subtype": "1.9 วิทยานิพนธ์",
+      "subtype_label": "วิทยานิพนธ์",
+      "role": "ที่ปรึกษาร่วม",
+      "common": {
+        "semester": "2",
+        "year": "2567",
+        "title": "ทดสอบภาระงาน W019",
+        "evidence_url": "https://example.com",
+        "role_note": "ข้อมูลสมมติ W019"
+      },
+      "inputs": {
+        "course": "CS999",
+        "credits": "3",
+        "share": "50",
+        "student_names": "นายทดสอบ หนึ่ง\nนางสาวตัวอย่าง สอง"
+      },
+      "expected": {
+        "score": 15,
+        "display": "15.00",
+        "status": "calculated",
+        "student_names_visible": true,
+        "visible_fields": [
+          {
+            "name": "course",
+            "label": "รหัสวิชา"
+          },
+          {
+            "name": "role",
+            "label": "หน้าที่ / บทบาท"
+          },
+          {
+            "name": "credits",
+            "label": "หน่วยกิต"
+          },
+          {
+            "name": "share",
+            "label": "สัดส่วนความรับผิดชอบ (%)"
+          }
+        ],
+        "save_allowed": true
+      },
+      "actual_result": "",
+      "verdict": "NOT_RUN"
+    },
+    {
+      "id": "W020",
+      "category": "teaching",
+      "category_label": "1. งานสอน",
+      "main_type": "โครงงาน / ปัญหาพิเศษ",
+      "subtype": "1.10 ปัญหาพิเศษ (โท / เอก)",
+      "subtype_label": "ปัญหาพิเศษ (โท / เอก)",
+      "role": "ที่ปรึกษาหลัก",
+      "common": {
+        "semester": "2",
+        "year": "2567",
+        "title": "ทดสอบภาระงาน W020",
+        "evidence_url": "https://example.com",
+        "role_note": "ข้อมูลสมมติ W020"
+      },
+      "inputs": {
+        "course": "CS999",
+        "quantity": "2",
+        "share": "50",
+        "student_names": "นายทดสอบ หนึ่ง\nนางสาวตัวอย่าง สอง"
+      },
+      "expected": {
+        "score": 45,
+        "display": "45.00",
+        "status": "calculated",
+        "student_names_visible": true,
+        "visible_fields": [
+          {
+            "name": "course",
+            "label": "รหัสวิชา"
+          },
+          {
+            "name": "role",
+            "label": "หน้าที่ / บทบาท"
+          },
+          {
+            "name": "quantity",
+            "label": "จำนวนเรื่อง / โครงงาน"
+          },
+          {
+            "name": "share",
+            "label": "สัดส่วนความรับผิดชอบ (%)"
+          }
+        ],
+        "save_allowed": true
+      },
+      "actual_result": "",
+      "verdict": "NOT_RUN"
+    },
+    {
+      "id": "W021",
+      "category": "teaching",
+      "category_label": "1. งานสอน",
+      "main_type": "โครงงาน / ปัญหาพิเศษ",
+      "subtype": "1.10 ปัญหาพิเศษ (โท / เอก)",
+      "subtype_label": "ปัญหาพิเศษ (โท / เอก)",
+      "role": "ที่ปรึกษาร่วม",
+      "common": {
+        "semester": "2",
+        "year": "2567",
+        "title": "ทดสอบภาระงาน W021",
+        "evidence_url": "https://example.com",
+        "role_note": "ข้อมูลสมมติ W021"
+      },
+      "inputs": {
+        "course": "CS999",
+        "quantity": "2",
+        "share": "50",
+        "student_names": "นายทดสอบ หนึ่ง\nนางสาวตัวอย่าง สอง"
+      },
+      "expected": {
+        "score": 22.5,
+        "display": "22.50",
+        "status": "calculated",
+        "student_names_visible": true,
+        "visible_fields": [
+          {
+            "name": "course",
+            "label": "รหัสวิชา"
+          },
+          {
+            "name": "role",
+            "label": "หน้าที่ / บทบาท"
+          },
+          {
+            "name": "quantity",
+            "label": "จำนวนเรื่อง / โครงงาน"
+          },
+          {
+            "name": "share",
+            "label": "สัดส่วนความรับผิดชอบ (%)"
+          }
+        ],
+        "save_allowed": true
+      },
+      "actual_result": "",
+      "verdict": "NOT_RUN"
+    },
+    {
+      "id": "W022",
+      "category": "teaching",
+      "category_label": "1. งานสอน",
+      "main_type": "สารนิพนธ์ / ค้นคว้าอิสระ",
+      "subtype": "1.11 สารนิพนธ์ / ค้นคว้าอิสระ",
+      "subtype_label": "สารนิพนธ์ / ค้นคว้าอิสระ",
+      "role": "ที่ปรึกษาหลัก",
+      "common": {
+        "semester": "2",
+        "year": "2567",
+        "title": "ทดสอบภาระงาน W022",
+        "evidence_url": "https://example.com",
+        "role_note": "ข้อมูลสมมติ W022"
+      },
+      "inputs": {
+        "course": "CS999",
+        "credits": "3",
+        "share": "50",
+        "student_names": "นายทดสอบ หนึ่ง\nนางสาวตัวอย่าง สอง"
+      },
+      "expected": {
+        "score": 15,
+        "display": "15.00",
+        "status": "calculated",
+        "student_names_visible": true,
+        "visible_fields": [
+          {
+            "name": "course",
+            "label": "รหัสวิชา"
+          },
+          {
+            "name": "role",
+            "label": "หน้าที่ / บทบาท"
+          },
+          {
+            "name": "credits",
+            "label": "หน่วยกิต"
+          },
+          {
+            "name": "share",
+            "label": "สัดส่วนความรับผิดชอบ (%)"
+          }
+        ],
+        "save_allowed": true
+      },
+      "actual_result": "",
+      "verdict": "NOT_RUN"
+    },
+    {
+      "id": "W023",
+      "category": "teaching",
+      "category_label": "1. งานสอน",
+      "main_type": "สารนิพนธ์ / ค้นคว้าอิสระ",
+      "subtype": "1.11 สารนิพนธ์ / ค้นคว้าอิสระ",
+      "subtype_label": "สารนิพนธ์ / ค้นคว้าอิสระ",
+      "role": "ที่ปรึกษาร่วม",
+      "common": {
+        "semester": "2",
+        "year": "2567",
+        "title": "ทดสอบภาระงาน W023",
+        "evidence_url": "https://example.com",
+        "role_note": "ข้อมูลสมมติ W023"
+      },
+      "inputs": {
+        "course": "CS999",
+        "credits": "3",
+        "share": "50",
+        "student_names": "นายทดสอบ หนึ่ง\nนางสาวตัวอย่าง สอง"
+      },
+      "expected": {
+        "score": 7.5,
+        "display": "7.50",
+        "status": "calculated",
+        "student_names_visible": true,
+        "visible_fields": [
+          {
+            "name": "course",
+            "label": "รหัสวิชา"
+          },
+          {
+            "name": "role",
+            "label": "หน้าที่ / บทบาท"
+          },
+          {
+            "name": "credits",
+            "label": "หน่วยกิต"
+          },
+          {
+            "name": "share",
+            "label": "สัดส่วนความรับผิดชอบ (%)"
+          }
+        ],
+        "save_allowed": true
+      },
+      "actual_result": "",
+      "verdict": "NOT_RUN"
+    },
+    {
+      "id": "W024",
+      "category": "academic",
+      "category_label": "2. งานวิชาการ",
+      "main_type": "รายงานวิจัย",
+      "subtype": "2.1 รายงานวิจัยฉบับสมบูรณ์",
+      "subtype_label": "รายงานวิจัยฉบับสมบูรณ์",
+      "role": "ทุนวิจัยจากต่างประเทศ",
+      "common": {
+        "semester": "2",
+        "year": "2567",
+        "title": "ทดสอบภาระงาน W024",
+        "evidence_url": "https://example.com",
+        "role_note": "ข้อมูลสมมติ W024"
+      },
+      "inputs": {
+        "share": "50",
+        "source": "หน่วยงานทดสอบภาระงาน"
+      },
+      "expected": {
+        "score": 100,
+        "display": "100.00",
+        "status": "calculated",
+        "student_names_visible": false,
+        "visible_fields": [
+          {
+            "name": "role",
+            "label": "ชนิดทุน"
+          },
+          {
+            "name": "share",
+            "label": "สัดส่วนการมีส่วนร่วม (%)"
+          },
+          {
+            "name": "source",
+            "label": "แหล่งทุน / หน่วยงานผู้ให้ทุน"
+          }
+        ],
+        "save_allowed": true
+      },
+      "actual_result": "",
+      "verdict": "NOT_RUN"
+    },
+    {
+      "id": "W025",
+      "category": "academic",
+      "category_label": "2. งานวิชาการ",
+      "main_type": "รายงานวิจัย",
+      "subtype": "2.1 รายงานวิจัยฉบับสมบูรณ์",
+      "subtype_label": "รายงานวิจัยฉบับสมบูรณ์",
+      "role": "ทุนวิจัยในประเทศนอก มธ.",
+      "common": {
+        "semester": "2",
+        "year": "2567",
+        "title": "ทดสอบภาระงาน W025",
+        "evidence_url": "https://example.com",
+        "role_note": "ข้อมูลสมมติ W025"
+      },
+      "inputs": {
+        "share": "50",
+        "source": "หน่วยงานทดสอบภาระงาน"
+      },
+      "expected": {
+        "score": 50,
+        "display": "50.00",
+        "status": "calculated",
+        "student_names_visible": false,
+        "visible_fields": [
+          {
+            "name": "role",
+            "label": "ชนิดทุน"
+          },
+          {
+            "name": "share",
+            "label": "สัดส่วนการมีส่วนร่วม (%)"
+          },
+          {
+            "name": "source",
+            "label": "แหล่งทุน / หน่วยงานผู้ให้ทุน"
+          }
+        ],
+        "save_allowed": true
+      },
+      "actual_result": "",
+      "verdict": "NOT_RUN"
+    },
+    {
+      "id": "W026",
+      "category": "academic",
+      "category_label": "2. งานวิชาการ",
+      "main_type": "รายงานวิจัย",
+      "subtype": "2.1 รายงานวิจัยฉบับสมบูรณ์",
+      "subtype_label": "รายงานวิจัยฉบับสมบูรณ์",
+      "role": "ทุนวิจัยภายใน มธ.",
+      "common": {
+        "semester": "2",
+        "year": "2567",
+        "title": "ทดสอบภาระงาน W026",
+        "evidence_url": "https://example.com",
+        "role_note": "ข้อมูลสมมติ W026"
+      },
+      "inputs": {
+        "share": "50",
+        "source": "หน่วยงานทดสอบภาระงาน"
+      },
+      "expected": {
+        "score": 25,
+        "display": "25.00",
+        "status": "calculated",
+        "student_names_visible": false,
+        "visible_fields": [
+          {
+            "name": "role",
+            "label": "ชนิดทุน"
+          },
+          {
+            "name": "share",
+            "label": "สัดส่วนการมีส่วนร่วม (%)"
+          },
+          {
+            "name": "source",
+            "label": "แหล่งทุน / หน่วยงานผู้ให้ทุน"
+          }
+        ],
+        "save_allowed": true
+      },
+      "actual_result": "",
+      "verdict": "NOT_RUN"
+    },
+    {
+      "id": "W027",
+      "category": "academic",
+      "category_label": "2. งานวิชาการ",
+      "main_type": "รายงานวิจัย",
+      "subtype": "2.1 รายงานวิจัยฉบับสมบูรณ์",
+      "subtype_label": "รายงานวิจัยฉบับสมบูรณ์",
+      "role": "งานวิจัยที่ได้รับการสนับสนุนจากคณะฯ",
+      "common": {
+        "semester": "2",
+        "year": "2567",
+        "title": "ทดสอบภาระงาน W027",
+        "evidence_url": "https://example.com",
+        "role_note": "ข้อมูลสมมติ W027"
+      },
+      "inputs": {
+        "share": "50",
+        "source": "หน่วยงานทดสอบภาระงาน"
+      },
+      "expected": {
+        "score": 12.5,
+        "display": "12.50",
+        "status": "calculated",
+        "student_names_visible": false,
+        "visible_fields": [
+          {
+            "name": "role",
+            "label": "ชนิดทุน"
+          },
+          {
+            "name": "share",
+            "label": "สัดส่วนการมีส่วนร่วม (%)"
+          },
+          {
+            "name": "source",
+            "label": "แหล่งทุน / หน่วยงานผู้ให้ทุน"
+          }
+        ],
+        "save_allowed": true
+      },
+      "actual_result": "",
+      "verdict": "NOT_RUN"
+    },
+    {
+      "id": "W028",
+      "category": "academic",
+      "category_label": "2. งานวิชาการ",
+      "main_type": "รายงานวิจัย",
+      "subtype": "2.2 รายงานความก้าวหน้า",
+      "subtype_label": "รายงานความก้าวหน้า",
+      "role": "รายงานความก้าวหน้าประจำปีของโครงการต่อเนื่อง (ทุกชนิดทุน)",
+      "common": {
+        "semester": "2",
+        "year": "2567",
+        "title": "ทดสอบภาระงาน W028",
+        "evidence_url": "https://example.com",
+        "role_note": "ข้อมูลสมมติ W028"
+      },
+      "inputs": {
+        "share": "50",
+        "source": "หน่วยงานทดสอบภาระงาน"
+      },
+      "expected": {
+        "score": 5,
+        "display": "5.00",
+        "status": "calculated",
+        "student_names_visible": false,
+        "visible_fields": [
+          {
+            "name": "role",
+            "label": "ชนิดงาน"
+          },
+          {
+            "name": "share",
+            "label": "สัดส่วนการมีส่วนร่วม (%)"
+          },
+          {
+            "name": "source",
+            "label": "แหล่งทุน / หน่วยงานผู้ให้ทุน"
+          }
+        ],
+        "save_allowed": true
+      },
+      "actual_result": "",
+      "verdict": "NOT_RUN"
+    },
+    {
+      "id": "W029",
+      "category": "academic",
+      "category_label": "2. งานวิชาการ",
+      "main_type": "บทความ / ผลงานตีพิมพ์",
+      "subtype": "2.3.1 บทความวิจัยนานาชาติ",
+      "subtype_label": "บทความวิจัยนานาชาติ",
+      "role": "บทความวิจัย Tier 1",
+      "common": {
+        "semester": "2",
+        "year": "2567",
+        "title": "ทดสอบภาระงาน W029",
+        "evidence_url": "https://example.com",
+        "role_note": "ข้อมูลสมมติ W029"
+      },
+      "inputs": {
+        "share": "50",
+        "source": "หน่วยงานทดสอบภาระงาน"
+      },
+      "expected": {
+        "score": 250,
+        "display": "250.00",
+        "status": "calculated",
+        "student_names_visible": false,
+        "visible_fields": [
+          {
+            "name": "role",
+            "label": "ชนิดงาน"
+          },
+          {
+            "name": "share",
+            "label": "สัดส่วนการมีส่วนร่วม (%)"
+          },
+          {
+            "name": "source",
+            "label": "ชื่อวารสาร / Proceedings"
+          }
+        ],
+        "save_allowed": true
+      },
+      "actual_result": "",
+      "verdict": "NOT_RUN"
+    },
+    {
+      "id": "W030",
+      "category": "academic",
+      "category_label": "2. งานวิชาการ",
+      "main_type": "บทความ / ผลงานตีพิมพ์",
+      "subtype": "2.3.1 บทความวิจัยนานาชาติ",
+      "subtype_label": "บทความวิจัยนานาชาติ",
+      "role": "บทความวิจัย Q1",
+      "common": {
+        "semester": "2",
+        "year": "2567",
+        "title": "ทดสอบภาระงาน W030",
+        "evidence_url": "https://example.com",
+        "role_note": "ข้อมูลสมมติ W030"
+      },
+      "inputs": {
+        "share": "50",
+        "source": "หน่วยงานทดสอบภาระงาน"
+      },
+      "expected": {
+        "score": 225,
+        "display": "225.00",
+        "status": "calculated",
+        "student_names_visible": false,
+        "visible_fields": [
+          {
+            "name": "role",
+            "label": "ชนิดงาน"
+          },
+          {
+            "name": "share",
+            "label": "สัดส่วนการมีส่วนร่วม (%)"
+          },
+          {
+            "name": "source",
+            "label": "ชื่อวารสาร / Proceedings"
+          }
+        ],
+        "save_allowed": true
+      },
+      "actual_result": "",
+      "verdict": "NOT_RUN"
+    },
+    {
+      "id": "W031",
+      "category": "academic",
+      "category_label": "2. งานวิชาการ",
+      "main_type": "บทความ / ผลงานตีพิมพ์",
+      "subtype": "2.3.1 บทความวิจัยนานาชาติ",
+      "subtype_label": "บทความวิจัยนานาชาติ",
+      "role": "บทความวิจัย Q2",
+      "common": {
+        "semester": "2",
+        "year": "2567",
+        "title": "ทดสอบภาระงาน W031",
+        "evidence_url": "https://example.com",
+        "role_note": "ข้อมูลสมมติ W031"
+      },
+      "inputs": {
+        "share": "50",
+        "source": "หน่วยงานทดสอบภาระงาน"
+      },
+      "expected": {
+        "score": 200,
+        "display": "200.00",
+        "status": "calculated",
+        "student_names_visible": false,
+        "visible_fields": [
+          {
+            "name": "role",
+            "label": "ชนิดงาน"
+          },
+          {
+            "name": "share",
+            "label": "สัดส่วนการมีส่วนร่วม (%)"
+          },
+          {
+            "name": "source",
+            "label": "ชื่อวารสาร / Proceedings"
+          }
+        ],
+        "save_allowed": true
+      },
+      "actual_result": "",
+      "verdict": "NOT_RUN"
+    },
+    {
+      "id": "W032",
+      "category": "academic",
+      "category_label": "2. งานวิชาการ",
+      "main_type": "บทความ / ผลงานตีพิมพ์",
+      "subtype": "2.3.1 บทความวิจัยนานาชาติ",
+      "subtype_label": "บทความวิจัยนานาชาติ",
+      "role": "บทความวิจัย Q3",
+      "common": {
+        "semester": "2",
+        "year": "2567",
+        "title": "ทดสอบภาระงาน W032",
+        "evidence_url": "https://example.com",
+        "role_note": "ข้อมูลสมมติ W032"
+      },
+      "inputs": {
+        "share": "50",
+        "source": "หน่วยงานทดสอบภาระงาน"
+      },
+      "expected": {
+        "score": 175,
+        "display": "175.00",
+        "status": "calculated",
+        "student_names_visible": false,
+        "visible_fields": [
+          {
+            "name": "role",
+            "label": "ชนิดงาน"
+          },
+          {
+            "name": "share",
+            "label": "สัดส่วนการมีส่วนร่วม (%)"
+          },
+          {
+            "name": "source",
+            "label": "ชื่อวารสาร / Proceedings"
+          }
+        ],
+        "save_allowed": true
+      },
+      "actual_result": "",
+      "verdict": "NOT_RUN"
+    },
+    {
+      "id": "W033",
+      "category": "academic",
+      "category_label": "2. งานวิชาการ",
+      "main_type": "บทความ / ผลงานตีพิมพ์",
+      "subtype": "2.3.1 บทความวิจัยนานาชาติ",
+      "subtype_label": "บทความวิจัยนานาชาติ",
+      "role": "บทความวิจัย Q4",
+      "common": {
+        "semester": "2",
+        "year": "2567",
+        "title": "ทดสอบภาระงาน W033",
+        "evidence_url": "https://example.com",
+        "role_note": "ข้อมูลสมมติ W033"
+      },
+      "inputs": {
+        "share": "50",
+        "source": "หน่วยงานทดสอบภาระงาน"
+      },
+      "expected": {
+        "score": 150,
+        "display": "150.00",
+        "status": "calculated",
+        "student_names_visible": false,
+        "visible_fields": [
+          {
+            "name": "role",
+            "label": "ชนิดงาน"
+          },
+          {
+            "name": "share",
+            "label": "สัดส่วนการมีส่วนร่วม (%)"
+          },
+          {
+            "name": "source",
+            "label": "ชื่อวารสาร / Proceedings"
+          }
+        ],
+        "save_allowed": true
+      },
+      "actual_result": "",
+      "verdict": "NOT_RUN"
+    },
+    {
+      "id": "W034",
+      "category": "academic",
+      "category_label": "2. งานวิชาการ",
+      "main_type": "บทความ / ผลงานตีพิมพ์",
+      "subtype": "2.3.1 บทความวิจัยนานาชาติ",
+      "subtype_label": "บทความวิจัยนานาชาติ",
+      "role": "บทความวิจัยที่ไม่มี Q",
+      "common": {
+        "semester": "2",
+        "year": "2567",
+        "title": "ทดสอบภาระงาน W034",
+        "evidence_url": "https://example.com",
+        "role_note": "ข้อมูลสมมติ W034"
+      },
+      "inputs": {
+        "share": "50",
+        "source": "หน่วยงานทดสอบภาระงาน"
+      },
+      "expected": {
+        "score": 125,
+        "display": "125.00",
+        "status": "calculated",
+        "student_names_visible": false,
+        "visible_fields": [
+          {
+            "name": "role",
+            "label": "ชนิดงาน"
+          },
+          {
+            "name": "share",
+            "label": "สัดส่วนการมีส่วนร่วม (%)"
+          },
+          {
+            "name": "source",
+            "label": "ชื่อวารสาร / Proceedings"
+          }
+        ],
+        "save_allowed": true
+      },
+      "actual_result": "",
+      "verdict": "NOT_RUN"
+    },
+    {
+      "id": "W035",
+      "category": "academic",
+      "category_label": "2. งานวิชาการ",
+      "main_type": "บทความ / ผลงานตีพิมพ์",
+      "subtype": "2.3.2 Short Communication / บทความปริทัศน์",
+      "subtype_label": "Short Communication / บทความปริทัศน์",
+      "role": "Short Communication / บทความวิชาการ Tier 1",
+      "common": {
+        "semester": "2",
+        "year": "2567",
+        "title": "ทดสอบภาระงาน W035",
+        "evidence_url": "https://example.com",
+        "role_note": "ข้อมูลสมมติ W035"
+      },
+      "inputs": {
+        "share": "50",
+        "source": "หน่วยงานทดสอบภาระงาน"
+      },
+      "expected": {
+        "score": 125,
+        "display": "125.00",
+        "status": "calculated",
+        "student_names_visible": false,
+        "visible_fields": [
+          {
+            "name": "role",
+            "label": "ชนิดงาน"
+          },
+          {
+            "name": "share",
+            "label": "สัดส่วนการมีส่วนร่วม (%)"
+          },
+          {
+            "name": "source",
+            "label": "ชื่อวารสาร / Proceedings"
+          }
+        ],
+        "save_allowed": true
+      },
+      "actual_result": "",
+      "verdict": "NOT_RUN"
+    },
+    {
+      "id": "W036",
+      "category": "academic",
+      "category_label": "2. งานวิชาการ",
+      "main_type": "บทความ / ผลงานตีพิมพ์",
+      "subtype": "2.3.2 Short Communication / บทความปริทัศน์",
+      "subtype_label": "Short Communication / บทความปริทัศน์",
+      "role": "Short Communication / บทความวิชาการ Q1",
+      "common": {
+        "semester": "2",
+        "year": "2567",
+        "title": "ทดสอบภาระงาน W036",
+        "evidence_url": "https://example.com",
+        "role_note": "ข้อมูลสมมติ W036"
+      },
+      "inputs": {
+        "share": "50",
+        "source": "หน่วยงานทดสอบภาระงาน"
+      },
+      "expected": {
+        "score": 112.5,
+        "display": "112.50",
+        "status": "calculated",
+        "student_names_visible": false,
+        "visible_fields": [
+          {
+            "name": "role",
+            "label": "ชนิดงาน"
+          },
+          {
+            "name": "share",
+            "label": "สัดส่วนการมีส่วนร่วม (%)"
+          },
+          {
+            "name": "source",
+            "label": "ชื่อวารสาร / Proceedings"
+          }
+        ],
+        "save_allowed": true
+      },
+      "actual_result": "",
+      "verdict": "NOT_RUN"
+    },
+    {
+      "id": "W037",
+      "category": "academic",
+      "category_label": "2. งานวิชาการ",
+      "main_type": "บทความ / ผลงานตีพิมพ์",
+      "subtype": "2.3.2 Short Communication / บทความปริทัศน์",
+      "subtype_label": "Short Communication / บทความปริทัศน์",
+      "role": "Short Communication / บทความวิชาการ Q2",
+      "common": {
+        "semester": "2",
+        "year": "2567",
+        "title": "ทดสอบภาระงาน W037",
+        "evidence_url": "https://example.com",
+        "role_note": "ข้อมูลสมมติ W037"
+      },
+      "inputs": {
+        "share": "50",
+        "source": "หน่วยงานทดสอบภาระงาน"
+      },
+      "expected": {
+        "score": 100,
+        "display": "100.00",
+        "status": "calculated",
+        "student_names_visible": false,
+        "visible_fields": [
+          {
+            "name": "role",
+            "label": "ชนิดงาน"
+          },
+          {
+            "name": "share",
+            "label": "สัดส่วนการมีส่วนร่วม (%)"
+          },
+          {
+            "name": "source",
+            "label": "ชื่อวารสาร / Proceedings"
+          }
+        ],
+        "save_allowed": true
+      },
+      "actual_result": "",
+      "verdict": "NOT_RUN"
+    },
+    {
+      "id": "W038",
+      "category": "academic",
+      "category_label": "2. งานวิชาการ",
+      "main_type": "บทความ / ผลงานตีพิมพ์",
+      "subtype": "2.3.2 Short Communication / บทความปริทัศน์",
+      "subtype_label": "Short Communication / บทความปริทัศน์",
+      "role": "Short Communication / บทความวิชาการ Q3",
+      "common": {
+        "semester": "2",
+        "year": "2567",
+        "title": "ทดสอบภาระงาน W038",
+        "evidence_url": "https://example.com",
+        "role_note": "ข้อมูลสมมติ W038"
+      },
+      "inputs": {
+        "share": "50",
+        "source": "หน่วยงานทดสอบภาระงาน"
+      },
+      "expected": {
+        "score": 87.5,
+        "display": "87.50",
+        "status": "calculated",
+        "student_names_visible": false,
+        "visible_fields": [
+          {
+            "name": "role",
+            "label": "ชนิดงาน"
+          },
+          {
+            "name": "share",
+            "label": "สัดส่วนการมีส่วนร่วม (%)"
+          },
+          {
+            "name": "source",
+            "label": "ชื่อวารสาร / Proceedings"
+          }
+        ],
+        "save_allowed": true
+      },
+      "actual_result": "",
+      "verdict": "NOT_RUN"
+    },
+    {
+      "id": "W039",
+      "category": "academic",
+      "category_label": "2. งานวิชาการ",
+      "main_type": "บทความ / ผลงานตีพิมพ์",
+      "subtype": "2.3.2 Short Communication / บทความปริทัศน์",
+      "subtype_label": "Short Communication / บทความปริทัศน์",
+      "role": "Short Communication / บทความวิชาการ Q4",
+      "common": {
+        "semester": "2",
+        "year": "2567",
+        "title": "ทดสอบภาระงาน W039",
+        "evidence_url": "https://example.com",
+        "role_note": "ข้อมูลสมมติ W039"
+      },
+      "inputs": {
+        "share": "50",
+        "source": "หน่วยงานทดสอบภาระงาน"
+      },
+      "expected": {
+        "score": 75,
+        "display": "75.00",
+        "status": "calculated",
+        "student_names_visible": false,
+        "visible_fields": [
+          {
+            "name": "role",
+            "label": "ชนิดงาน"
+          },
+          {
+            "name": "share",
+            "label": "สัดส่วนการมีส่วนร่วม (%)"
+          },
+          {
+            "name": "source",
+            "label": "ชื่อวารสาร / Proceedings"
+          }
+        ],
+        "save_allowed": true
+      },
+      "actual_result": "",
+      "verdict": "NOT_RUN"
+    },
+    {
+      "id": "W040",
+      "category": "academic",
+      "category_label": "2. งานวิชาการ",
+      "main_type": "บทความ / ผลงานตีพิมพ์",
+      "subtype": "2.3.3 วารสารในฐานข้อมูล TCI",
+      "subtype_label": "วารสารในฐานข้อมูล TCI",
+      "role": "บทความวิจัย กลุ่ม 1",
+      "common": {
+        "semester": "2",
+        "year": "2567",
+        "title": "ทดสอบภาระงาน W040",
+        "evidence_url": "https://example.com",
+        "role_note": "ข้อมูลสมมติ W040"
+      },
+      "inputs": {
+        "share": "50",
+        "source": "หน่วยงานทดสอบภาระงาน"
+      },
+      "expected": {
+        "score": 75,
+        "display": "75.00",
+        "status": "calculated",
+        "student_names_visible": false,
+        "visible_fields": [
+          {
+            "name": "role",
+            "label": "ชนิดงาน"
+          },
+          {
+            "name": "share",
+            "label": "สัดส่วนการมีส่วนร่วม (%)"
+          },
+          {
+            "name": "source",
+            "label": "ชื่อวารสาร / Proceedings"
+          }
+        ],
+        "save_allowed": true
+      },
+      "actual_result": "",
+      "verdict": "NOT_RUN"
+    },
+    {
+      "id": "W041",
+      "category": "academic",
+      "category_label": "2. งานวิชาการ",
+      "main_type": "บทความ / ผลงานตีพิมพ์",
+      "subtype": "2.3.3 วารสารในฐานข้อมูล TCI",
+      "subtype_label": "วารสารในฐานข้อมูล TCI",
+      "role": "บทความวิจัย กลุ่ม 2",
+      "common": {
+        "semester": "2",
+        "year": "2567",
+        "title": "ทดสอบภาระงาน W041",
+        "evidence_url": "https://example.com",
+        "role_note": "ข้อมูลสมมติ W041"
+      },
+      "inputs": {
+        "share": "50",
+        "source": "หน่วยงานทดสอบภาระงาน"
+      },
+      "expected": {
+        "score": 50,
+        "display": "50.00",
+        "status": "calculated",
+        "student_names_visible": false,
+        "visible_fields": [
+          {
+            "name": "role",
+            "label": "ชนิดงาน"
+          },
+          {
+            "name": "share",
+            "label": "สัดส่วนการมีส่วนร่วม (%)"
+          },
+          {
+            "name": "source",
+            "label": "ชื่อวารสาร / Proceedings"
+          }
+        ],
+        "save_allowed": true
+      },
+      "actual_result": "",
+      "verdict": "NOT_RUN"
+    },
+    {
+      "id": "W042",
+      "category": "academic",
+      "category_label": "2. งานวิชาการ",
+      "main_type": "บทความ / ผลงานตีพิมพ์",
+      "subtype": "2.3.3 วารสารในฐานข้อมูล TCI",
+      "subtype_label": "วารสารในฐานข้อมูล TCI",
+      "role": "บทความวิชาการ กลุ่ม 1",
+      "common": {
+        "semester": "2",
+        "year": "2567",
+        "title": "ทดสอบภาระงาน W042",
+        "evidence_url": "https://example.com",
+        "role_note": "ข้อมูลสมมติ W042"
+      },
+      "inputs": {
+        "share": "50",
+        "source": "หน่วยงานทดสอบภาระงาน"
+      },
+      "expected": {
+        "score": 37.5,
+        "display": "37.50",
+        "status": "calculated",
+        "student_names_visible": false,
+        "visible_fields": [
+          {
+            "name": "role",
+            "label": "ชนิดงาน"
+          },
+          {
+            "name": "share",
+            "label": "สัดส่วนการมีส่วนร่วม (%)"
+          },
+          {
+            "name": "source",
+            "label": "ชื่อวารสาร / Proceedings"
+          }
+        ],
+        "save_allowed": true
+      },
+      "actual_result": "",
+      "verdict": "NOT_RUN"
+    },
+    {
+      "id": "W043",
+      "category": "academic",
+      "category_label": "2. งานวิชาการ",
+      "main_type": "บทความ / ผลงานตีพิมพ์",
+      "subtype": "2.3.3 วารสารในฐานข้อมูล TCI",
+      "subtype_label": "วารสารในฐานข้อมูล TCI",
+      "role": "บทความวิชาการ กลุ่ม 2",
+      "common": {
+        "semester": "2",
+        "year": "2567",
+        "title": "ทดสอบภาระงาน W043",
+        "evidence_url": "https://example.com",
+        "role_note": "ข้อมูลสมมติ W043"
+      },
+      "inputs": {
+        "share": "50",
+        "source": "หน่วยงานทดสอบภาระงาน"
+      },
+      "expected": {
+        "score": 25,
+        "display": "25.00",
+        "status": "calculated",
+        "student_names_visible": false,
+        "visible_fields": [
+          {
+            "name": "role",
+            "label": "ชนิดงาน"
+          },
+          {
+            "name": "share",
+            "label": "สัดส่วนการมีส่วนร่วม (%)"
+          },
+          {
+            "name": "source",
+            "label": "ชื่อวารสาร / Proceedings"
+          }
+        ],
+        "save_allowed": true
+      },
+      "actual_result": "",
+      "verdict": "NOT_RUN"
+    },
+    {
+      "id": "W044",
+      "category": "academic",
+      "category_label": "2. งานวิชาการ",
+      "main_type": "บทความ / ผลงานตีพิมพ์",
+      "subtype": "2.3.4 วารสารนานาชาติอื่น / Proceedings / Data Article",
+      "subtype_label": "วารสารนานาชาติอื่น / Proceedings / Data Article",
+      "role": "บทความวิจัย",
+      "common": {
+        "semester": "2",
+        "year": "2567",
+        "title": "ทดสอบภาระงาน W044",
+        "evidence_url": "https://example.com",
+        "role_note": "ข้อมูลสมมติ W044"
+      },
+      "inputs": {
+        "share": "50",
+        "source": "หน่วยงานทดสอบภาระงาน"
+      },
+      "expected": {
+        "score": 75,
+        "display": "75.00",
+        "status": "calculated",
+        "student_names_visible": false,
+        "visible_fields": [
+          {
+            "name": "role",
+            "label": "ชนิดงาน"
+          },
+          {
+            "name": "share",
+            "label": "สัดส่วนการมีส่วนร่วม (%)"
+          },
+          {
+            "name": "source",
+            "label": "ชื่อวารสาร / Proceedings"
+          }
+        ],
+        "save_allowed": true
+      },
+      "actual_result": "",
+      "verdict": "NOT_RUN"
+    },
+    {
+      "id": "W045",
+      "category": "academic",
+      "category_label": "2. งานวิชาการ",
+      "main_type": "บทความ / ผลงานตีพิมพ์",
+      "subtype": "2.3.4 วารสารนานาชาติอื่น / Proceedings / Data Article",
+      "subtype_label": "วารสารนานาชาติอื่น / Proceedings / Data Article",
+      "role": "Short Communication",
+      "common": {
+        "semester": "2",
+        "year": "2567",
+        "title": "ทดสอบภาระงาน W045",
+        "evidence_url": "https://example.com",
+        "role_note": "ข้อมูลสมมติ W045"
+      },
+      "inputs": {
+        "share": "50",
+        "source": "หน่วยงานทดสอบภาระงาน"
+      },
+      "expected": {
+        "score": 37.5,
+        "display": "37.50",
+        "status": "calculated",
+        "student_names_visible": false,
+        "visible_fields": [
+          {
+            "name": "role",
+            "label": "ชนิดงาน"
+          },
+          {
+            "name": "share",
+            "label": "สัดส่วนการมีส่วนร่วม (%)"
+          },
+          {
+            "name": "source",
+            "label": "ชื่อวารสาร / Proceedings"
+          }
+        ],
+        "save_allowed": true
+      },
+      "actual_result": "",
+      "verdict": "NOT_RUN"
+    },
+    {
+      "id": "W046",
+      "category": "academic",
+      "category_label": "2. งานวิชาการ",
+      "main_type": "บทความ / ผลงานตีพิมพ์",
+      "subtype": "2.3.4 วารสารนานาชาติอื่น / Proceedings / Data Article",
+      "subtype_label": "วารสารนานาชาติอื่น / Proceedings / Data Article",
+      "role": "บทความวิชาการทั่วไป",
+      "common": {
+        "semester": "2",
+        "year": "2567",
+        "title": "ทดสอบภาระงาน W046",
+        "evidence_url": "https://example.com",
+        "role_note": "ข้อมูลสมมติ W046"
+      },
+      "inputs": {
+        "share": "50",
+        "source": "หน่วยงานทดสอบภาระงาน"
+      },
+      "expected": {
+        "score": 37.5,
+        "display": "37.50",
+        "status": "calculated",
+        "student_names_visible": false,
+        "visible_fields": [
+          {
+            "name": "role",
+            "label": "ชนิดงาน"
+          },
+          {
+            "name": "share",
+            "label": "สัดส่วนการมีส่วนร่วม (%)"
+          },
+          {
+            "name": "source",
+            "label": "ชื่อวารสาร / Proceedings"
+          }
+        ],
+        "save_allowed": true
+      },
+      "actual_result": "",
+      "verdict": "NOT_RUN"
+    },
+    {
+      "id": "W047",
+      "category": "academic",
+      "category_label": "2. งานวิชาการ",
+      "main_type": "บทความ / ผลงานตีพิมพ์",
+      "subtype": "2.3.4 วารสารนานาชาติอื่น / Proceedings / Data Article",
+      "subtype_label": "วารสารนานาชาติอื่น / Proceedings / Data Article",
+      "role": "Data Article",
+      "common": {
+        "semester": "2",
+        "year": "2567",
+        "title": "ทดสอบภาระงาน W047",
+        "evidence_url": "https://example.com",
+        "role_note": "ข้อมูลสมมติ W047"
+      },
+      "inputs": {
+        "share": "50",
+        "source": "หน่วยงานทดสอบภาระงาน"
+      },
+      "expected": {
+        "score": 75,
+        "display": "75.00",
+        "status": "calculated",
+        "student_names_visible": false,
+        "visible_fields": [
+          {
+            "name": "role",
+            "label": "ชนิดงาน"
+          },
+          {
+            "name": "share",
+            "label": "สัดส่วนการมีส่วนร่วม (%)"
+          },
+          {
+            "name": "source",
+            "label": "ชื่อวารสาร / Proceedings"
+          }
+        ],
+        "save_allowed": true
+      },
+      "actual_result": "",
+      "verdict": "NOT_RUN"
+    },
+    {
+      "id": "W048",
+      "category": "academic",
+      "category_label": "2. งานวิชาการ",
+      "main_type": "บทความ / ผลงานตีพิมพ์",
+      "subtype": "2.3.5 วารสารระดับชาติอื่น / Proceedings",
+      "subtype_label": "วารสารระดับชาติอื่น / Proceedings",
+      "role": "บทความวิจัย",
+      "common": {
+        "semester": "2",
+        "year": "2567",
+        "title": "ทดสอบภาระงาน W048",
+        "evidence_url": "https://example.com",
+        "role_note": "ข้อมูลสมมติ W048"
+      },
+      "inputs": {
+        "share": "50",
+        "source": "หน่วยงานทดสอบภาระงาน"
+      },
+      "expected": {
+        "score": 40,
+        "display": "40.00",
+        "status": "calculated",
+        "student_names_visible": false,
+        "visible_fields": [
+          {
+            "name": "role",
+            "label": "ชนิดงาน"
+          },
+          {
+            "name": "share",
+            "label": "สัดส่วนการมีส่วนร่วม (%)"
+          },
+          {
+            "name": "source",
+            "label": "ชื่อวารสาร / Proceedings"
+          }
+        ],
+        "save_allowed": true
+      },
+      "actual_result": "",
+      "verdict": "NOT_RUN"
+    },
+    {
+      "id": "W049",
+      "category": "academic",
+      "category_label": "2. งานวิชาการ",
+      "main_type": "บทความ / ผลงานตีพิมพ์",
+      "subtype": "2.3.5 วารสารระดับชาติอื่น / Proceedings",
+      "subtype_label": "วารสารระดับชาติอื่น / Proceedings",
+      "role": "Short Communication",
+      "common": {
+        "semester": "2",
+        "year": "2567",
+        "title": "ทดสอบภาระงาน W049",
+        "evidence_url": "https://example.com",
+        "role_note": "ข้อมูลสมมติ W049"
+      },
+      "inputs": {
+        "share": "50",
+        "source": "หน่วยงานทดสอบภาระงาน"
+      },
+      "expected": {
+        "score": 20,
+        "display": "20.00",
+        "status": "calculated",
+        "student_names_visible": false,
+        "visible_fields": [
+          {
+            "name": "role",
+            "label": "ชนิดงาน"
+          },
+          {
+            "name": "share",
+            "label": "สัดส่วนการมีส่วนร่วม (%)"
+          },
+          {
+            "name": "source",
+            "label": "ชื่อวารสาร / Proceedings"
+          }
+        ],
+        "save_allowed": true
+      },
+      "actual_result": "",
+      "verdict": "NOT_RUN"
+    },
+    {
+      "id": "W050",
+      "category": "academic",
+      "category_label": "2. งานวิชาการ",
+      "main_type": "บทความ / ผลงานตีพิมพ์",
+      "subtype": "2.3.5 วารสารระดับชาติอื่น / Proceedings",
+      "subtype_label": "วารสารระดับชาติอื่น / Proceedings",
+      "role": "บทความวิชาการทั่วไป",
+      "common": {
+        "semester": "2",
+        "year": "2567",
+        "title": "ทดสอบภาระงาน W050",
+        "evidence_url": "https://example.com",
+        "role_note": "ข้อมูลสมมติ W050"
+      },
+      "inputs": {
+        "share": "50",
+        "source": "หน่วยงานทดสอบภาระงาน"
+      },
+      "expected": {
+        "score": 20,
+        "display": "20.00",
+        "status": "calculated",
+        "student_names_visible": false,
+        "visible_fields": [
+          {
+            "name": "role",
+            "label": "ชนิดงาน"
+          },
+          {
+            "name": "share",
+            "label": "สัดส่วนการมีส่วนร่วม (%)"
+          },
+          {
+            "name": "source",
+            "label": "ชื่อวารสาร / Proceedings"
+          }
+        ],
+        "save_allowed": true
+      },
+      "actual_result": "",
+      "verdict": "NOT_RUN"
+    },
+    {
+      "id": "W051",
+      "category": "academic",
+      "category_label": "2. งานวิชาการ",
+      "main_type": "นำเสนอในการประชุมวิชาการ",
+      "subtype": "2.4.1 นำเสนอผลงานระดับนานาชาติ",
+      "subtype_label": "นำเสนอผลงานระดับนานาชาติ",
+      "role": "แบบบรรยาย",
+      "common": {
+        "semester": "2",
+        "year": "2567",
+        "title": "ทดสอบภาระงาน W051",
+        "evidence_url": "https://example.com",
+        "role_note": "ข้อมูลสมมติ W051"
+      },
+      "inputs": {
+        "share": "50",
+        "source": "หน่วยงานทดสอบภาระงาน"
+      },
+      "expected": {
+        "score": 75,
+        "display": "75.00",
+        "status": "calculated",
+        "student_names_visible": false,
+        "visible_fields": [
+          {
+            "name": "role",
+            "label": "ชนิดงาน"
+          },
+          {
+            "name": "share",
+            "label": "สัดส่วนการมีส่วนร่วม (%)"
+          },
+          {
+            "name": "source",
+            "label": "ชื่อการประชุมวิชาการ"
+          }
+        ],
+        "save_allowed": true
+      },
+      "actual_result": "",
+      "verdict": "NOT_RUN"
+    },
+    {
+      "id": "W052",
+      "category": "academic",
+      "category_label": "2. งานวิชาการ",
+      "main_type": "นำเสนอในการประชุมวิชาการ",
+      "subtype": "2.4.1 นำเสนอผลงานระดับนานาชาติ",
+      "subtype_label": "นำเสนอผลงานระดับนานาชาติ",
+      "role": "แบบโปสเตอร์",
+      "common": {
+        "semester": "2",
+        "year": "2567",
+        "title": "ทดสอบภาระงาน W052",
+        "evidence_url": "https://example.com",
+        "role_note": "ข้อมูลสมมติ W052"
+      },
+      "inputs": {
+        "share": "50",
+        "source": "หน่วยงานทดสอบภาระงาน"
+      },
+      "expected": {
+        "score": 37.5,
+        "display": "37.50",
+        "status": "calculated",
+        "student_names_visible": false,
+        "visible_fields": [
+          {
+            "name": "role",
+            "label": "ชนิดงาน"
+          },
+          {
+            "name": "share",
+            "label": "สัดส่วนการมีส่วนร่วม (%)"
+          },
+          {
+            "name": "source",
+            "label": "ชื่อการประชุมวิชาการ"
+          }
+        ],
+        "save_allowed": true
+      },
+      "actual_result": "",
+      "verdict": "NOT_RUN"
+    },
+    {
+      "id": "W053",
+      "category": "academic",
+      "category_label": "2. งานวิชาการ",
+      "main_type": "นำเสนอในการประชุมวิชาการ",
+      "subtype": "2.4.2 นำเสนอผลงานระดับชาติ / สถาบัน",
+      "subtype_label": "นำเสนอผลงานระดับชาติ / สถาบัน",
+      "role": "แบบบรรยาย",
+      "common": {
+        "semester": "2",
+        "year": "2567",
+        "title": "ทดสอบภาระงาน W053",
+        "evidence_url": "https://example.com",
+        "role_note": "ข้อมูลสมมติ W053"
+      },
+      "inputs": {
+        "share": "50",
+        "source": "หน่วยงานทดสอบภาระงาน"
+      },
+      "expected": {
+        "score": 50,
+        "display": "50.00",
+        "status": "calculated",
+        "student_names_visible": false,
+        "visible_fields": [
+          {
+            "name": "role",
+            "label": "ชนิดงาน"
+          },
+          {
+            "name": "share",
+            "label": "สัดส่วนการมีส่วนร่วม (%)"
+          },
+          {
+            "name": "source",
+            "label": "ชื่อการประชุมวิชาการ"
+          }
+        ],
+        "save_allowed": true
+      },
+      "actual_result": "",
+      "verdict": "NOT_RUN"
+    },
+    {
+      "id": "W054",
+      "category": "academic",
+      "category_label": "2. งานวิชาการ",
+      "main_type": "นำเสนอในการประชุมวิชาการ",
+      "subtype": "2.4.2 นำเสนอผลงานระดับชาติ / สถาบัน",
+      "subtype_label": "นำเสนอผลงานระดับชาติ / สถาบัน",
+      "role": "แบบโปสเตอร์",
+      "common": {
+        "semester": "2",
+        "year": "2567",
+        "title": "ทดสอบภาระงาน W054",
+        "evidence_url": "https://example.com",
+        "role_note": "ข้อมูลสมมติ W054"
+      },
+      "inputs": {
+        "share": "50",
+        "source": "หน่วยงานทดสอบภาระงาน"
+      },
+      "expected": {
+        "score": 25,
+        "display": "25.00",
+        "status": "calculated",
+        "student_names_visible": false,
+        "visible_fields": [
+          {
+            "name": "role",
+            "label": "ชนิดงาน"
+          },
+          {
+            "name": "share",
+            "label": "สัดส่วนการมีส่วนร่วม (%)"
+          },
+          {
+            "name": "source",
+            "label": "ชื่อการประชุมวิชาการ"
+          }
+        ],
+        "save_allowed": true
+      },
+      "actual_result": "",
+      "verdict": "NOT_RUN"
+    },
+    {
+      "id": "W055",
+      "category": "academic",
+      "category_label": "2. งานวิชาการ",
+      "main_type": "สิทธิบัตร / สิ่งประดิษฐ์",
+      "subtype": "2.5 สิทธิบัตร / สิ่งประดิษฐ์",
+      "subtype_label": "สิทธิบัตร / สิ่งประดิษฐ์",
+      "role": "ยื่นจดทะเบียนสิทธิบัตร / อนุสิทธิบัตร ในประเทศ / ต่างประเทศ",
+      "common": {
+        "semester": "2",
+        "year": "2567",
+        "title": "ทดสอบภาระงาน W055",
+        "evidence_url": "https://example.com",
+        "role_note": "ข้อมูลสมมติ W055"
+      },
+      "inputs": {
+        "share": "50"
+      },
+      "expected": {
+        "score": 10,
+        "display": "10.00",
+        "status": "calculated",
+        "student_names_visible": false,
+        "visible_fields": [
+          {
+            "name": "role",
+            "label": "ชนิดงาน"
+          },
+          {
+            "name": "share",
+            "label": "สัดส่วนการมีส่วนร่วม (%)"
+          }
+        ],
+        "save_allowed": true
+      },
+      "actual_result": "",
+      "verdict": "NOT_RUN"
+    },
+    {
+      "id": "W056",
+      "category": "academic",
+      "category_label": "2. งานวิชาการ",
+      "main_type": "สิทธิบัตร / สิ่งประดิษฐ์",
+      "subtype": "2.5 สิทธิบัตร / สิ่งประดิษฐ์",
+      "subtype_label": "สิทธิบัตร / สิ่งประดิษฐ์",
+      "role": "ทะเบียนสิทธิบัตรในต่างประเทศ",
+      "common": {
+        "semester": "2",
+        "year": "2567",
+        "title": "ทดสอบภาระงาน W056",
+        "evidence_url": "https://example.com",
+        "role_note": "ข้อมูลสมมติ W056"
+      },
+      "inputs": {
+        "share": "50"
+      },
+      "expected": {
+        "score": 275,
+        "display": "275.00",
+        "status": "calculated",
+        "student_names_visible": false,
+        "visible_fields": [
+          {
+            "name": "role",
+            "label": "ชนิดงาน"
+          },
+          {
+            "name": "share",
+            "label": "สัดส่วนการมีส่วนร่วม (%)"
+          }
+        ],
+        "save_allowed": true
+      },
+      "actual_result": "",
+      "verdict": "NOT_RUN"
+    },
+    {
+      "id": "W057",
+      "category": "academic",
+      "category_label": "2. งานวิชาการ",
+      "main_type": "สิทธิบัตร / สิ่งประดิษฐ์",
+      "subtype": "2.5 สิทธิบัตร / สิ่งประดิษฐ์",
+      "subtype_label": "สิทธิบัตร / สิ่งประดิษฐ์",
+      "role": "ทะเบียนสิทธิบัตรภายในประเทศ",
+      "common": {
+        "semester": "2",
+        "year": "2567",
+        "title": "ทดสอบภาระงาน W057",
+        "evidence_url": "https://example.com",
+        "role_note": "ข้อมูลสมมติ W057"
+      },
+      "inputs": {
+        "share": "50"
+      },
+      "expected": {
+        "score": 225,
+        "display": "225.00",
+        "status": "calculated",
+        "student_names_visible": false,
+        "visible_fields": [
+          {
+            "name": "role",
+            "label": "ชนิดงาน"
+          },
+          {
+            "name": "share",
+            "label": "สัดส่วนการมีส่วนร่วม (%)"
+          }
+        ],
+        "save_allowed": true
+      },
+      "actual_result": "",
+      "verdict": "NOT_RUN"
+    },
+    {
+      "id": "W058",
+      "category": "academic",
+      "category_label": "2. งานวิชาการ",
+      "main_type": "หนังสือ / ตำรา / Book Chapter",
+      "subtype": "2.6.1 หนังสือ / ตำรา",
+      "subtype_label": "หนังสือ / ตำรา",
+      "role": "หนังสือหรือตำรา",
+      "common": {
+        "semester": "2",
+        "year": "2567",
+        "title": "ทดสอบภาระงาน W058",
+        "evidence_url": "https://example.com",
+        "role_note": "ข้อมูลสมมติ W058"
+      },
+      "inputs": {
+        "share": "50",
+        "source": "หน่วยงานทดสอบภาระงาน"
+      },
+      "expected": {
+        "score": 200,
+        "display": "200.00",
+        "status": "calculated",
+        "student_names_visible": false,
+        "visible_fields": [
+          {
+            "name": "role",
+            "label": "ชนิดงาน"
+          },
+          {
+            "name": "share",
+            "label": "สัดส่วนการมีส่วนร่วม (%)"
+          },
+          {
+            "name": "source",
+            "label": "สำนักพิมพ์"
+          }
+        ],
+        "save_allowed": true
+      },
+      "actual_result": "",
+      "verdict": "NOT_RUN"
+    },
+    {
+      "id": "W059",
+      "category": "academic",
+      "category_label": "2. งานวิชาการ",
+      "main_type": "หนังสือ / ตำรา / Book Chapter",
+      "subtype": "2.6.1 หนังสือ / ตำรา",
+      "subtype_label": "หนังสือ / ตำรา",
+      "role": "หนังสือแปลหรือตำราแปล",
+      "common": {
+        "semester": "2",
+        "year": "2567",
+        "title": "ทดสอบภาระงาน W059",
+        "evidence_url": "https://example.com",
+        "role_note": "ข้อมูลสมมติ W059"
+      },
+      "inputs": {
+        "share": "50",
+        "source": "หน่วยงานทดสอบภาระงาน"
+      },
+      "expected": {
+        "score": 150,
+        "display": "150.00",
+        "status": "calculated",
+        "student_names_visible": false,
+        "visible_fields": [
+          {
+            "name": "role",
+            "label": "ชนิดงาน"
+          },
+          {
+            "name": "share",
+            "label": "สัดส่วนการมีส่วนร่วม (%)"
+          },
+          {
+            "name": "source",
+            "label": "สำนักพิมพ์"
+          }
+        ],
+        "save_allowed": true
+      },
+      "actual_result": "",
+      "verdict": "NOT_RUN"
+    },
+    {
+      "id": "W060",
+      "category": "academic",
+      "category_label": "2. งานวิชาการ",
+      "main_type": "หนังสือ / ตำรา / Book Chapter",
+      "subtype": "2.6.2 Book Chapter",
+      "subtype_label": "Book Chapter",
+      "role": "Book Chapter",
+      "common": {
+        "semester": "2",
+        "year": "2567",
+        "title": "ทดสอบภาระงาน W060",
+        "evidence_url": "https://example.com",
+        "role_note": "ข้อมูลสมมติ W060"
+      },
+      "inputs": {
+        "share": "50",
+        "source": "หน่วยงานทดสอบภาระงาน",
+        "quantity": "2"
+      },
+      "expected": {
+        "score": 80,
+        "display": "80.00",
+        "status": "calculated",
+        "student_names_visible": false,
+        "visible_fields": [
+          {
+            "name": "role",
+            "label": "ชนิดงาน"
+          },
+          {
+            "name": "share",
+            "label": "สัดส่วนการมีส่วนร่วม (%)"
+          },
+          {
+            "name": "source",
+            "label": "สำนักพิมพ์"
+          },
+          {
+            "name": "quantity",
+            "label": "จำนวน Chapter"
+          }
+        ],
+        "save_allowed": true
+      },
+      "actual_result": "",
+      "verdict": "NOT_RUN"
+    },
+    {
+      "id": "W061",
+      "category": "academic",
+      "category_label": "2. งานวิชาการ",
+      "main_type": "เอกสารและสื่อการสอน",
+      "subtype": "2.7 เอกสารและสื่อการสอน",
+      "subtype_label": "เอกสารและสื่อการสอน",
+      "role": "เอกสารคำสอน",
+      "common": {
+        "semester": "2",
+        "year": "2567",
+        "title": "ทดสอบภาระงาน W061",
+        "evidence_url": "https://example.com",
+        "role_note": "ข้อมูลสมมติ W061"
+      },
+      "inputs": {
+        "share": "50"
+      },
+      "expected": {
+        "score": 50,
+        "display": "50.00",
+        "status": "calculated",
+        "student_names_visible": false,
+        "visible_fields": [
+          {
+            "name": "role",
+            "label": "ชนิดงาน"
+          },
+          {
+            "name": "share",
+            "label": "สัดส่วนการมีส่วนร่วม (%)"
+          }
+        ],
+        "save_allowed": true
+      },
+      "actual_result": "",
+      "verdict": "NOT_RUN"
+    },
+    {
+      "id": "W062",
+      "category": "academic",
+      "category_label": "2. งานวิชาการ",
+      "main_type": "เอกสารและสื่อการสอน",
+      "subtype": "2.7 เอกสารและสื่อการสอน",
+      "subtype_label": "เอกสารและสื่อการสอน",
+      "role": "เอกสารประกอบการสอน",
+      "common": {
+        "semester": "2",
+        "year": "2567",
+        "title": "ทดสอบภาระงาน W062",
+        "evidence_url": "https://example.com",
+        "role_note": "ข้อมูลสมมติ W062"
+      },
+      "inputs": {
+        "share": "50"
+      },
+      "expected": {
+        "score": 40,
+        "display": "40.00",
+        "status": "calculated",
+        "student_names_visible": false,
+        "visible_fields": [
+          {
+            "name": "role",
+            "label": "ชนิดงาน"
+          },
+          {
+            "name": "share",
+            "label": "สัดส่วนการมีส่วนร่วม (%)"
+          }
+        ],
+        "save_allowed": true
+      },
+      "actual_result": "",
+      "verdict": "NOT_RUN"
+    },
+    {
+      "id": "W063",
+      "category": "academic",
+      "category_label": "2. งานวิชาการ",
+      "main_type": "เอกสารและสื่อการสอน",
+      "subtype": "2.7 เอกสารและสื่อการสอน",
+      "subtype_label": "เอกสารและสื่อการสอน",
+      "role": "คู่มือปฏิบัติการ",
+      "common": {
+        "semester": "2",
+        "year": "2567",
+        "title": "ทดสอบภาระงาน W063",
+        "evidence_url": "https://example.com",
+        "role_note": "ข้อมูลสมมติ W063"
+      },
+      "inputs": {
+        "share": "50"
+      },
+      "expected": {
+        "score": 40,
+        "display": "40.00",
+        "status": "calculated",
+        "student_names_visible": false,
+        "visible_fields": [
+          {
+            "name": "role",
+            "label": "ชนิดงาน"
+          },
+          {
+            "name": "share",
+            "label": "สัดส่วนการมีส่วนร่วม (%)"
+          }
+        ],
+        "save_allowed": true
+      },
+      "actual_result": "",
+      "verdict": "NOT_RUN"
+    },
+    {
+      "id": "W064",
+      "category": "academic",
+      "category_label": "2. งานวิชาการ",
+      "main_type": "เอกสารและสื่อการสอน",
+      "subtype": "2.7 เอกสารและสื่อการสอน",
+      "subtype_label": "เอกสารและสื่อการสอน",
+      "role": "งานสร้างอุปกรณ์ / เครื่องมือ / ชุดทดลอง",
+      "common": {
+        "semester": "2",
+        "year": "2567",
+        "title": "ทดสอบภาระงาน W064",
+        "evidence_url": "https://example.com",
+        "role_note": "ข้อมูลสมมติ W064"
+      },
+      "inputs": {
+        "share": "50"
+      },
+      "expected": {
+        "score": 50,
+        "display": "50.00",
+        "status": "calculated",
+        "student_names_visible": false,
+        "visible_fields": [
+          {
+            "name": "role",
+            "label": "ชนิดงาน"
+          },
+          {
+            "name": "share",
+            "label": "สัดส่วนการมีส่วนร่วม (%)"
+          }
+        ],
+        "save_allowed": true
+      },
+      "actual_result": "",
+      "verdict": "NOT_RUN"
+    },
+    {
+      "id": "W065",
+      "category": "academic",
+      "category_label": "2. งานวิชาการ",
+      "main_type": "เอกสารและสื่อการสอน",
+      "subtype": "2.7 เอกสารและสื่อการสอน",
+      "subtype_label": "เอกสารและสื่อการสอน",
+      "role": "สื่อการสอนที่เป็นนวัตกรรมใหม่",
+      "common": {
+        "semester": "2",
+        "year": "2567",
+        "title": "ทดสอบภาระงาน W065",
+        "evidence_url": "https://example.com",
+        "role_note": "ข้อมูลสมมติ W065"
+      },
+      "inputs": {
+        "share": "50"
+      },
+      "expected": {
+        "score": 50,
+        "display": "50.00",
+        "status": "calculated",
+        "student_names_visible": false,
+        "visible_fields": [
+          {
+            "name": "role",
+            "label": "ชนิดงาน"
+          },
+          {
+            "name": "share",
+            "label": "สัดส่วนการมีส่วนร่วม (%)"
+          }
+        ],
+        "save_allowed": true
+      },
+      "actual_result": "",
+      "verdict": "NOT_RUN"
+    },
+    {
+      "id": "W066",
+      "category": "academic",
+      "category_label": "2. งานวิชาการ",
+      "main_type": "เอกสารและสื่อการสอน",
+      "subtype": "2.7 เอกสารและสื่อการสอน",
+      "subtype_label": "เอกสารและสื่อการสอน",
+      "role": "การแจ้งมีลิขสิทธิ์",
+      "common": {
+        "semester": "2",
+        "year": "2567",
+        "title": "ทดสอบภาระงาน W066",
+        "evidence_url": "https://example.com",
+        "role_note": "ข้อมูลสมมติ W066"
+      },
+      "inputs": {
+        "share": "50"
+      },
+      "expected": {
+        "score": 5,
+        "display": "5.00",
+        "status": "calculated",
+        "student_names_visible": false,
+        "visible_fields": [
+          {
+            "name": "role",
+            "label": "ชนิดงาน"
+          },
+          {
+            "name": "share",
+            "label": "สัดส่วนการมีส่วนร่วม (%)"
+          }
+        ],
+        "save_allowed": true
+      },
+      "actual_result": "",
+      "verdict": "NOT_RUN"
+    },
+    {
+      "id": "W067",
+      "category": "academic",
+      "category_label": "2. งานวิชาการ",
+      "main_type": "ทุนวิจัย",
+      "subtype": "2.8.1 ทุนวิจัยภายนอก",
+      "subtype_label": "ทุนวิจัยภายนอก",
+      "role": "งบประมาณตั้งแต่ 20 ล้านบาท",
+      "common": {
+        "semester": "2",
+        "year": "2567",
+        "title": "ทดสอบภาระงาน W067",
+        "evidence_url": "https://example.com",
+        "role_note": "ข้อมูลสมมติ W067"
+      },
+      "inputs": {
+        "share": "50",
+        "source": "หน่วยงานทดสอบภาระงาน",
+        "budget": "20000000"
+      },
+      "expected": {
+        "score": 225,
+        "display": "225.00",
+        "status": "calculated",
+        "student_names_visible": false,
+        "visible_fields": [
+          {
+            "name": "role",
+            "label": "ชนิดงาน"
+          },
+          {
+            "name": "share",
+            "label": "สัดส่วนการมีส่วนร่วม (%)"
+          },
+          {
+            "name": "source",
+            "label": "แหล่งทุน / หน่วยงานผู้ให้ทุน"
+          },
+          {
+            "name": "budget",
+            "label": "งบประมาณ (บาท)"
+          }
+        ],
+        "save_allowed": true
+      },
+      "actual_result": "",
+      "verdict": "NOT_RUN"
+    },
+    {
+      "id": "W068",
+      "category": "academic",
+      "category_label": "2. งานวิชาการ",
+      "main_type": "ทุนวิจัย",
+      "subtype": "2.8.1 ทุนวิจัยภายนอก",
+      "subtype_label": "ทุนวิจัยภายนอก",
+      "role": "งบประมาณตั้งแต่ 15 ล้าน แต่ไม่ถึง 20 ล้านบาท",
+      "common": {
+        "semester": "2",
+        "year": "2567",
+        "title": "ทดสอบภาระงาน W068",
+        "evidence_url": "https://example.com",
+        "role_note": "ข้อมูลสมมติ W068"
+      },
+      "inputs": {
+        "share": "50",
+        "source": "หน่วยงานทดสอบภาระงาน",
+        "budget": "15000000"
+      },
+      "expected": {
+        "score": 200,
+        "display": "200.00",
+        "status": "calculated",
+        "student_names_visible": false,
+        "visible_fields": [
+          {
+            "name": "role",
+            "label": "ชนิดงาน"
+          },
+          {
+            "name": "share",
+            "label": "สัดส่วนการมีส่วนร่วม (%)"
+          },
+          {
+            "name": "source",
+            "label": "แหล่งทุน / หน่วยงานผู้ให้ทุน"
+          },
+          {
+            "name": "budget",
+            "label": "งบประมาณ (บาท)"
+          }
+        ],
+        "save_allowed": true
+      },
+      "actual_result": "",
+      "verdict": "NOT_RUN"
+    },
+    {
+      "id": "W069",
+      "category": "academic",
+      "category_label": "2. งานวิชาการ",
+      "main_type": "ทุนวิจัย",
+      "subtype": "2.8.1 ทุนวิจัยภายนอก",
+      "subtype_label": "ทุนวิจัยภายนอก",
+      "role": "งบประมาณตั้งแต่ 10 ล้าน แต่ไม่ถึง 15 ล้านบาท",
+      "common": {
+        "semester": "2",
+        "year": "2567",
+        "title": "ทดสอบภาระงาน W069",
+        "evidence_url": "https://example.com",
+        "role_note": "ข้อมูลสมมติ W069"
+      },
+      "inputs": {
+        "share": "50",
+        "source": "หน่วยงานทดสอบภาระงาน",
+        "budget": "10000000"
+      },
+      "expected": {
+        "score": 175,
+        "display": "175.00",
+        "status": "calculated",
+        "student_names_visible": false,
+        "visible_fields": [
+          {
+            "name": "role",
+            "label": "ชนิดงาน"
+          },
+          {
+            "name": "share",
+            "label": "สัดส่วนการมีส่วนร่วม (%)"
+          },
+          {
+            "name": "source",
+            "label": "แหล่งทุน / หน่วยงานผู้ให้ทุน"
+          },
+          {
+            "name": "budget",
+            "label": "งบประมาณ (บาท)"
+          }
+        ],
+        "save_allowed": true
+      },
+      "actual_result": "",
+      "verdict": "NOT_RUN"
+    },
+    {
+      "id": "W070",
+      "category": "academic",
+      "category_label": "2. งานวิชาการ",
+      "main_type": "ทุนวิจัย",
+      "subtype": "2.8.1 ทุนวิจัยภายนอก",
+      "subtype_label": "ทุนวิจัยภายนอก",
+      "role": "งบประมาณตั้งแต่ 5 ล้าน แต่ไม่ถึง 10 ล้านบาท",
+      "common": {
+        "semester": "2",
+        "year": "2567",
+        "title": "ทดสอบภาระงาน W070",
+        "evidence_url": "https://example.com",
+        "role_note": "ข้อมูลสมมติ W070"
+      },
+      "inputs": {
+        "share": "50",
+        "source": "หน่วยงานทดสอบภาระงาน",
+        "budget": "5000000"
+      },
+      "expected": {
+        "score": 150,
+        "display": "150.00",
+        "status": "calculated",
+        "student_names_visible": false,
+        "visible_fields": [
+          {
+            "name": "role",
+            "label": "ชนิดงาน"
+          },
+          {
+            "name": "share",
+            "label": "สัดส่วนการมีส่วนร่วม (%)"
+          },
+          {
+            "name": "source",
+            "label": "แหล่งทุน / หน่วยงานผู้ให้ทุน"
+          },
+          {
+            "name": "budget",
+            "label": "งบประมาณ (บาท)"
+          }
+        ],
+        "save_allowed": true
+      },
+      "actual_result": "",
+      "verdict": "NOT_RUN"
+    },
+    {
+      "id": "W071",
+      "category": "academic",
+      "category_label": "2. งานวิชาการ",
+      "main_type": "ทุนวิจัย",
+      "subtype": "2.8.1 ทุนวิจัยภายนอก",
+      "subtype_label": "ทุนวิจัยภายนอก",
+      "role": "งบประมาณตั้งแต่ 1 ล้าน แต่ไม่ถึง 5 ล้านบาท",
+      "common": {
+        "semester": "2",
+        "year": "2567",
+        "title": "ทดสอบภาระงาน W071",
+        "evidence_url": "https://example.com",
+        "role_note": "ข้อมูลสมมติ W071"
+      },
+      "inputs": {
+        "share": "50",
+        "source": "หน่วยงานทดสอบภาระงาน",
+        "budget": "1000000"
+      },
+      "expected": {
+        "score": 125,
+        "display": "125.00",
+        "status": "calculated",
+        "student_names_visible": false,
+        "visible_fields": [
+          {
+            "name": "role",
+            "label": "ชนิดงาน"
+          },
+          {
+            "name": "share",
+            "label": "สัดส่วนการมีส่วนร่วม (%)"
+          },
+          {
+            "name": "source",
+            "label": "แหล่งทุน / หน่วยงานผู้ให้ทุน"
+          },
+          {
+            "name": "budget",
+            "label": "งบประมาณ (บาท)"
+          }
+        ],
+        "save_allowed": true
+      },
+      "actual_result": "",
+      "verdict": "NOT_RUN"
+    },
+    {
+      "id": "W072",
+      "category": "academic",
+      "category_label": "2. งานวิชาการ",
+      "main_type": "ทุนวิจัย",
+      "subtype": "2.8.1 ทุนวิจัยภายนอก",
+      "subtype_label": "ทุนวิจัยภายนอก",
+      "role": "งบประมาณตั้งแต่ 5 แสน แต่ไม่ถึง 1 ล้านบาท",
+      "common": {
+        "semester": "2",
+        "year": "2567",
+        "title": "ทดสอบภาระงาน W072",
+        "evidence_url": "https://example.com",
+        "role_note": "ข้อมูลสมมติ W072"
+      },
+      "inputs": {
+        "share": "50",
+        "source": "หน่วยงานทดสอบภาระงาน",
+        "budget": "500000"
+      },
+      "expected": {
+        "score": 100,
+        "display": "100.00",
+        "status": "calculated",
+        "student_names_visible": false,
+        "visible_fields": [
+          {
+            "name": "role",
+            "label": "ชนิดงาน"
+          },
+          {
+            "name": "share",
+            "label": "สัดส่วนการมีส่วนร่วม (%)"
+          },
+          {
+            "name": "source",
+            "label": "แหล่งทุน / หน่วยงานผู้ให้ทุน"
+          },
+          {
+            "name": "budget",
+            "label": "งบประมาณ (บาท)"
+          }
+        ],
+        "save_allowed": true
+      },
+      "actual_result": "",
+      "verdict": "NOT_RUN"
+    },
+    {
+      "id": "W073",
+      "category": "academic",
+      "category_label": "2. งานวิชาการ",
+      "main_type": "ทุนวิจัย",
+      "subtype": "2.8.1 ทุนวิจัยภายนอก",
+      "subtype_label": "ทุนวิจัยภายนอก",
+      "role": "งบประมาณตั้งแต่ 1 แสน แต่ไม่ถึง 5 แสนบาท",
+      "common": {
+        "semester": "2",
+        "year": "2567",
+        "title": "ทดสอบภาระงาน W073",
+        "evidence_url": "https://example.com",
+        "role_note": "ข้อมูลสมมติ W073"
+      },
+      "inputs": {
+        "share": "50",
+        "source": "หน่วยงานทดสอบภาระงาน",
+        "budget": "100000"
+      },
+      "expected": {
+        "score": 75,
+        "display": "75.00",
+        "status": "calculated",
+        "student_names_visible": false,
+        "visible_fields": [
+          {
+            "name": "role",
+            "label": "ชนิดงาน"
+          },
+          {
+            "name": "share",
+            "label": "สัดส่วนการมีส่วนร่วม (%)"
+          },
+          {
+            "name": "source",
+            "label": "แหล่งทุน / หน่วยงานผู้ให้ทุน"
+          },
+          {
+            "name": "budget",
+            "label": "งบประมาณ (บาท)"
+          }
+        ],
+        "save_allowed": true
+      },
+      "actual_result": "",
+      "verdict": "NOT_RUN"
+    },
+    {
+      "id": "W074",
+      "category": "academic",
+      "category_label": "2. งานวิชาการ",
+      "main_type": "ทุนวิจัย",
+      "subtype": "2.8.1 ทุนวิจัยภายนอก",
+      "subtype_label": "ทุนวิจัยภายนอก",
+      "role": "งบประมาณน้อยกว่า 1 แสนบาท",
+      "common": {
+        "semester": "2",
+        "year": "2567",
+        "title": "ทดสอบภาระงาน W074",
+        "evidence_url": "https://example.com",
+        "role_note": "ข้อมูลสมมติ W074"
+      },
+      "inputs": {
+        "share": "50",
+        "source": "หน่วยงานทดสอบภาระงาน",
+        "budget": "50000"
+      },
+      "expected": {
+        "score": 37.5,
+        "display": "37.50",
+        "status": "calculated",
+        "student_names_visible": false,
+        "visible_fields": [
+          {
+            "name": "role",
+            "label": "ชนิดงาน"
+          },
+          {
+            "name": "share",
+            "label": "สัดส่วนการมีส่วนร่วม (%)"
+          },
+          {
+            "name": "source",
+            "label": "แหล่งทุน / หน่วยงานผู้ให้ทุน"
+          },
+          {
+            "name": "budget",
+            "label": "งบประมาณ (บาท)"
+          }
+        ],
+        "save_allowed": true
+      },
+      "actual_result": "",
+      "verdict": "NOT_RUN"
+    },
+    {
+      "id": "W075",
+      "category": "academic",
+      "category_label": "2. งานวิชาการ",
+      "main_type": "ทุนวิจัย",
+      "subtype": "2.8.2 ทุนวิจัยอื่น",
+      "subtype_label": "ทุนวิจัยอื่น",
+      "role": "งบประมาณตั้งแต่ 5 ล้านบาท",
+      "common": {
+        "semester": "2",
+        "year": "2567",
+        "title": "ทดสอบภาระงาน W075",
+        "evidence_url": "https://example.com",
+        "role_note": "ข้อมูลสมมติ W075"
+      },
+      "inputs": {
+        "share": "50",
+        "source": "หน่วยงานทดสอบภาระงาน",
+        "budget": "5000000"
+      },
+      "expected": {
+        "score": 100,
+        "display": "100.00",
+        "status": "calculated",
+        "student_names_visible": false,
+        "visible_fields": [
+          {
+            "name": "role",
+            "label": "ชนิดงาน"
+          },
+          {
+            "name": "share",
+            "label": "สัดส่วนการมีส่วนร่วม (%)"
+          },
+          {
+            "name": "source",
+            "label": "แหล่งทุน / หน่วยงานผู้ให้ทุน"
+          },
+          {
+            "name": "budget",
+            "label": "งบประมาณ (บาท)"
+          }
+        ],
+        "save_allowed": true
+      },
+      "actual_result": "",
+      "verdict": "NOT_RUN"
+    },
+    {
+      "id": "W076",
+      "category": "academic",
+      "category_label": "2. งานวิชาการ",
+      "main_type": "ทุนวิจัย",
+      "subtype": "2.8.2 ทุนวิจัยอื่น",
+      "subtype_label": "ทุนวิจัยอื่น",
+      "role": "งบประมาณตั้งแต่ 1 ล้าน แต่ไม่ถึง 5 ล้านบาท",
+      "common": {
+        "semester": "2",
+        "year": "2567",
+        "title": "ทดสอบภาระงาน W076",
+        "evidence_url": "https://example.com",
+        "role_note": "ข้อมูลสมมติ W076"
+      },
+      "inputs": {
+        "share": "50",
+        "source": "หน่วยงานทดสอบภาระงาน",
+        "budget": "1000000"
+      },
+      "expected": {
+        "score": 75,
+        "display": "75.00",
+        "status": "calculated",
+        "student_names_visible": false,
+        "visible_fields": [
+          {
+            "name": "role",
+            "label": "ชนิดงาน"
+          },
+          {
+            "name": "share",
+            "label": "สัดส่วนการมีส่วนร่วม (%)"
+          },
+          {
+            "name": "source",
+            "label": "แหล่งทุน / หน่วยงานผู้ให้ทุน"
+          },
+          {
+            "name": "budget",
+            "label": "งบประมาณ (บาท)"
+          }
+        ],
+        "save_allowed": true
+      },
+      "actual_result": "",
+      "verdict": "NOT_RUN"
+    },
+    {
+      "id": "W077",
+      "category": "academic",
+      "category_label": "2. งานวิชาการ",
+      "main_type": "ทุนวิจัย",
+      "subtype": "2.8.2 ทุนวิจัยอื่น",
+      "subtype_label": "ทุนวิจัยอื่น",
+      "role": "งบประมาณตั้งแต่ 5 แสน แต่ไม่ถึง 1 ล้านบาท",
+      "common": {
+        "semester": "2",
+        "year": "2567",
+        "title": "ทดสอบภาระงาน W077",
+        "evidence_url": "https://example.com",
+        "role_note": "ข้อมูลสมมติ W077"
+      },
+      "inputs": {
+        "share": "50",
+        "source": "หน่วยงานทดสอบภาระงาน",
+        "budget": "500000"
+      },
+      "expected": {
+        "score": 62.5,
+        "display": "62.50",
+        "status": "calculated",
+        "student_names_visible": false,
+        "visible_fields": [
+          {
+            "name": "role",
+            "label": "ชนิดงาน"
+          },
+          {
+            "name": "share",
+            "label": "สัดส่วนการมีส่วนร่วม (%)"
+          },
+          {
+            "name": "source",
+            "label": "แหล่งทุน / หน่วยงานผู้ให้ทุน"
+          },
+          {
+            "name": "budget",
+            "label": "งบประมาณ (บาท)"
+          }
+        ],
+        "save_allowed": true
+      },
+      "actual_result": "",
+      "verdict": "NOT_RUN"
+    },
+    {
+      "id": "W078",
+      "category": "academic",
+      "category_label": "2. งานวิชาการ",
+      "main_type": "ทุนวิจัย",
+      "subtype": "2.8.2 ทุนวิจัยอื่น",
+      "subtype_label": "ทุนวิจัยอื่น",
+      "role": "งบประมาณตั้งแต่ 1 แสน แต่ไม่ถึง 5 แสนบาท",
+      "common": {
+        "semester": "2",
+        "year": "2567",
+        "title": "ทดสอบภาระงาน W078",
+        "evidence_url": "https://example.com",
+        "role_note": "ข้อมูลสมมติ W078"
+      },
+      "inputs": {
+        "share": "50",
+        "source": "หน่วยงานทดสอบภาระงาน",
+        "budget": "100000"
+      },
+      "expected": {
+        "score": 50,
+        "display": "50.00",
+        "status": "calculated",
+        "student_names_visible": false,
+        "visible_fields": [
+          {
+            "name": "role",
+            "label": "ชนิดงาน"
+          },
+          {
+            "name": "share",
+            "label": "สัดส่วนการมีส่วนร่วม (%)"
+          },
+          {
+            "name": "source",
+            "label": "แหล่งทุน / หน่วยงานผู้ให้ทุน"
+          },
+          {
+            "name": "budget",
+            "label": "งบประมาณ (บาท)"
+          }
+        ],
+        "save_allowed": true
+      },
+      "actual_result": "",
+      "verdict": "NOT_RUN"
+    },
+    {
+      "id": "W079",
+      "category": "academic",
+      "category_label": "2. งานวิชาการ",
+      "main_type": "ทุนวิจัย",
+      "subtype": "2.8.2 ทุนวิจัยอื่น",
+      "subtype_label": "ทุนวิจัยอื่น",
+      "role": "งบประมาณน้อยกว่า 1 แสนบาท",
+      "common": {
+        "semester": "2",
+        "year": "2567",
+        "title": "ทดสอบภาระงาน W079",
+        "evidence_url": "https://example.com",
+        "role_note": "ข้อมูลสมมติ W079"
+      },
+      "inputs": {
+        "share": "50",
+        "source": "หน่วยงานทดสอบภาระงาน",
+        "budget": "50000"
+      },
+      "expected": {
+        "score": 25,
+        "display": "25.00",
+        "status": "calculated",
+        "student_names_visible": false,
+        "visible_fields": [
+          {
+            "name": "role",
+            "label": "ชนิดงาน"
+          },
+          {
+            "name": "share",
+            "label": "สัดส่วนการมีส่วนร่วม (%)"
+          },
+          {
+            "name": "source",
+            "label": "แหล่งทุน / หน่วยงานผู้ให้ทุน"
+          },
+          {
+            "name": "budget",
+            "label": "งบประมาณ (บาท)"
+          }
+        ],
+        "save_allowed": true
+      },
+      "actual_result": "",
+      "verdict": "NOT_RUN"
+    },
+    {
+      "id": "W080",
+      "category": "academic",
+      "category_label": "2. งานวิชาการ",
+      "main_type": "รางวัลทางวิชาการ",
+      "subtype": "2.9 รางวัลทางวิชาการ",
+      "subtype_label": "รางวัลทางวิชาการ",
+      "role": "รางวัลระดับนานาชาติ",
+      "common": {
+        "semester": "2",
+        "year": "2567",
+        "title": "ทดสอบภาระงาน W080",
+        "evidence_url": "https://example.com",
+        "role_note": "ข้อมูลสมมติ W080"
+      },
+      "inputs": {
+        "share": "50",
+        "source": "หน่วยงานทดสอบภาระงาน",
+        "quantity": "2"
+      },
+      "expected": {
+        "score": 200,
+        "display": "200.00",
+        "status": "calculated",
+        "student_names_visible": false,
+        "visible_fields": [
+          {
+            "name": "role",
+            "label": "ชนิดงาน"
+          },
+          {
+            "name": "share",
+            "label": "สัดส่วนการมีส่วนร่วม (%)"
+          },
+          {
+            "name": "source",
+            "label": "หน่วยงานที่มอบรางวัล / จัดประกวด"
+          },
+          {
+            "name": "quantity",
+            "label": "จำนวนผลงาน / Chapter"
+          }
+        ],
+        "save_allowed": true
+      },
+      "actual_result": "",
+      "verdict": "NOT_RUN"
+    },
+    {
+      "id": "W081",
+      "category": "academic",
+      "category_label": "2. งานวิชาการ",
+      "main_type": "รางวัลทางวิชาการ",
+      "subtype": "2.9 รางวัลทางวิชาการ",
+      "subtype_label": "รางวัลทางวิชาการ",
+      "role": "รางวัลระดับชาติ",
+      "common": {
+        "semester": "2",
+        "year": "2567",
+        "title": "ทดสอบภาระงาน W081",
+        "evidence_url": "https://example.com",
+        "role_note": "ข้อมูลสมมติ W081"
+      },
+      "inputs": {
+        "share": "50",
+        "source": "หน่วยงานทดสอบภาระงาน",
+        "quantity": "2"
+      },
+      "expected": {
+        "score": 100,
+        "display": "100.00",
+        "status": "calculated",
+        "student_names_visible": false,
+        "visible_fields": [
+          {
+            "name": "role",
+            "label": "ชนิดงาน"
+          },
+          {
+            "name": "share",
+            "label": "สัดส่วนการมีส่วนร่วม (%)"
+          },
+          {
+            "name": "source",
+            "label": "หน่วยงานที่มอบรางวัล / จัดประกวด"
+          },
+          {
+            "name": "quantity",
+            "label": "จำนวนผลงาน / Chapter"
+          }
+        ],
+        "save_allowed": true
+      },
+      "actual_result": "",
+      "verdict": "NOT_RUN"
+    },
+    {
+      "id": "W082",
+      "category": "academic",
+      "category_label": "2. งานวิชาการ",
+      "main_type": "รางวัลทางวิชาการ",
+      "subtype": "2.9 รางวัลทางวิชาการ",
+      "subtype_label": "รางวัลทางวิชาการ",
+      "role": "รางวัลระดับสถาบัน",
+      "common": {
+        "semester": "2",
+        "year": "2567",
+        "title": "ทดสอบภาระงาน W082",
+        "evidence_url": "https://example.com",
+        "role_note": "ข้อมูลสมมติ W082"
+      },
+      "inputs": {
+        "share": "50",
+        "source": "หน่วยงานทดสอบภาระงาน",
+        "quantity": "2"
+      },
+      "expected": {
+        "score": 50,
+        "display": "50.00",
+        "status": "calculated",
+        "student_names_visible": false,
+        "visible_fields": [
+          {
+            "name": "role",
+            "label": "ชนิดงาน"
+          },
+          {
+            "name": "share",
+            "label": "สัดส่วนการมีส่วนร่วม (%)"
+          },
+          {
+            "name": "source",
+            "label": "หน่วยงานที่มอบรางวัล / จัดประกวด"
+          },
+          {
+            "name": "quantity",
+            "label": "จำนวนผลงาน / Chapter"
+          }
+        ],
+        "save_allowed": true
+      },
+      "actual_result": "",
+      "verdict": "NOT_RUN"
+    },
+    {
+      "id": "W083",
+      "category": "academic",
+      "category_label": "2. งานวิชาการ",
+      "main_type": "รางวัลทางวิชาการ",
+      "subtype": "2.9 รางวัลทางวิชาการ",
+      "subtype_label": "รางวัลทางวิชาการ",
+      "role": "รางวัลในฐานะที่ปรึกษาโครงงาน / วิทยานิพนธ์ / โครงการ",
+      "common": {
+        "semester": "2",
+        "year": "2567",
+        "title": "ทดสอบภาระงาน W083",
+        "evidence_url": "https://example.com",
+        "role_note": "ข้อมูลสมมติ W083"
+      },
+      "inputs": {
+        "share": "50",
+        "source": "หน่วยงานทดสอบภาระงาน",
+        "quantity": "2",
+        "student_names": "นายทดสอบ หนึ่ง\nนางสาวตัวอย่าง สอง"
+      },
+      "expected": {
+        "score": 25,
+        "display": "25.00",
+        "status": "calculated",
+        "student_names_visible": true,
+        "visible_fields": [
+          {
+            "name": "role",
+            "label": "ชนิดงาน"
+          },
+          {
+            "name": "share",
+            "label": "สัดส่วนการมีส่วนร่วม (%)"
+          },
+          {
+            "name": "source",
+            "label": "หน่วยงานที่มอบรางวัล / จัดประกวด"
+          },
+          {
+            "name": "quantity",
+            "label": "จำนวนผลงาน / Chapter"
+          }
+        ],
+        "save_allowed": true
+      },
+      "actual_result": "",
+      "verdict": "NOT_RUN"
+    },
+    {
+      "id": "W084",
+      "category": "academic",
+      "category_label": "2. งานวิชาการ",
+      "main_type": "รางวัลทางวิชาการ",
+      "subtype": "2.9 รางวัลทางวิชาการ",
+      "subtype_label": "รางวัลทางวิชาการ",
+      "role": "ส่งนักศึกษาเข้าประกวด เมื่อเสร็จสิ้นและไม่ได้รับรางวัล",
+      "common": {
+        "semester": "2",
+        "year": "2567",
+        "title": "ทดสอบภาระงาน W084",
+        "evidence_url": "https://example.com",
+        "role_note": "ข้อมูลสมมติ W084"
+      },
+      "inputs": {
+        "share": "50",
+        "source": "หน่วยงานทดสอบภาระงาน",
+        "quantity": "2",
+        "student_names": "นายทดสอบ หนึ่ง\nนางสาวตัวอย่าง สอง"
+      },
+      "expected": {
+        "score": 10,
+        "display": "10.00",
+        "status": "calculated",
+        "student_names_visible": true,
+        "visible_fields": [
+          {
+            "name": "role",
+            "label": "ชนิดงาน"
+          },
+          {
+            "name": "share",
+            "label": "สัดส่วนการมีส่วนร่วม (%)"
+          },
+          {
+            "name": "source",
+            "label": "หน่วยงานที่มอบรางวัล / จัดประกวด"
+          },
+          {
+            "name": "quantity",
+            "label": "จำนวนผลงาน / Chapter"
+          }
+        ],
+        "save_allowed": true
+      },
+      "actual_result": "",
+      "verdict": "NOT_RUN"
+    },
+    {
+      "id": "W085",
+      "category": "academic",
+      "category_label": "2. งานวิชาการ",
+      "main_type": "การนำผลงานไปใช้ประโยชน์",
+      "subtype": "2.10 การนำผลงานวิจัยไปใช้ประโยชน์",
+      "subtype_label": "การนำผลงานวิจัยไปใช้ประโยชน์",
+      "role": "ผลงานที่นำไปใช้ประโยชน์ได้จริง ระดับนานาชาติ",
+      "common": {
+        "semester": "2",
+        "year": "2567",
+        "title": "ทดสอบภาระงาน W085",
+        "evidence_url": "https://example.com",
+        "role_note": "ข้อมูลสมมติ W085"
+      },
+      "inputs": {
+        "share": "50",
+        "source": "หน่วยงานทดสอบภาระงาน"
+      },
+      "expected": {
+        "score": 100,
+        "display": "100.00",
+        "status": "calculated",
+        "student_names_visible": false,
+        "visible_fields": [
+          {
+            "name": "role",
+            "label": "ชนิดงาน"
+          },
+          {
+            "name": "share",
+            "label": "สัดส่วนการมีส่วนร่วม (%)"
+          },
+          {
+            "name": "source",
+            "label": "หน่วยงานที่นำผลงานไปใช้ประโยชน์"
+          }
+        ],
+        "save_allowed": true
+      },
+      "actual_result": "",
+      "verdict": "NOT_RUN"
+    },
+    {
+      "id": "W086",
+      "category": "academic",
+      "category_label": "2. งานวิชาการ",
+      "main_type": "การนำผลงานไปใช้ประโยชน์",
+      "subtype": "2.10 การนำผลงานวิจัยไปใช้ประโยชน์",
+      "subtype_label": "การนำผลงานวิจัยไปใช้ประโยชน์",
+      "role": "ผลงานที่นำไปใช้ประโยชน์ได้จริง ภายในประเทศ (นอก มธ.)",
+      "common": {
+        "semester": "2",
+        "year": "2567",
+        "title": "ทดสอบภาระงาน W086",
+        "evidence_url": "https://example.com",
+        "role_note": "ข้อมูลสมมติ W086"
+      },
+      "inputs": {
+        "share": "50",
+        "source": "หน่วยงานทดสอบภาระงาน"
+      },
+      "expected": {
+        "score": 50,
+        "display": "50.00",
+        "status": "calculated",
+        "student_names_visible": false,
+        "visible_fields": [
+          {
+            "name": "role",
+            "label": "ชนิดงาน"
+          },
+          {
+            "name": "share",
+            "label": "สัดส่วนการมีส่วนร่วม (%)"
+          },
+          {
+            "name": "source",
+            "label": "หน่วยงานที่นำผลงานไปใช้ประโยชน์"
+          }
+        ],
+        "save_allowed": true
+      },
+      "actual_result": "",
+      "verdict": "NOT_RUN"
+    },
+    {
+      "id": "W087",
+      "category": "academic",
+      "category_label": "2. งานวิชาการ",
+      "main_type": "การนำผลงานไปใช้ประโยชน์",
+      "subtype": "2.10 การนำผลงานวิจัยไปใช้ประโยชน์",
+      "subtype_label": "การนำผลงานวิจัยไปใช้ประโยชน์",
+      "role": "ผลงานที่นำไปใช้ประโยชน์ได้จริง ระดับคณะ / ภายใน มธ.",
+      "common": {
+        "semester": "2",
+        "year": "2567",
+        "title": "ทดสอบภาระงาน W087",
+        "evidence_url": "https://example.com",
+        "role_note": "ข้อมูลสมมติ W087"
+      },
+      "inputs": {
+        "share": "50",
+        "source": "หน่วยงานทดสอบภาระงาน"
+      },
+      "expected": {
+        "score": 25,
+        "display": "25.00",
+        "status": "calculated",
+        "student_names_visible": false,
+        "visible_fields": [
+          {
+            "name": "role",
+            "label": "ชนิดงาน"
+          },
+          {
+            "name": "share",
+            "label": "สัดส่วนการมีส่วนร่วม (%)"
+          },
+          {
+            "name": "source",
+            "label": "หน่วยงานที่นำผลงานไปใช้ประโยชน์"
+          }
+        ],
+        "save_allowed": true
+      },
+      "actual_result": "",
+      "verdict": "NOT_RUN"
+    },
+    {
+      "id": "W088",
+      "category": "admin",
+      "category_label": "3. งานบริหาร",
+      "main_type": "ตำแหน่งบริหาร",
+      "subtype": "3.1 งานบริหารในตำแหน่ง",
+      "subtype_label": "งานบริหารในตำแหน่ง",
+      "role": "คณบดี",
+      "common": {
+        "semester": "2",
+        "year": "2567",
+        "title": "ทดสอบภาระงาน W088",
+        "evidence_url": "https://example.com",
+        "role_note": "ข้อมูลสมมติ W088"
+      },
+      "inputs": {},
+      "expected": {
+        "score": null,
+        "display": "รอประเมิน",
+        "status": "pending",
+        "student_names_visible": false,
+        "visible_fields": [
+          {
+            "name": "role",
+            "label": "ตำแหน่ง"
+          }
+        ],
+        "save_allowed": true
+      },
+      "actual_result": "",
+      "verdict": "NOT_RUN"
+    },
+    {
+      "id": "W089",
+      "category": "admin",
+      "category_label": "3. งานบริหาร",
+      "main_type": "ตำแหน่งบริหาร",
+      "subtype": "3.1 งานบริหารในตำแหน่ง",
+      "subtype_label": "งานบริหารในตำแหน่ง",
+      "role": "รองคณบดี",
+      "common": {
+        "semester": "2",
+        "year": "2567",
+        "title": "ทดสอบภาระงาน W089",
+        "evidence_url": "https://example.com",
+        "role_note": "ข้อมูลสมมติ W089"
+      },
+      "inputs": {},
+      "expected": {
+        "score": null,
+        "display": "รอประเมิน",
+        "status": "pending",
+        "student_names_visible": false,
+        "visible_fields": [
+          {
+            "name": "role",
+            "label": "ตำแหน่ง"
+          }
+        ],
+        "save_allowed": true
+      },
+      "actual_result": "",
+      "verdict": "NOT_RUN"
+    },
+    {
+      "id": "W090",
+      "category": "admin",
+      "category_label": "3. งานบริหาร",
+      "main_type": "ตำแหน่งบริหาร",
+      "subtype": "3.1 งานบริหารในตำแหน่ง",
+      "subtype_label": "งานบริหารในตำแหน่ง",
+      "role": "หัวหน้าสาขาวิชา",
+      "common": {
+        "semester": "2",
+        "year": "2567",
+        "title": "ทดสอบภาระงาน W090",
+        "evidence_url": "https://example.com",
+        "role_note": "ข้อมูลสมมติ W090"
+      },
+      "inputs": {},
+      "expected": {
+        "score": null,
+        "display": "รอประเมิน",
+        "status": "pending",
+        "student_names_visible": false,
+        "visible_fields": [
+          {
+            "name": "role",
+            "label": "ตำแหน่ง"
+          }
+        ],
+        "save_allowed": true
+      },
+      "actual_result": "",
+      "verdict": "NOT_RUN"
+    },
+    {
+      "id": "W091",
+      "category": "admin",
+      "category_label": "3. งานบริหาร",
+      "main_type": "ตำแหน่งบริหาร",
+      "subtype": "3.1 งานบริหารในตำแหน่ง",
+      "subtype_label": "งานบริหารในตำแหน่ง",
+      "role": "ผู้ช่วยคณบดี",
+      "common": {
+        "semester": "2",
+        "year": "2567",
+        "title": "ทดสอบภาระงาน W091",
+        "evidence_url": "https://example.com",
+        "role_note": "ข้อมูลสมมติ W091"
+      },
+      "inputs": {},
+      "expected": {
+        "score": null,
+        "display": "รอประเมิน",
+        "status": "pending",
+        "student_names_visible": false,
+        "visible_fields": [
+          {
+            "name": "role",
+            "label": "ตำแหน่ง"
+          }
+        ],
+        "save_allowed": true
+      },
+      "actual_result": "",
+      "verdict": "NOT_RUN"
+    },
+    {
+      "id": "W092",
+      "category": "admin",
+      "category_label": "3. งานบริหาร",
+      "main_type": "ตำแหน่งบริหาร",
+      "subtype": "3.1 งานบริหารในตำแหน่ง",
+      "subtype_label": "งานบริหารในตำแหน่ง",
+      "role": "กรรมการบริหาร",
+      "common": {
+        "semester": "2",
+        "year": "2567",
+        "title": "ทดสอบภาระงาน W092",
+        "evidence_url": "https://example.com",
+        "role_note": "ข้อมูลสมมติ W092"
+      },
+      "inputs": {},
+      "expected": {
+        "score": 50,
+        "display": "50.00",
+        "status": "calculated",
+        "student_names_visible": false,
+        "visible_fields": [
+          {
+            "name": "role",
+            "label": "ตำแหน่ง"
+          }
+        ],
+        "save_allowed": true
+      },
+      "actual_result": "",
+      "verdict": "NOT_RUN"
+    },
+    {
+      "id": "W093",
+      "category": "admin",
+      "category_label": "3. งานบริหาร",
+      "main_type": "ตำแหน่งบริหาร",
+      "subtype": "3.2 งานบริหารระดับสาขาวิชา",
+      "subtype_label": "งานบริหารระดับสาขาวิชา",
+      "role": "ผู้ช่วย / รองหัวหน้าสาขา / เลขา / ผู้ช่วยเลขา",
+      "common": {
+        "semester": "2",
+        "year": "2567",
+        "title": "ทดสอบภาระงาน W093",
+        "evidence_url": "https://example.com",
+        "role_note": "ข้อมูลสมมติ W093"
+      },
+      "inputs": {},
+      "expected": {
+        "score": null,
+        "display": "รอประเมิน",
+        "status": "pending",
+        "student_names_visible": false,
+        "visible_fields": [
+          {
+            "name": "role",
+            "label": "ตำแหน่ง"
+          }
+        ],
+        "save_allowed": true
+      },
+      "actual_result": "",
+      "verdict": "NOT_RUN"
+    },
+    {
+      "id": "W094",
+      "category": "admin",
+      "category_label": "3. งานบริหาร",
+      "main_type": "ตำแหน่งบริหาร",
+      "subtype": "3.2 งานบริหารระดับสาขาวิชา",
+      "subtype_label": "งานบริหารระดับสาขาวิชา",
+      "role": "กรรมการประจำสาขาวิชา",
+      "common": {
+        "semester": "2",
+        "year": "2567",
+        "title": "ทดสอบภาระงาน W094",
+        "evidence_url": "https://example.com",
+        "role_note": "ข้อมูลสมมติ W094"
+      },
+      "inputs": {},
+      "expected": {
+        "score": null,
+        "display": "รอประเมิน",
+        "status": "pending",
+        "student_names_visible": false,
+        "visible_fields": [
+          {
+            "name": "role",
+            "label": "ตำแหน่ง"
+          }
+        ],
+        "save_allowed": true
+      },
+      "actual_result": "",
+      "verdict": "NOT_RUN"
+    },
+    {
+      "id": "W095",
+      "category": "admin",
+      "category_label": "3. งานบริหาร",
+      "main_type": "ประสานงานรายวิชา / ฝึกงาน",
+      "subtype": "3.3 ผู้ประสานงานประจำวิชา",
+      "subtype_label": "ผู้ประสานงานประจำวิชา",
+      "role": "ผู้ประสานงานวิชาที่มีผู้สอน 1 คน",
+      "common": {
+        "semester": "2",
+        "year": "2567",
+        "title": "ทดสอบภาระงาน W095",
+        "evidence_url": "https://example.com",
+        "role_note": "ข้อมูลสมมติ W095"
+      },
+      "inputs": {
+        "course": "CS999",
+        "quantity": "2"
+      },
+      "expected": {
+        "score": 20,
+        "display": "20.00",
+        "status": "calculated",
+        "student_names_visible": false,
+        "visible_fields": [
+          {
+            "name": "role",
+            "label": "ชนิดงาน"
+          },
+          {
+            "name": "course",
+            "label": "รหัสวิชา (ถ้ามี)"
+          },
+          {
+            "name": "quantity",
+            "label": "จำนวนรายวิชา"
+          }
+        ],
+        "save_allowed": true
+      },
+      "actual_result": "",
+      "verdict": "NOT_RUN"
+    },
+    {
+      "id": "W096",
+      "category": "admin",
+      "category_label": "3. งานบริหาร",
+      "main_type": "ประสานงานรายวิชา / ฝึกงาน",
+      "subtype": "3.3 ผู้ประสานงานประจำวิชา",
+      "subtype_label": "ผู้ประสานงานประจำวิชา",
+      "role": "ผู้ประสานงานวิชาที่มีผู้สอนรวม 2–4 คน",
+      "common": {
+        "semester": "2",
+        "year": "2567",
+        "title": "ทดสอบภาระงาน W096",
+        "evidence_url": "https://example.com",
+        "role_note": "ข้อมูลสมมติ W096"
+      },
+      "inputs": {
+        "course": "CS999",
+        "quantity": "2"
+      },
+      "expected": {
+        "score": 40,
+        "display": "40.00",
+        "status": "calculated",
+        "student_names_visible": false,
+        "visible_fields": [
+          {
+            "name": "role",
+            "label": "ชนิดงาน"
+          },
+          {
+            "name": "course",
+            "label": "รหัสวิชา (ถ้ามี)"
+          },
+          {
+            "name": "quantity",
+            "label": "จำนวนรายวิชา"
+          }
+        ],
+        "save_allowed": true
+      },
+      "actual_result": "",
+      "verdict": "NOT_RUN"
+    },
+    {
+      "id": "W097",
+      "category": "admin",
+      "category_label": "3. งานบริหาร",
+      "main_type": "ประสานงานรายวิชา / ฝึกงาน",
+      "subtype": "3.3 ผู้ประสานงานประจำวิชา",
+      "subtype_label": "ผู้ประสานงานประจำวิชา",
+      "role": "ผู้ประสานงานวิชาที่มีผู้สอนรวม 5 คนขึ้นไป",
+      "common": {
+        "semester": "2",
+        "year": "2567",
+        "title": "ทดสอบภาระงาน W097",
+        "evidence_url": "https://example.com",
+        "role_note": "ข้อมูลสมมติ W097"
+      },
+      "inputs": {
+        "course": "CS999",
+        "quantity": "2"
+      },
+      "expected": {
+        "score": 60,
+        "display": "60.00",
+        "status": "calculated",
+        "student_names_visible": false,
+        "visible_fields": [
+          {
+            "name": "role",
+            "label": "ชนิดงาน"
+          },
+          {
+            "name": "course",
+            "label": "รหัสวิชา (ถ้ามี)"
+          },
+          {
+            "name": "quantity",
+            "label": "จำนวนรายวิชา"
+          }
+        ],
+        "save_allowed": true
+      },
+      "actual_result": "",
+      "verdict": "NOT_RUN"
+    },
+    {
+      "id": "W098",
+      "category": "admin",
+      "category_label": "3. งานบริหาร",
+      "main_type": "ประสานงานรายวิชา / ฝึกงาน",
+      "subtype": "3.3 ผู้ประสานงานประจำวิชา",
+      "subtype_label": "ผู้ประสานงานประจำวิชา",
+      "role": "คะแนนเพิ่ม: ผู้ประสานงานวิชาที่มีนักศึกษามากกว่า 300 คน",
+      "common": {
+        "semester": "2",
+        "year": "2567",
+        "title": "ทดสอบภาระงาน W098",
+        "evidence_url": "https://example.com",
+        "role_note": "ข้อมูลสมมติ W098"
+      },
+      "inputs": {
+        "course": "CS999",
+        "quantity": "2",
+        "students": "301"
+      },
+      "expected": {
+        "score": 20,
+        "display": "20.00",
+        "status": "calculated",
+        "student_names_visible": false,
+        "visible_fields": [
+          {
+            "name": "role",
+            "label": "ชนิดงาน"
+          },
+          {
+            "name": "course",
+            "label": "รหัสวิชา (ถ้ามี)"
+          },
+          {
+            "name": "quantity",
+            "label": "จำนวนรายวิชา"
+          },
+          {
+            "name": "students",
+            "label": "จำนวนนักศึกษา"
+          }
+        ],
+        "save_allowed": true
+      },
+      "actual_result": "",
+      "verdict": "NOT_RUN"
+    },
+    {
+      "id": "W099",
+      "category": "admin",
+      "category_label": "3. งานบริหาร",
+      "main_type": "ประสานงานรายวิชา / ฝึกงาน",
+      "subtype": "3.4 ผู้ประสานงานฝึกงาน / ฝึกภาคสนาม",
+      "subtype_label": "ผู้ประสานงานฝึกงาน / ฝึกภาคสนาม",
+      "role": "ผู้ประสานงานฝึกงาน / ฝึกภาคสนาม",
+      "common": {
+        "semester": "2",
+        "year": "2567",
+        "title": "ทดสอบภาระงาน W099",
+        "evidence_url": "https://example.com",
+        "role_note": "ข้อมูลสมมติ W099"
+      },
+      "inputs": {
+        "course": "CS999",
+        "quantity": "2",
+        "share": "50"
+      },
+      "expected": {
+        "score": 50,
+        "display": "50.00",
+        "status": "calculated",
+        "student_names_visible": false,
+        "visible_fields": [
+          {
+            "name": "role",
+            "label": "ชนิดงาน"
+          },
+          {
+            "name": "course",
+            "label": "รหัสวิชา (ถ้ามี)"
+          },
+          {
+            "name": "quantity",
+            "label": "จำนวนรายวิชา"
+          },
+          {
+            "name": "share",
+            "label": "สัดส่วนความรับผิดชอบ (%)"
+          }
+        ],
+        "save_allowed": true
+      },
+      "actual_result": "",
+      "verdict": "NOT_RUN"
+    },
+    {
+      "id": "W100",
+      "category": "admin",
+      "category_label": "3. งานบริหาร",
+      "main_type": "งานอาจารย์ที่ปรึกษา / งานเชิญผู้เชี่ยวชาญ",
+      "subtype": "3.5 อาจารย์ที่ปรึกษา / PostMaster / PostDoc / Visiting Professor",
+      "subtype_label": "อาจารย์ที่ปรึกษา / PostMaster / PostDoc / Visiting Professor",
+      "role": "อาจารย์ที่ปรึกษาทั่วไป (ปริญญาตรี โท และเอก)",
+      "common": {
+        "semester": "2",
+        "year": "2567",
+        "title": "ทดสอบภาระงาน W100",
+        "evidence_url": "https://example.com",
+        "role_note": "ข้อมูลสมมติ W100"
+      },
+      "inputs": {
+        "student_names": "นายทดสอบ หนึ่ง\nนางสาวตัวอย่าง สอง"
+      },
+      "expected": {
+        "score": 25,
+        "display": "25.00",
+        "status": "calculated",
+        "student_names_visible": true,
+        "visible_fields": [
+          {
+            "name": "role",
+            "label": "ชนิดงาน"
+          }
+        ],
+        "save_allowed": true
+      },
+      "actual_result": "",
+      "verdict": "NOT_RUN"
+    },
+    {
+      "id": "W101",
+      "category": "admin",
+      "category_label": "3. งานบริหาร",
+      "main_type": "งานอาจารย์ที่ปรึกษา / งานเชิญผู้เชี่ยวชาญ",
+      "subtype": "3.5 อาจารย์ที่ปรึกษา / PostMaster / PostDoc / Visiting Professor",
+      "subtype_label": "อาจารย์ที่ปรึกษา / PostMaster / PostDoc / Visiting Professor",
+      "role": "อาจารย์ที่ปรึกษา PostMaster / PostDoc",
+      "common": {
+        "semester": "2",
+        "year": "2567",
+        "title": "ทดสอบภาระงาน W101",
+        "evidence_url": "https://example.com",
+        "role_note": "ข้อมูลสมมติ W101"
+      },
+      "inputs": {
+        "student_names": "นายทดสอบ หนึ่ง\nนางสาวตัวอย่าง สอง"
+      },
+      "expected": {
+        "score": 25,
+        "display": "25.00",
+        "status": "calculated",
+        "student_names_visible": true,
+        "visible_fields": [
+          {
+            "name": "role",
+            "label": "ชนิดงาน"
+          }
+        ],
+        "save_allowed": true
+      },
+      "actual_result": "",
+      "verdict": "NOT_RUN"
+    },
+    {
+      "id": "W102",
+      "category": "admin",
+      "category_label": "3. งานบริหาร",
+      "main_type": "งานอาจารย์ที่ปรึกษา / งานเชิญผู้เชี่ยวชาญ",
+      "subtype": "3.5 อาจารย์ที่ปรึกษา / PostMaster / PostDoc / Visiting Professor",
+      "subtype_label": "อาจารย์ที่ปรึกษา / PostMaster / PostDoc / Visiting Professor",
+      "role": "งานเชิญ Visiting Professor / Invited Speaker",
+      "common": {
+        "semester": "2",
+        "year": "2567",
+        "title": "ทดสอบภาระงาน W102",
+        "evidence_url": "https://example.com",
+        "role_note": "ข้อมูลสมมติ W102"
+      },
+      "inputs": {},
+      "expected": {
+        "score": 25,
+        "display": "25.00",
+        "status": "calculated",
+        "student_names_visible": false,
+        "visible_fields": [
+          {
+            "name": "role",
+            "label": "ชนิดงาน"
+          }
+        ],
+        "save_allowed": true
+      },
+      "actual_result": "",
+      "verdict": "NOT_RUN"
+    },
+    {
+      "id": "W103",
+      "category": "service",
+      "category_label": "4. งานบริการวิชาการและอื่น ๆ",
+      "main_type": "คณะทำงาน / กรรมการ",
+      "subtype": "4.1.1 คณะทำงาน / กรรมการระดับคณะหรือสาขา",
+      "subtype_label": "คณะทำงาน / กรรมการระดับคณะหรือสาขา",
+      "role": "ประธาน / เลขานุการ",
+      "common": {
+        "semester": "2",
+        "year": "2567",
+        "title": "ทดสอบภาระงาน W103",
+        "evidence_url": "https://example.com",
+        "role_note": "ข้อมูลสมมติ W103"
+      },
+      "inputs": {
+        "organization": "หน่วยงานทดสอบภาระงาน",
+        "quantity": "2"
+      },
+      "expected": {
+        "score": 30,
+        "display": "30.00",
+        "status": "calculated",
+        "student_names_visible": false,
+        "visible_fields": [
+          {
+            "name": "role",
+            "label": "หน้าที่ / บทบาท"
+          },
+          {
+            "name": "organization",
+            "label": "หน่วยงาน / วารสาร"
+          },
+          {
+            "name": "quantity",
+            "label": "จำนวนคำสั่ง"
+          }
+        ],
+        "save_allowed": true
+      },
+      "actual_result": "",
+      "verdict": "NOT_RUN"
+    },
+    {
+      "id": "W104",
+      "category": "service",
+      "category_label": "4. งานบริการวิชาการและอื่น ๆ",
+      "main_type": "คณะทำงาน / กรรมการ",
+      "subtype": "4.1.1 คณะทำงาน / กรรมการระดับคณะหรือสาขา",
+      "subtype_label": "คณะทำงาน / กรรมการระดับคณะหรือสาขา",
+      "role": "คณะทำงาน",
+      "common": {
+        "semester": "2",
+        "year": "2567",
+        "title": "ทดสอบภาระงาน W104",
+        "evidence_url": "https://example.com",
+        "role_note": "ข้อมูลสมมติ W104"
+      },
+      "inputs": {
+        "organization": "หน่วยงานทดสอบภาระงาน",
+        "quantity": "2"
+      },
+      "expected": {
+        "score": 20,
+        "display": "20.00",
+        "status": "calculated",
+        "student_names_visible": false,
+        "visible_fields": [
+          {
+            "name": "role",
+            "label": "หน้าที่ / บทบาท"
+          },
+          {
+            "name": "organization",
+            "label": "หน่วยงาน / วารสาร"
+          },
+          {
+            "name": "quantity",
+            "label": "จำนวนคำสั่ง"
+          }
+        ],
+        "save_allowed": true
+      },
+      "actual_result": "",
+      "verdict": "NOT_RUN"
+    },
+    {
+      "id": "W105",
+      "category": "service",
+      "category_label": "4. งานบริการวิชาการและอื่น ๆ",
+      "main_type": "คณะทำงาน / กรรมการ",
+      "subtype": "4.2.1 กรรมการ / คณะทำงานนอกคณะ",
+      "subtype_label": "กรรมการ / คณะทำงานนอกคณะ",
+      "role": "ประธาน / เลขานุการ",
+      "common": {
+        "semester": "2",
+        "year": "2567",
+        "title": "ทดสอบภาระงาน W105",
+        "evidence_url": "https://example.com",
+        "role_note": "ข้อมูลสมมติ W105"
+      },
+      "inputs": {
+        "organization": "หน่วยงานทดสอบภาระงาน",
+        "quantity": "2"
+      },
+      "expected": {
+        "score": 30,
+        "display": "30.00",
+        "status": "calculated",
+        "student_names_visible": false,
+        "visible_fields": [
+          {
+            "name": "role",
+            "label": "หน้าที่ / บทบาท"
+          },
+          {
+            "name": "organization",
+            "label": "หน่วยงาน / วารสาร"
+          },
+          {
+            "name": "quantity",
+            "label": "จำนวนคำสั่ง"
+          }
+        ],
+        "save_allowed": true
+      },
+      "actual_result": "",
+      "verdict": "NOT_RUN"
+    },
+    {
+      "id": "W106",
+      "category": "service",
+      "category_label": "4. งานบริการวิชาการและอื่น ๆ",
+      "main_type": "คณะทำงาน / กรรมการ",
+      "subtype": "4.2.1 กรรมการ / คณะทำงานนอกคณะ",
+      "subtype_label": "กรรมการ / คณะทำงานนอกคณะ",
+      "role": "กรรมการ",
+      "common": {
+        "semester": "2",
+        "year": "2567",
+        "title": "ทดสอบภาระงาน W106",
+        "evidence_url": "https://example.com",
+        "role_note": "ข้อมูลสมมติ W106"
+      },
+      "inputs": {
+        "organization": "หน่วยงานทดสอบภาระงาน",
+        "quantity": "2"
+      },
+      "expected": {
+        "score": 20,
+        "display": "20.00",
+        "status": "calculated",
+        "student_names_visible": false,
+        "visible_fields": [
+          {
+            "name": "role",
+            "label": "หน้าที่ / บทบาท"
+          },
+          {
+            "name": "organization",
+            "label": "หน่วยงาน / วารสาร"
+          },
+          {
+            "name": "quantity",
+            "label": "จำนวนคำสั่ง"
+          }
+        ],
+        "save_allowed": true
+      },
+      "actual_result": "",
+      "verdict": "NOT_RUN"
+    },
+    {
+      "id": "W107",
+      "category": "service",
+      "category_label": "4. งานบริการวิชาการและอื่น ๆ",
+      "main_type": "บริหารนอกคณะใน มธ.",
+      "subtype": "4.2.2 ตำแหน่งบริหารนอกคณะใน มธ.",
+      "subtype_label": "ตำแหน่งบริหารนอกคณะใน มธ.",
+      "role": "ตำแหน่งบริหารนอกคณะใน มธ. (อธิการบดี / รองอธิการบดี / ผู้ช่วยอธิการบดี / ผู้อำนวยการสำนักหรือสถาบัน / ผู้อำนวยการโครงการ / รองผู้อำนวยการ)",
+      "common": {
+        "semester": "2",
+        "year": "2567",
+        "title": "ทดสอบภาระงาน W107",
+        "evidence_url": "https://example.com",
+        "role_note": "ข้อมูลสมมติ W107"
+      },
+      "inputs": {
+        "organization": "หน่วยงานทดสอบภาระงาน"
+      },
+      "expected": {
+        "score": 40,
+        "display": "40.00",
+        "status": "calculated",
+        "student_names_visible": false,
+        "visible_fields": [
+          {
+            "name": "role",
+            "label": "หน้าที่ / บทบาท"
+          },
+          {
+            "name": "organization",
+            "label": "หน่วยงาน / วารสาร"
+          }
+        ],
+        "save_allowed": true
+      },
+      "actual_result": "",
+      "verdict": "NOT_RUN"
+    },
+    {
+      "id": "W108",
+      "category": "service",
+      "category_label": "4. งานบริการวิชาการและอื่น ๆ",
+      "main_type": "บริการวิชาการแก่สังคม",
+      "subtype": "4.3 บริการวิชาการแก่สังคม",
+      "subtype_label": "บริการวิชาการแก่สังคม",
+      "role": "วิทยากร / ที่ปรึกษา / ผู้ทรงคุณวุฒิของทางราชการ (หน่วยงานภายนอก) ที่ได้รับอนุญาตจากคณะ",
+      "common": {
+        "semester": "2",
+        "year": "2567",
+        "title": "ทดสอบภาระงาน W108",
+        "evidence_url": "https://example.com",
+        "role_note": "ข้อมูลสมมติ W108"
+      },
+      "inputs": {
+        "organization": "หน่วยงานทดสอบภาระงาน",
+        "quantity": "2",
+        "share": "50"
+      },
+      "expected": {
+        "score": 15,
+        "display": "15.00",
+        "status": "calculated",
+        "student_names_visible": false,
+        "visible_fields": [
+          {
+            "name": "role",
+            "label": "หน้าที่ / บทบาท"
+          },
+          {
+            "name": "organization",
+            "label": "หน่วยงาน / วารสาร"
+          },
+          {
+            "name": "quantity",
+            "label": "จำนวนคำสั่ง / เรื่อง / คน"
+          },
+          {
+            "name": "share",
+            "label": "สัดส่วนความรับผิดชอบ (%)"
+          }
+        ],
+        "save_allowed": true
+      },
+      "actual_result": "",
+      "verdict": "NOT_RUN"
+    },
+    {
+      "id": "W109",
+      "category": "service",
+      "category_label": "4. งานบริการวิชาการและอื่น ๆ",
+      "main_type": "บริการวิชาการแก่สังคม",
+      "subtype": "4.3 บริการวิชาการแก่สังคม",
+      "subtype_label": "บริการวิชาการแก่สังคม",
+      "role": "อาจารย์ที่ปรึกษาวิทยานิพนธ์ร่วม / สารนิพนธ์ / กรรมการสอบโครงร่าง / กรรมการสอบ",
+      "common": {
+        "semester": "2",
+        "year": "2567",
+        "title": "ทดสอบภาระงาน W109",
+        "evidence_url": "https://example.com",
+        "role_note": "ข้อมูลสมมติ W109"
+      },
+      "inputs": {
+        "organization": "หน่วยงานทดสอบภาระงาน",
+        "quantity": "2",
+        "share": "50",
+        "student_names": "นายทดสอบ หนึ่ง\nนางสาวตัวอย่าง สอง"
+      },
+      "expected": {
+        "score": 15,
+        "display": "15.00",
+        "status": "calculated",
+        "student_names_visible": true,
+        "visible_fields": [
+          {
+            "name": "role",
+            "label": "หน้าที่ / บทบาท"
+          },
+          {
+            "name": "organization",
+            "label": "หน่วยงาน / วารสาร"
+          },
+          {
+            "name": "quantity",
+            "label": "จำนวนคำสั่ง / เรื่อง / คน"
+          },
+          {
+            "name": "share",
+            "label": "สัดส่วนความรับผิดชอบ (%)"
+          }
+        ],
+        "save_allowed": true
+      },
+      "actual_result": "",
+      "verdict": "NOT_RUN"
+    },
+    {
+      "id": "W110",
+      "category": "service",
+      "category_label": "4. งานบริการวิชาการและอื่น ๆ",
+      "main_type": "บริการวิชาการแก่สังคม",
+      "subtype": "4.3 บริการวิชาการแก่สังคม",
+      "subtype_label": "บริการวิชาการแก่สังคม",
+      "role": "เอกสารหรือบทความวิชาการในหนังสือพิมพ์ / สื่อสิ่งพิมพ์ / สื่อออนไลน์",
+      "common": {
+        "semester": "2",
+        "year": "2567",
+        "title": "ทดสอบภาระงาน W110",
+        "evidence_url": "https://example.com",
+        "role_note": "ข้อมูลสมมติ W110"
+      },
+      "inputs": {
+        "organization": "หน่วยงานทดสอบภาระงาน",
+        "quantity": "2",
+        "share": "50"
+      },
+      "expected": {
+        "score": 15,
+        "display": "15.00",
+        "status": "calculated",
+        "student_names_visible": false,
+        "visible_fields": [
+          {
+            "name": "role",
+            "label": "หน้าที่ / บทบาท"
+          },
+          {
+            "name": "organization",
+            "label": "หน่วยงาน / วารสาร"
+          },
+          {
+            "name": "quantity",
+            "label": "จำนวนคำสั่ง / เรื่อง / คน"
+          },
+          {
+            "name": "share",
+            "label": "สัดส่วนความรับผิดชอบ (%)"
+          }
+        ],
+        "save_allowed": true
+      },
+      "actual_result": "",
+      "verdict": "NOT_RUN"
+    },
+    {
+      "id": "W111",
+      "category": "service",
+      "category_label": "4. งานบริการวิชาการและอื่น ๆ",
+      "main_type": "บริการวิชาการแก่สังคม",
+      "subtype": "4.3 บริการวิชาการแก่สังคม",
+      "subtype_label": "บริการวิชาการแก่สังคม",
+      "role": "งานบริการวิชาการอื่นของทางราชการที่ไม่ใช่งานสอน / ให้สัมภาษณ์สื่อ",
+      "common": {
+        "semester": "2",
+        "year": "2567",
+        "title": "ทดสอบภาระงาน W111",
+        "evidence_url": "https://example.com",
+        "role_note": "ข้อมูลสมมติ W111"
+      },
+      "inputs": {
+        "organization": "หน่วยงานทดสอบภาระงาน",
+        "quantity": "2",
+        "share": "50"
+      },
+      "expected": {
+        "score": 15,
+        "display": "15.00",
+        "status": "calculated",
+        "student_names_visible": false,
+        "visible_fields": [
+          {
+            "name": "role",
+            "label": "หน้าที่ / บทบาท"
+          },
+          {
+            "name": "organization",
+            "label": "หน่วยงาน / วารสาร"
+          },
+          {
+            "name": "quantity",
+            "label": "จำนวนคำสั่ง / เรื่อง / คน"
+          },
+          {
+            "name": "share",
+            "label": "สัดส่วนความรับผิดชอบ (%)"
+          }
+        ],
+        "save_allowed": true
+      },
+      "actual_result": "",
+      "verdict": "NOT_RUN"
+    },
+    {
+      "id": "W112",
+      "category": "service",
+      "category_label": "4. งานบริการวิชาการและอื่น ๆ",
+      "main_type": "ประเมินผลงาน / ตำแหน่งทางวิชาการ",
+      "subtype": "4.4 ประเมินผลงานทางวิชาการ",
+      "subtype_label": "ประเมินผลงานทางวิชาการ",
+      "role": "ผู้ประเมินระดับนานาชาติ",
+      "common": {
+        "semester": "2",
+        "year": "2567",
+        "title": "ทดสอบภาระงาน W112",
+        "evidence_url": "https://example.com",
+        "role_note": "ข้อมูลสมมติ W112"
+      },
+      "inputs": {
+        "organization": "หน่วยงานทดสอบภาระงาน",
+        "quantity": "2"
+      },
+      "expected": {
+        "score": 30,
+        "display": "30.00",
+        "status": "calculated",
+        "student_names_visible": false,
+        "visible_fields": [
+          {
+            "name": "role",
+            "label": "หน้าที่ / บทบาท"
+          },
+          {
+            "name": "organization",
+            "label": "หน่วยงาน / วารสาร"
+          },
+          {
+            "name": "quantity",
+            "label": "จำนวนคำสั่ง / เรื่อง / คน"
+          }
+        ],
+        "save_allowed": true
+      },
+      "actual_result": "",
+      "verdict": "NOT_RUN"
+    },
+    {
+      "id": "W113",
+      "category": "service",
+      "category_label": "4. งานบริการวิชาการและอื่น ๆ",
+      "main_type": "ประเมินผลงาน / ตำแหน่งทางวิชาการ",
+      "subtype": "4.4 ประเมินผลงานทางวิชาการ",
+      "subtype_label": "ประเมินผลงานทางวิชาการ",
+      "role": "ผู้ประเมินระดับประเทศ",
+      "common": {
+        "semester": "2",
+        "year": "2567",
+        "title": "ทดสอบภาระงาน W113",
+        "evidence_url": "https://example.com",
+        "role_note": "ข้อมูลสมมติ W113"
+      },
+      "inputs": {
+        "organization": "หน่วยงานทดสอบภาระงาน",
+        "quantity": "2"
+      },
+      "expected": {
+        "score": 20,
+        "display": "20.00",
+        "status": "calculated",
+        "student_names_visible": false,
+        "visible_fields": [
+          {
+            "name": "role",
+            "label": "หน้าที่ / บทบาท"
+          },
+          {
+            "name": "organization",
+            "label": "หน่วยงาน / วารสาร"
+          },
+          {
+            "name": "quantity",
+            "label": "จำนวนคำสั่ง / เรื่อง / คน"
+          }
+        ],
+        "save_allowed": true
+      },
+      "actual_result": "",
+      "verdict": "NOT_RUN"
+    },
+    {
+      "id": "W114",
+      "category": "service",
+      "category_label": "4. งานบริการวิชาการและอื่น ๆ",
+      "main_type": "ประเมินผลงาน / ตำแหน่งทางวิชาการ",
+      "subtype": "4.5 ประเมินตำแหน่งทางวิชาการ",
+      "subtype_label": "ประเมินตำแหน่งทางวิชาการ",
+      "role": "ผู้ประเมินตำแหน่งทางวิชาการ",
+      "common": {
+        "semester": "2",
+        "year": "2567",
+        "title": "ทดสอบภาระงาน W114",
+        "evidence_url": "https://example.com",
+        "role_note": "ข้อมูลสมมติ W114"
+      },
+      "inputs": {
+        "organization": "หน่วยงานทดสอบภาระงาน",
+        "quantity": "2"
+      },
+      "expected": {
+        "score": 40,
+        "display": "40.00",
+        "status": "calculated",
+        "student_names_visible": false,
+        "visible_fields": [
+          {
+            "name": "role",
+            "label": "หน้าที่ / บทบาท"
+          },
+          {
+            "name": "organization",
+            "label": "หน่วยงาน / วารสาร"
+          },
+          {
+            "name": "quantity",
+            "label": "จำนวนผู้รับการประเมิน (คน)"
+          }
+        ],
+        "save_allowed": true
+      },
+      "actual_result": "",
+      "verdict": "NOT_RUN"
+    },
+    {
+      "id": "W115",
+      "category": "service",
+      "category_label": "4. งานบริการวิชาการและอื่น ๆ",
+      "main_type": "บรรณาธิการ",
+      "subtype": "4.6 บรรณาธิการ / Editor",
+      "subtype_label": "บรรณาธิการ / Editor",
+      "role": "บรรณาธิการ / Editor",
+      "common": {
+        "semester": "2",
+        "year": "2567",
+        "title": "ทดสอบภาระงาน W115",
+        "evidence_url": "https://example.com",
+        "role_note": "ข้อมูลสมมติ W115"
+      },
+      "inputs": {
+        "organization": "หน่วยงานทดสอบภาระงาน",
+        "quantity": "2"
+      },
+      "expected": {
+        "score": 40,
+        "display": "40.00",
+        "status": "calculated",
+        "student_names_visible": false,
+        "visible_fields": [
+          {
+            "name": "role",
+            "label": "หน้าที่ / บทบาท"
+          },
+          {
+            "name": "organization",
+            "label": "หน่วยงาน / วารสาร"
+          },
+          {
+            "name": "quantity",
+            "label": "จำนวนวารสาร"
+          }
+        ],
+        "save_allowed": true
+      },
+      "actual_result": "",
+      "verdict": "NOT_RUN"
+    }
+  ],
+  "boundary_cases": [
+    {
+      "id": "N01",
+      "title": "นักศึกษา 0 คน",
+      "route": {
+        "category": "1. งานสอน",
+        "main_type": "วิชาบรรยาย",
+        "subtype": "วิชาบรรยาย (ปริญญาตรี)",
+        "role": "ผู้สอนวิชาบรรยาย"
+      },
+      "inputs": {
+        "credits": 3,
+        "students": 0,
+        "share": 100
+      },
+      "expected": "200.00 คะแนน",
+      "steps": "",
+      "actual_result": "",
+      "verdict": "NOT_RUN"
+    },
+    {
+      "id": "N02",
+      "title": "นักศึกษา 99 คน",
+      "route": {
+        "category": "1. งานสอน",
+        "main_type": "วิชาบรรยาย",
+        "subtype": "วิชาบรรยาย (ปริญญาตรี)",
+        "role": "ผู้สอนวิชาบรรยาย"
+      },
+      "inputs": {
+        "credits": 3,
+        "students": 99,
+        "share": 100
+      },
+      "expected": "200.00 คะแนน",
+      "steps": "",
+      "actual_result": "",
+      "verdict": "NOT_RUN"
+    },
+    {
+      "id": "N03",
+      "title": "นักศึกษา 100 คน",
+      "route": {
+        "category": "1. งานสอน",
+        "main_type": "วิชาบรรยาย",
+        "subtype": "วิชาบรรยาย (ปริญญาตรี)",
+        "role": "ผู้สอนวิชาบรรยาย"
+      },
+      "inputs": {
+        "credits": 3,
+        "students": 100,
+        "share": 100
+      },
+      "expected": "220.00 คะแนน",
+      "steps": "",
+      "actual_result": "",
+      "verdict": "NOT_RUN"
+    },
+    {
+      "id": "N04",
+      "title": "นักศึกษา 250 คน",
+      "route": {
+        "category": "1. งานสอน",
+        "main_type": "วิชาบรรยาย",
+        "subtype": "วิชาบรรยาย (ปริญญาตรี)",
+        "role": "ผู้สอนวิชาบรรยาย"
+      },
+      "inputs": {
+        "credits": 3,
+        "students": 250,
+        "share": 100
+      },
+      "expected": "220.00 คะแนน",
+      "steps": "",
+      "actual_result": "",
+      "verdict": "NOT_RUN"
+    },
+    {
+      "id": "N05",
+      "title": "นักศึกษา 251 คน",
+      "route": {
+        "category": "1. งานสอน",
+        "main_type": "วิชาบรรยาย",
+        "subtype": "วิชาบรรยาย (ปริญญาตรี)",
+        "role": "ผู้สอนวิชาบรรยาย"
+      },
+      "inputs": {
+        "credits": 3,
+        "students": 251,
+        "share": 100
+      },
+      "expected": "240.00 คะแนน",
+      "steps": "",
+      "actual_result": "",
+      "verdict": "NOT_RUN"
+    },
+    {
+      "id": "N06",
+      "title": "นักศึกษา 500 คน",
+      "route": {
+        "category": "1. งานสอน",
+        "main_type": "วิชาบรรยาย",
+        "subtype": "วิชาบรรยาย (ปริญญาตรี)",
+        "role": "ผู้สอนวิชาบรรยาย"
+      },
+      "inputs": {
+        "credits": 3,
+        "students": 500,
+        "share": 100
+      },
+      "expected": "240.00 คะแนน",
+      "steps": "",
+      "actual_result": "",
+      "verdict": "NOT_RUN"
+    },
+    {
+      "id": "N07",
+      "title": "นักศึกษา 501 คน",
+      "route": {
+        "category": "1. งานสอน",
+        "main_type": "วิชาบรรยาย",
+        "subtype": "วิชาบรรยาย (ปริญญาตรี)",
+        "role": "ผู้สอนวิชาบรรยาย"
+      },
+      "inputs": {
+        "credits": 3,
+        "students": 501,
+        "share": 100
+      },
+      "expected": "260.00 คะแนน",
+      "steps": "",
+      "actual_result": "",
+      "verdict": "NOT_RUN"
+    },
+    {
+      "id": "N08",
+      "title": "สัดส่วน 0%",
+      "route": {
+        "category": "1. งานสอน",
+        "main_type": "วิชาบรรยาย",
+        "subtype": "วิชาบรรยาย (ปริญญาตรี)",
+        "role": "ผู้สอนวิชาบรรยาย"
+      },
+      "inputs": {
+        "credits": 3,
+        "students": 99,
+        "share": 0
+      },
+      "expected": "0.00 คะแนน",
+      "steps": "",
+      "actual_result": "",
+      "verdict": "NOT_RUN"
+    },
+    {
+      "id": "N09",
+      "title": "สัดส่วน 20%",
+      "route": {
+        "category": "1. งานสอน",
+        "main_type": "วิชาบรรยาย",
+        "subtype": "วิชาบรรยาย (ปริญญาตรี)",
+        "role": "ผู้สอนวิชาบรรยาย"
+      },
+      "inputs": {
+        "credits": 3,
+        "students": 99,
+        "share": 20
+      },
+      "expected": "40.00 คะแนน",
+      "steps": "",
+      "actual_result": "",
+      "verdict": "NOT_RUN"
+    },
+    {
+      "id": "N10",
+      "title": "สัดส่วน 50%",
+      "route": {
+        "category": "1. งานสอน",
+        "main_type": "วิชาบรรยาย",
+        "subtype": "วิชาบรรยาย (ปริญญาตรี)",
+        "role": "ผู้สอนวิชาบรรยาย"
+      },
+      "inputs": {
+        "credits": 3,
+        "students": 99,
+        "share": 50
+      },
+      "expected": "100.00 คะแนน",
+      "steps": "",
+      "actual_result": "",
+      "verdict": "NOT_RUN"
+    },
+    {
+      "id": "N11",
+      "title": "สัดส่วน 100%",
+      "route": {
+        "category": "1. งานสอน",
+        "main_type": "วิชาบรรยาย",
+        "subtype": "วิชาบรรยาย (ปริญญาตรี)",
+        "role": "ผู้สอนวิชาบรรยาย"
+      },
+      "inputs": {
+        "credits": 3,
+        "students": 99,
+        "share": 100
+      },
+      "expected": "200.00 คะแนน",
+      "steps": "",
+      "actual_result": "",
+      "verdict": "NOT_RUN"
+    },
+    {
+      "id": "N12",
+      "title": "หน่วยกิตทศนิยม",
+      "route": {
+        "category": "1. งานสอน",
+        "main_type": "วิชาบรรยาย",
+        "subtype": "วิชาบรรยาย (ปริญญาตรี)",
+        "role": "ผู้สอนวิชาบรรยาย"
+      },
+      "inputs": {
+        "credits": 1.5,
+        "students": 99,
+        "share": 50
+      },
+      "expected": "50.00 คะแนน",
+      "steps": "",
+      "actual_result": "",
+      "verdict": "NOT_RUN"
+    },
+    {
+      "id": "N13",
+      "title": "คำนวณจากหน่วยกิตวิทยานิพนธ์",
+      "route": {
+        "category": "1. งานสอน",
+        "main_type": "วิทยานิพนธ์",
+        "subtype": "วิทยานิพนธ์",
+        "role": "ที่ปรึกษาหลัก"
+      },
+      "inputs": {
+        "credits": 6,
+        "share": 50
+      },
+      "expected": "60.00 คะแนน",
+      "steps": "",
+      "actual_result": "",
+      "verdict": "NOT_RUN"
+    },
+    {
+      "id": "N14",
+      "title": "คำนวณตามจำนวน Chapter",
+      "route": {
+        "category": "2. งานวิชาการ",
+        "main_type": "หนังสือ / ตำรา / Book Chapter",
+        "subtype": "Book Chapter",
+        "role": "Book Chapter"
+      },
+      "inputs": {
+        "quantity": 3,
+        "share": 50
+      },
+      "expected": "120.00 คะแนน",
+      "steps": "",
+      "actual_result": "",
+      "verdict": "NOT_RUN"
+    },
+    {
+      "id": "N15",
+      "title": "ข้อมูลศูนย์ไม่ใช่ค่าว่าง",
+      "route": {
+        "category": "1. งานสอน",
+        "main_type": "โครงงาน / ปัญหาพิเศษ",
+        "subtype": "ซีเนียร์โปรเจก / ปัญหาพิเศษ",
+        "role": "อาจารย์ที่ปรึกษา"
+      },
+      "inputs": {
+        "quantity": 0,
+        "share": 100
+      },
+      "expected": "0.00 คะแนน; บันทึกได้ตามกฎปัจจุบัน",
+      "steps": "",
+      "actual_result": "",
+      "verdict": "NOT_RUN"
+    },
+    {
+      "id": "N16",
+      "title": "คะแนนเพิ่มที่ 300 คน",
+      "route": {
+        "category": "3. งานบริหาร",
+        "main_type": "ประสานงานรายวิชา / ฝึกงาน",
+        "subtype": "ผู้ประสานงานประจำวิชา",
+        "role": "คะแนนเพิ่ม: ผู้ประสานงานวิชาที่มีนักศึกษามากกว่า 300 คน"
+      },
+      "inputs": {
+        "students": 300,
+        "quantity": 1
+      },
+      "expected": "คะแนน —; เพิ่มรายการไม่ได้",
+      "steps": "",
+      "actual_result": "",
+      "verdict": "NOT_RUN"
+    },
+    {
+      "id": "N17",
+      "title": "คะแนนเพิ่มที่ 301 คน",
+      "route": {
+        "category": "3. งานบริหาร",
+        "main_type": "ประสานงานรายวิชา / ฝึกงาน",
+        "subtype": "ผู้ประสานงานประจำวิชา",
+        "role": "คะแนนเพิ่ม: ผู้ประสานงานวิชาที่มีนักศึกษามากกว่า 300 คน"
+      },
+      "inputs": {
+        "students": 301,
+        "quantity": 1
+      },
+      "expected": "10.00 คะแนน",
+      "steps": "",
+      "actual_result": "",
+      "verdict": "NOT_RUN"
+    },
+    {
+      "id": "N18",
+      "title": "ล้างหน่วยกิตที่จำเป็น",
+      "route": {
+        "category": "1. งานสอน",
+        "main_type": "วิชาบรรยาย",
+        "subtype": "วิชาบรรยาย (ปริญญาตรี)",
+        "role": "ผู้สอนวิชาบรรยาย"
+      },
+      "inputs": {
+        "credits": "",
+        "students": 99,
+        "share": 100
+      },
+      "expected": "คะแนน —; เพิ่มรายการไม่ได้",
+      "steps": "",
+      "actual_result": "",
+      "verdict": "NOT_RUN"
+    },
+    {
+      "id": "N19",
+      "title": "สัดส่วนมากกว่า 100",
+      "route": {
+        "category": "1. งานสอน",
+        "main_type": "โครงงาน / ปัญหาพิเศษ",
+        "subtype": "ซีเนียร์โปรเจก / ปัญหาพิเศษ",
+        "role": "อาจารย์ที่ปรึกษา"
+      },
+      "inputs": {
+        "quantity": 2,
+        "share": 101
+      },
+      "expected": "เพิ่มรายการไม่ได้",
+      "steps": "",
+      "actual_result": "",
+      "verdict": "NOT_RUN"
+    },
+    {
+      "id": "N20",
+      "title": "สัดส่วนติดลบ",
+      "route": {
+        "category": "1. งานสอน",
+        "main_type": "โครงงาน / ปัญหาพิเศษ",
+        "subtype": "ซีเนียร์โปรเจก / ปัญหาพิเศษ",
+        "role": "อาจารย์ที่ปรึกษา"
+      },
+      "inputs": {
+        "quantity": 2,
+        "share": -1
+      },
+      "expected": "เพิ่มรายการไม่ได้",
+      "steps": "",
+      "actual_result": "",
+      "verdict": "NOT_RUN"
+    },
+    {
+      "id": "N21",
+      "title": "จำนวนนักศึกษาทศนิยม",
+      "route": {
+        "category": "1. งานสอน",
+        "main_type": "วิชาบรรยาย",
+        "subtype": "วิชาบรรยาย (ปริญญาตรี)",
+        "role": "ผู้สอนวิชาบรรยาย"
+      },
+      "inputs": {
+        "credits": 3,
+        "students": 1.5,
+        "share": 100
+      },
+      "expected": "คะแนน —; เพิ่มรายการไม่ได้",
+      "steps": "",
+      "actual_result": "",
+      "verdict": "NOT_RUN"
+    },
+    {
+      "id": "N22",
+      "title": "จำนวนเรื่องทศนิยม",
+      "route": {
+        "category": "1. งานสอน",
+        "main_type": "โครงงาน / ปัญหาพิเศษ",
+        "subtype": "ซีเนียร์โปรเจก / ปัญหาพิเศษ",
+        "role": "อาจารย์ที่ปรึกษา"
+      },
+      "inputs": {
+        "quantity": 1.5,
+        "share": 100
+      },
+      "expected": "เพิ่มรายการไม่ได้ เพราะจำนวนเรื่องต้องเป็นจำนวนเต็ม; ช่องคะแนนอาจแสดงผลระหว่างพิมพ์",
+      "steps": "",
+      "actual_result": "",
+      "verdict": "NOT_RUN"
+    },
+    {
+      "id": "N23",
+      "title": "หน่วยกิตติดลบ",
+      "route": {
+        "category": "1. งานสอน",
+        "main_type": "วิชาบรรยาย",
+        "subtype": "วิชาบรรยาย (ปริญญาตรี)",
+        "role": "ผู้สอนวิชาบรรยาย"
+      },
+      "inputs": {
+        "credits": -3,
+        "students": 99,
+        "share": 100
+      },
+      "expected": "เพิ่มรายการไม่ได้",
+      "steps": "",
+      "actual_result": "",
+      "verdict": "NOT_RUN"
+    },
+    {
+      "id": "N24",
+      "title": "ชื่อรายการเป็นช่องว่าง",
+      "route": {
+        "category": "1. งานสอน",
+        "main_type": "โครงงาน / ปัญหาพิเศษ",
+        "subtype": "ซีเนียร์โปรเจก / ปัญหาพิเศษ",
+        "role": "อาจารย์ที่ปรึกษา"
+      },
+      "inputs": {
+        "quantity": 2,
+        "share": 100,
+        "title": "   "
+      },
+      "expected": "เพิ่มรายการไม่ได้",
+      "steps": "",
+      "actual_result": "",
+      "verdict": "NOT_RUN"
+    },
+    {
+      "id": "N25",
+      "title": "ปีต่ำกว่าที่อนุญาต",
+      "route": {
+        "category": "1. งานสอน",
+        "main_type": "โครงงาน / ปัญหาพิเศษ",
+        "subtype": "ซีเนียร์โปรเจก / ปัญหาพิเศษ",
+        "role": "อาจารย์ที่ปรึกษา"
+      },
+      "inputs": {
+        "quantity": 2,
+        "share": 100,
+        "year": 2499
+      },
+      "expected": "เพิ่มรายการไม่ได้",
+      "steps": "",
+      "actual_result": "",
+      "verdict": "NOT_RUN"
+    },
+    {
+      "id": "N26",
+      "title": "ปีสูงกว่าที่อนุญาต",
+      "route": {
+        "category": "1. งานสอน",
+        "main_type": "โครงงาน / ปัญหาพิเศษ",
+        "subtype": "ซีเนียร์โปรเจก / ปัญหาพิเศษ",
+        "role": "อาจารย์ที่ปรึกษา"
+      },
+      "inputs": {
+        "quantity": 2,
+        "share": 100,
+        "year": 2701
+      },
+      "expected": "เพิ่มรายการไม่ได้",
+      "steps": "",
+      "actual_result": "",
+      "verdict": "NOT_RUN"
+    },
+    {
+      "id": "N27",
+      "title": "ลิงก์หลักฐานไม่ใช่ HTTP(S)",
+      "route": {
+        "category": "1. งานสอน",
+        "main_type": "โครงงาน / ปัญหาพิเศษ",
+        "subtype": "ซีเนียร์โปรเจก / ปัญหาพิเศษ",
+        "role": "อาจารย์ที่ปรึกษา"
+      },
+      "inputs": {
+        "quantity": 2,
+        "share": 100,
+        "evidence_url": "javascript:alert(1)"
+      },
+      "expected": "เพิ่มรายการไม่ได้",
+      "steps": "",
+      "actual_result": "",
+      "verdict": "NOT_RUN"
+    },
+    {
+      "id": "N28",
+      "title": "ลิงก์หลักฐานเว้นว่าง",
+      "route": {
+        "category": "1. งานสอน",
+        "main_type": "โครงงาน / ปัญหาพิเศษ",
+        "subtype": "ซีเนียร์โปรเจก / ปัญหาพิเศษ",
+        "role": "อาจารย์ที่ปรึกษา"
+      },
+      "inputs": {
+        "quantity": 2,
+        "share": 100,
+        "evidence_url": ""
+      },
+      "expected": "80.00 คะแนน; เพิ่มรายการได้",
+      "steps": "",
+      "actual_result": "",
+      "verdict": "NOT_RUN"
+    },
+    {
+      "id": "N29",
+      "title": "ไม่กรอกชื่อนักศึกษา",
+      "route": {
+        "category": "1. งานสอน",
+        "main_type": "โครงงาน / ปัญหาพิเศษ",
+        "subtype": "ซีเนียร์โปรเจก / ปัญหาพิเศษ",
+        "role": "อาจารย์ที่ปรึกษา"
+      },
+      "inputs": {
+        "quantity": 2,
+        "share": 100,
+        "student_names": ""
+      },
+      "expected": "80.00 คะแนน; ชื่อนักศึกษาเป็นข้อมูลเสริม ไม่บังคับตามกฎปัจจุบัน",
+      "steps": "",
+      "actual_result": "",
+      "verdict": "NOT_RUN"
+    },
+    {
+      "id": "N30",
+      "title": "ข้อความ HTML ต้องเป็นข้อความธรรมดา",
+      "route": {
+        "category": "1. งานสอน",
+        "main_type": "โครงงาน / ปัญหาพิเศษ",
+        "subtype": "ซีเนียร์โปรเจก / ปัญหาพิเศษ",
+        "role": "อาจารย์ที่ปรึกษา"
+      },
+      "inputs": {
+        "quantity": 2,
+        "share": 100,
+        "title": "<img src=x onerror=alert(1)>",
+        "student_names": "<script>alert(1)</script>"
+      },
+      "expected": "ไม่มี popup หรือรูปที่แทรก; แสดงข้อความตามที่พิมพ์หลังบันทึก",
+      "steps": "",
+      "actual_result": "",
+      "verdict": "NOT_RUN"
+    },
+    {
+      "id": "N31",
+      "title": "จำนวน 3 รายการของบทบาทที่นับครั้งเดียว",
+      "route": {
+        "category": "3. งานบริหาร",
+        "main_type": "งานอาจารย์ที่ปรึกษา / งานเชิญผู้เชี่ยวชาญ",
+        "subtype": "อาจารย์ที่ปรึกษา / PostMaster / PostDoc / Visiting Professor",
+        "role": "อาจารย์ที่ปรึกษาทั่วไป (ปริญญาตรี โท และเอก)"
+      },
+      "inputs": {},
+      "expected": "ไม่มีช่องจำนวนงาน; 25.00 คะแนน ไม่เพิ่มตามจำนวนนักศึกษาหรือจำนวนชื่อ",
+      "steps": "",
+      "actual_result": "",
+      "verdict": "NOT_RUN"
+    }
+  ],
+  "flow_cases": [
+    {
+      "id": "F01",
+      "title": "เพิ่มรายการ",
+      "steps": "ใช้ W001 → กดเพิ่มรายการภาระงาน",
+      "expected": "รายการเพิ่ม 1; คะแนนบนการ์ดตรงกับช่องคะแนน; ฟอร์มกลับค่าเริ่มต้น",
+      "actual_result": "",
+      "verdict": "NOT_RUN"
+    },
+    {
+      "id": "F02",
+      "title": "แก้ไขคะแนนอัตโนมัติ",
+      "steps": "เปิดแก้ไข W001 → เปลี่ยนหน่วยกิตเป็น 6 → บันทึก",
+      "expected": "คะแนน 220.00; จำนวนรายการเท่าเดิม",
+      "actual_result": "",
+      "verdict": "NOT_RUN"
+    },
+    {
+      "id": "F03",
+      "title": "ยกเลิกการแก้ไข",
+      "steps": "แก้ W001 เป็นหน่วยกิต 9 แต่กดยกเลิก",
+      "expected": "ข้อมูลเดิมและคะแนนเดิมบนการ์ดไม่เปลี่ยน",
+      "actual_result": "",
+      "verdict": "NOT_RUN"
+    },
+    {
+      "id": "F04",
+      "title": "เปลี่ยนประเภทขณะแก้ไข",
+      "steps": "แก้ W001 → เปลี่ยนเป็นงานวิชาการ / เอกสารและสื่อการสอน / เอกสารคำสอน → สัดส่วน 50 → บันทึก",
+      "expected": "คะแนน 50.00; ไม่มีรหัสวิชา ชั่วโมง หน่วยกิต หรือจำนวนนักศึกษาติดในการ์ด",
+      "actual_result": "",
+      "verdict": "NOT_RUN"
+    },
+    {
+      "id": "F05",
+      "title": "เปลี่ยนบทบาทขณะกรอก",
+      "steps": "เลือกซีเนียร์โปรเจก → จำนวน 2 สัดส่วน 100 → สลับที่ปรึกษา / ที่ปรึกษาร่วม / กรรมการสอบ",
+      "expected": "คะแนนทันที 80.00 / 40.00 / 20.00 ตามลำดับ",
+      "actual_result": "",
+      "verdict": "NOT_RUN"
+    },
+    {
+      "id": "F06",
+      "title": "สลับบทบาทที่มีชื่อนักศึกษา",
+      "steps": "งานบริหาร / งานอาจารย์ที่ปรึกษา → ที่ปรึกษาทั่วไป → ใส่ชื่อ → เปลี่ยนเป็นงานเชิญ Visiting Professor",
+      "expected": "ช่องชื่อนักศึกษาหายและไม่ถูกบันทึกในรายการใหม่",
+      "actual_result": "",
+      "verdict": "NOT_RUN"
+    },
+    {
+      "id": "F07",
+      "title": "หลายชื่อนักศึกษา",
+      "steps": "งานวิทยานิพนธ์ → ใส่สองชื่อคนละบรรทัด → บันทึก → แก้ไข",
+      "expected": "ชื่อครบทั้งสองบรรทัด ไม่ถูกใช้คูณคะแนนเพิ่ม",
+      "actual_result": "",
+      "verdict": "NOT_RUN"
+    },
+    {
+      "id": "F08",
+      "title": "สัมมนาไม่กรอกชื่อ",
+      "steps": "เลือกสัมมนาระดับตรีและโท/เอก แล้วไล่ทุกบทบาท",
+      "expected": "ไม่มีช่องชื่อนักศึกษาทุกบทบาท",
+      "actual_result": "",
+      "verdict": "NOT_RUN"
+    },
+    {
+      "id": "F09",
+      "title": "สหกิจไม่กรอกชื่อ",
+      "steps": "เลือกสหกิจศึกษา แล้วไล่ทั้งสามบทบาท",
+      "expected": "ไม่มีช่องชื่อนักศึกษาทุกบทบาท",
+      "actual_result": "",
+      "verdict": "NOT_RUN"
+    },
+    {
+      "id": "F10",
+      "title": "กรองรายการ",
+      "steps": "สร้างงานสอน 1 และงานวิชาการ 1 → เปลี่ยนตัวกรองหมวด",
+      "expected": "แสดงเฉพาะหมวดที่เลือก; จำนวนรวมด้านบนยังนับทุกหมวด",
+      "actual_result": "",
+      "verdict": "NOT_RUN"
+    },
+    {
+      "id": "F11",
+      "title": "ยกเลิกลบ",
+      "steps": "กดลบรายการ → เลือกยกเลิกในกล่องยืนยัน",
+      "expected": "รายการและจำนวนรวมไม่เปลี่ยน",
+      "actual_result": "",
+      "verdict": "NOT_RUN"
+    },
+    {
+      "id": "F12",
+      "title": "ยืนยันลบ",
+      "steps": "กดลบรายการ → ยืนยัน",
+      "expected": "รายการหาย จำนวนรวมลด 1",
+      "actual_result": "",
+      "verdict": "NOT_RUN"
+    },
+    {
+      "id": "F13",
+      "title": "ลบรายการที่กำลังแก้ไข",
+      "steps": "กดแก้ไขรายการ → กดลบรายการนั้นด้านล่าง → ยืนยัน",
+      "expected": "รายการหายและฟอร์มออกจากโหมดแก้ไข",
+      "actual_result": "",
+      "verdict": "NOT_RUN"
+    },
+    {
+      "id": "F14",
+      "title": "กันทับข้อมูลค้าง",
+      "steps": "เปิดแก้ไขรายการหนึ่ง พิมพ์ข้อมูลเพิ่ม → กดแก้ไขอีกอัน → ยกเลิกคำถามยืนยัน",
+      "expected": "ข้อมูลที่กำลังกรอกยังอยู่ ไม่สลับรายการ",
+      "actual_result": "",
+      "verdict": "NOT_RUN"
+    },
+    {
+      "id": "F15",
+      "title": "รอประเมิน",
+      "steps": "เลือกคณบดี / รองคณบดี / หัวหน้าสาขา / ผู้ช่วยคณบดี และตำแหน่งในงานบริหารระดับสาขา",
+      "expected": "แสดงรอประเมิน; เพิ่มและแก้ไขรายการได้; ไม่แสดง NaN หรือ 0.00 แทนคะแนนที่ยังไม่มี",
+      "actual_result": "",
+      "verdict": "NOT_RUN"
+    },
+    {
+      "id": "F16",
+      "title": "งานบริหารที่มีคะแนนแน่นอน",
+      "steps": "เลือกงานบริหารในตำแหน่ง → กรรมการบริหาร",
+      "expected": "50.00 คะแนนทันที",
+      "actual_result": "",
+      "verdict": "NOT_RUN"
+    },
+    {
+      "id": "F17",
+      "title": "กันซ้ำงานอาจารย์ที่ปรึกษา",
+      "steps": "เพิ่มข้อ 3.5 บทบาทเดียวกัน ภาคเดียวกัน ปีเดียวกัน 2 ครั้ง",
+      "expected": "ครั้งที่สองถูกปฏิเสธ; ใช้ปุ่มแก้ไขรายการเดิมได้",
+      "actual_result": "",
+      "verdict": "NOT_RUN"
+    },
+    {
+      "id": "F18",
+      "title": "บทบาทหรือภาคต่างกัน",
+      "steps": "หลัง F17 เพิ่มอีกบทบาท หรือเปลี่ยนภาค/ปีของรายการใหม่",
+      "expected": "เพิ่มรายการใหม่ได้",
+      "actual_result": "",
+      "verdict": "NOT_RUN"
+    },
+    {
+      "id": "F19",
+      "title": "ไฟล์หลายไฟล์",
+      "steps": "เลือกไฟล์ PDF และ PNG สมมติพร้อมกัน → เพิ่ม → แก้ไขโดยไม่เลือกไฟล์ใหม่ → บันทึก",
+      "expected": "ชื่อไฟล์ยังอยู่ครบ; ไม่มีการอัปโหลดจริง",
+      "actual_result": "",
+      "verdict": "NOT_RUN"
+    },
+    {
+      "id": "F20",
+      "title": "แทนที่ไฟล์",
+      "steps": "แก้ไขรายการที่มีไฟล์ → เลือกไฟล์ใหม่ → บันทึก",
+      "expected": "ชื่อไฟล์ชุดใหม่แทนที่ชุดเดิม",
+      "actual_result": "",
+      "verdict": "NOT_RUN"
+    },
+    {
+      "id": "F21",
+      "title": "ลิงก์หลักฐาน",
+      "steps": "ใส่ https://example.com → เพิ่ม → เปิดรายละเอียด → เปิดลิงก์",
+      "expected": "เปิดแท็บใหม่ ปลายทาง example.com",
+      "actual_result": "",
+      "verdict": "NOT_RUN"
+    },
+    {
+      "id": "F22",
+      "title": "คะแนนล็อก",
+      "steps": "ลองคลิก พิมพ์ วางข้อความในช่องคะแนน และค้นหาช่องน้ำหนัก",
+      "expected": "คะแนนพิมพ์ทับไม่ได้; ไม่มีช่องน้ำหนักหรือสูตรบนหน้า",
+      "actual_result": "",
+      "verdict": "NOT_RUN"
+    },
+    {
+      "id": "F23",
+      "title": "เปลี่ยนประเภทหลัก",
+      "steps": "งานวิชาการ / ทุนวิจัย ใส่งบประมาณ → เปลี่ยนเป็นบทความ → เปลี่ยนเป็นงานสอน / วิทยานิพนธ์",
+      "expected": "งบประมาณหายเมื่อไม่เกี่ยวข้อง; วารสารหายเมื่องานสอน; วิทยานิพนธ์ไม่มีช่องชั่วโมง/จำนวนนักศึกษา แต่มีชื่อและหน่วยกิต",
+      "actual_result": "",
+      "verdict": "NOT_RUN"
+    },
+    {
+      "id": "F24",
+      "title": "ไม่มีเลขหัวข้อในชื่อย่อย",
+      "steps": "ไล่เลือกประเภทหลักทุกหมวดและดูรายการที่บันทึก",
+      "expected": "ชื่อประเภทย่อยไม่มี 1.1 / 2.3.1 นำหน้า; รหัสภายในไม่ต้องแสดง",
+      "actual_result": "",
+      "verdict": "NOT_RUN"
+    },
+    {
+      "id": "F25",
+      "title": "รีเฟรชหลังบันทึก",
+      "steps": "เพิ่มรายการแล้วรีเฟรชหน้า",
+      "expected": "รายการหายตามพฤติกรรม mockup; ทำข้อนี้ท้ายชุด",
+      "actual_result": "",
+      "verdict": "NOT_RUN"
+    },
+    {
+      "id": "F26",
+      "title": "แป้นพิมพ์",
+      "steps": "ใช้ Tab, Shift+Tab และปุ่มลูกศรเลือก dropdown; Enter เพื่อส่งฟอร์ม",
+      "expected": "เข้าถึงช่องที่แสดงอยู่ได้ ไม่มีช่องที่ถูกซ่อนขัดขวางการส่ง",
+      "actual_result": "",
+      "verdict": "NOT_RUN"
+    },
+    {
+      "id": "F27",
+      "title": "หน้าจอมือถือ",
+      "steps": "ย่อหน้าต่างประมาณ 390px → เลือกบทบาทข้อความยาวและใส่ชื่อหลายบรรทัด",
+      "expected": "ช่องกรอกและปุ่มไม่ทับกัน; ไม่มีเนื้อหาสำคัญหลุดจอ",
+      "actual_result": "",
+      "verdict": "NOT_RUN"
+    },
+    {
+      "id": "F28",
+      "title": "ไม่มี backend สำหรับ mockup",
+      "steps": "เปิด DevTools Network → เพิ่ม แก้ไข ลบภาระงาน",
+      "expected": "ไม่มีคำขอ POST/PATCH/DELETE ไปฐานข้อมูลจากฟอร์มภาระงานนี้",
+      "actual_result": "",
+      "verdict": "NOT_RUN"
+    },
+    {
+      "id": "F29",
+      "title": "ชนิดไฟล์ไม่รองรับ",
+      "steps": "ลองเลือกไฟล์ .exe หรือ .txt โดยเปลี่ยนตัวกรองไฟล์ของระบบ",
+      "expected": "บันทึกผลจริง: accept เป็นเพียงตัวกรอง ปัจจุบันยังไม่มีการตรวจไฟล์เชิงเนื้อหาหรือขนาด; ไม่ถือว่าระบบอัปโหลดปลอดภัยแล้ว",
+      "actual_result": "",
+      "verdict": "NOT_RUN"
+    },
+    {
+      "id": "F30",
+      "title": "ช่องที่หายไม่ทำให้บันทึกพัง",
+      "steps": "เลือกบทบาทกรรมการบริหาร (ไม่มี share/quantity) → เพิ่ม → แก้ไข → บันทึก",
+      "expected": "บันทึกได้ 50.00 คะแนน; Console ไม่มี TypeError จากช่องที่ไม่มีแล้ว",
+      "actual_result": "",
+      "verdict": "NOT_RUN"
+    }
+  ],
+  "known_gaps": [
+    {
+      "id": "G01",
+      "title": "สิทธิบัตร ตัวเลือกที่ 4",
+      "steps": "งานวิชาการ → สิทธิบัตร / สิ่งประดิษฐ์ → เปิด dropdown ชนิดงาน",
+      "expected": "ตัวเลือกข้อความถูกตัดใน PDF ถูกปิด ไม่สามารถเลือกหรือคำนวณได้"
+    },
+    {
+      "id": "G02",
+      "title": "คะแนนพิเศษ",
+      "steps": "เลือกหมวดคะแนนพิเศษ",
+      "expected": "ไม่มีเกณฑ์ / คะแนน —; ปุ่มเพิ่มรายการถูกปิด"
+    },
+    {
+      "id": "G03",
+      "title": "เพดานคะแนนยังไม่ใช้",
+      "steps": "ซีเนียร์โปรเจก ที่ปรึกษา จำนวน 10 สัดส่วน 100",
+      "expected": "คะแนนดิบ 400.00 ไม่ถูกจำกัดเหลือ 200; นี่เป็นข้อจำกัดที่ทราบ ไม่ใช่คะแนนประเมินสุดท้าย"
+    },
+    {
+      "id": "G04",
+      "title": "เงื่อนไขรายงานประเมิน",
+      "steps": "ตรวจความต้องการก่อนนำไปใช้จริง",
+      "expected": "ยังไม่ตรวจครบเรื่องเพดานรวม การนับซ้ำทุกชนิด จำนวนคำสั่ง การนับ Section คุณสมบัติหลักฐาน และการอนุมัติ"
+    }
+  ]
+}

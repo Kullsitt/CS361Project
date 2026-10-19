@@ -8,7 +8,7 @@ ALTER TABLE teaching_workloads ADD COLUMN IF NOT EXISTS evidence_url text;
 ALTER TABLE teaching_workloads ADD COLUMN IF NOT EXISTS attachment_names text[];
 ALTER TABLE teaching_workloads ADD COLUMN IF NOT EXISTS score_status text;
 ALTER TABLE teaching_workloads ADD COLUMN IF NOT EXISTS score numeric;
-ALTER TABLE teaching_workloads ADD COLUMN IF NOT EXISTS course_name_th text;
+ALTER TABLE teaching_workloads ADD COLUMN IF NOT EXISTS course_code text;
 ALTER TABLE teaching_workloads ADD COLUMN IF NOT EXISTS course_code text;
 ALTER TABLE teaching_workloads ADD COLUMN IF NOT EXISTS role_type text;
 ALTER TABLE teaching_workloads ADD COLUMN IF NOT EXISTS credits numeric;

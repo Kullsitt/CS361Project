@@ -48,5 +48,14 @@ input[readonly] {
 /* ===== START WORKLOAD_SCORE: สไตล์ช่องคะแนนและคะแนนบนการ์ด ===== */
 .score-panel{margin-top:24px;padding:20px;background:#fff8ee;border:1px solid #ebddc5;border-radius:10px}.score-panel .field-grid{margin-top:0}.score-panel .muted{margin-top:10px;font-size:12px}#live-score{display:flex;align-items:center;min-height:46px;font-size:24px;font-weight:700;color:var(--brand)}.record-score{color:var(--brand);font-weight:700;margin-top:12px}
 /* ===== END WORKLOAD_SCORE ===== */
+.dashboard-result{position:fixed;inset:0;margin:auto;transform:translateY(-8vh);border:0;border-radius:18px;padding:32px;max-width:440px;width:calc(100% - 40px);max-height:75dvh;overflow:auto;box-sizing:border-box;text-align:center;color:#252936;box-shadow:0 20px 70px #0003}
+.dashboard-result::backdrop{background:rgba(25,29,38,.5)}
+.dashboard-result .result-icon{display:grid;place-items:center;width:64px;height:64px;margin:0 auto 16px;border-radius:50%;background:#eaf5ef;color:#216342;font-size:36px;font-weight:700}
+.dashboard-result[data-kind="error"] .result-icon{background:#fdf2f2;color:#9b1c1c}
+.dashboard-result h2{margin:0 0 12px;font-size:24px}
+.dashboard-result p{margin:0 0 24px;line-height:1.7;white-space:pre-wrap;overflow-wrap:anywhere}
+.dashboard-result button{min-width:120px}
+#workload-notice[data-kind="error"]{background:#fdf2f2;color:#9b1c1c}
+#workload-notice[data-kind="info"]{background:#f0f2f6;color:#475569}
 .role-guidance{margin-top:16px;padding:12px 16px;background:#f4f6f9;border-left:3px solid #8c1d24;border-radius:4px;line-height:1.8}
 .student-names-field{margin-top:20px}.student-names-summary{margin-top:12px;white-space:pre-line;font-size:14px;line-height:1.8}#live-score{background:#f0f1f4;border-color:#e3e5e9;cursor:default;width:100%;font-size:22px}

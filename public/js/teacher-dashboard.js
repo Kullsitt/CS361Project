@@ -1,4 +1,4 @@
-const API_URL = window.DashboardAPI.base;
+const API_URL = typeof API_BASE_URL !== 'undefined' ? API_BASE_URL : 'http://34.236.42.23/api';
 
 (async () => {
   // 1. ตรวจสอบการเข้าสู่ระบบ (Authentication Check)
@@ -215,10 +215,12 @@ const API_URL = window.DashboardAPI.base;
       setEditing(false);
       showMessage('บันทึกข้อมูลลงในระบบเรียบร้อยแล้ว');
       edit.focus();
+      window.showDashboardResult('บันทึกข้อมูลส่วนตัวเรียบร้อยแล้ว', 'success');
 
     } catch (error) {
       console.error('Save Profile Error:', error);
       showMessage(error.message, 'error');
+      window.showDashboardResult(error.message, 'error');
     } finally {
       saving = false; fields.disabled = !editing;
       buttons.forEach(button => { button.disabled = false; });

@@ -210,7 +210,7 @@ function filterWorkloadsByKeyword(keyword) {
   }
 
   const filteredList = state.rawWorkloads.filter(item => {
-    const title = (item.title || item.course_name_th || item.position_or_task_name || '').toLowerCase();
+    const title = (item.title || item.course_code || item.position_or_task_name || '').toLowerCase();
     const code = (item.course_code || '').toLowerCase();
     const source = (item.source_name || item.organization || item.advisee_name || '').toLowerCase();
     const role = (item.work_type || item.role || item.publication_type || '').toLowerCase();
@@ -269,7 +269,7 @@ function renderWorkloadCards(itemsToRender = state.rawWorkloads) {
       const termLabel = item.semester ? `${item.semester}/${item.academic_year}` : `ปี ${item.academic_year || '-'}`;
       const hoursLabel = item.workload_hours ? `${item.workload_hours} ชม./สัปดาห์` : (item.score ? `คะแนน: ${item.score}` : '');
       const courseCode = item.course_code ? `${item.course_code}: ` : '';
-      const displayTitle = item.title || item.course_name_th || 'ไม่มีชื่อรายการ';
+      const displayTitle = item.title || item.course_code || 'ไม่มีชื่อรายการ';
 
       let subText = '';
       if (state.currentCategory === 'TEACHING') {

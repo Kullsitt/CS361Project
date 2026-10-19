@@ -18,7 +18,7 @@
 1. ใช้ `backend/.env` สำหรับ DB_HOST, DB_PORT, DB_NAME, DB_USER, DB_PASSWORD และ SECRET_KEY จริงของระบบ ห้าม commit ไฟล์นี้
 2. ตรวจและสำรองฐานข้อมูลก่อนใช้ `backend/migrations/001_dashboard_fields.sql` ภายใน transaction ไฟล์นี้เพิ่มช่องที่ฟอร์มต้องเก็บ และขยายชนิดของหน่วยกิต/ชื่อบทบาท/คะแนน/น้ำหนัก ไม่ลบแถวเดิม ใช้ `python scripts/apply-dashboard-migration.py` เพื่อตรวจ และเพิ่ม `--apply` เมื่อต้องการนำไปใช้จริง
 3. ติดตั้ง `backend/requirements.txt` และรันจาก root: `python -m uvicorn app.main:app --app-dir backend --host 127.0.0.1 --port 8000`
-4. เปิด `http://127.0.0.1:8000/login.html` จากนั้นเข้า `teacher-dashboard.html` หน้า localhost เรียก `/api` บน Backend ในเครื่อง
+4. เปิดหน้า login.html จากนั้นเข้า teacher-dashboard.html หน้าเว็บใช้ API_BASE_URL หากกำหนดไว้ มิฉะนั้นใช้ `http://34.236.42.23/api` ทั้ง Live Server และเว็บที่เผยแพร่ โดยไม่แยกตาม hostname
 5. Deploy Backend และไฟล์ public ไปยัง EC2/hosting ที่ใช้จริง แล้วตรวจ `/openapi.json` ว่ามีเส้นทางข้างต้น
 
 ## การทดสอบ
@@ -29,6 +29,12 @@
 - `python tests/test_dashboard_database.py` ใช้ PostgreSQL จริง แต่สร้าง TEMP tables จำลอง schema และ rollback ทั้งหมด ไม่แก้ไข public tables
 
 ## ข้อจำกัดที่ต้องทราบ
+
+การเปลี่ยนให้เหลือ `course_code` ช่องเดียว: ต้องอัปเดต Backend รุ่นนี้และรัน
+`python scripts/apply-dashboard-migration.py --apply --remove-course-name`
+ในช่วงหยุดบริการเดียวกัน แล้วเริ่ม Backend ใหม่ เพราะโค้ดเก่าอ่าน `course_name_th`
+และตารางเก่าบังคับให้ส่งชื่อนี้ตอนเพิ่มรายการ คำสั่งนี้ลบคอลัมน์และชื่อวิชาเดิมจริง
+ตามคำขอผู้ใช้ แต่ไม่ลบแถวภาระงานหรือ `course_code` ควรสำรองก่อนรัน
 
 - migration ยังต้องผ่านการตรวจและนำไปใช้ก่อน workload API จะใช้งานครบ
 - รายการเดิมที่ไม่มี subtype จะอ่านได้ แต่ยังไม่เปิดแก้ไขเพราะไม่มีข้อมูลพอจะเดาประเภท/บทบาท
