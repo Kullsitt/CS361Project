@@ -1,16 +1,19 @@
-// Workload UI prototype. Records and attachment names stay in memory only.
-/* ===== WORKLOAD_SCORE: จุดที่ต้องแก้หากยกเลิกช่องคะแนน =====
- * ค้นหา WORKLOAD_SCORE เพื่อดูส่วนที่เกี่ยวข้องใน HTML / CSS / JS
- * 1. ลบ score-panel ใน HTML และสไตล์ score-panel / live-score / record-score
- * 2. ไม่มีช่องกรอก weight หรือสูตรใน UI; น้ำหนักมาจาก workload-scoring.js เท่านั้น
- * 3. ลบส่วนแสดงคะแนนใน updateScore() แต่เก็บส่วนแสดงช่องชื่อนักศึกษาไว้
- * 4. ลบการเรียก evaluate ก่อนบันทึก, score / score_status ใน record และคะแนนบนการ์ด
- * 5. ปรับ required ของ credits / quantity / share หากไม่บังคับใช้คำนวณแล้ว
- * ยังต้องเก็บ workload-scoring.js และ scoring.rule() หากใช้ dropdown บทบาทเดิม
- * เพราะไฟล์นั้นมีทั้งรายการบทบาทและสูตรคะแนน ไม่ใช่เฉพาะช่องแสดงผล
- * หมายเหตุ: ตอนนี้เป็นคอมเมนต์อธิบายเท่านั้น ระบบคะแนนยังทำงานตามเดิม
- * ===================================================== */
-(() => {
+(async () => {
+  // 1. กำหนด API_URL ให้อยู่ใน Scope ของฟังก์ชัน
+  const API_URL = typeof API_BASE_URL !== 'undefined' ? API_BASE_URL : 'http://34.236.42.23/api';
+  const token = localStorage.getItem('token');
+  let profId = null;
+
+  try {
+    const userData = localStorage.getItem('user');
+    if (userData) {
+      const user = JSON.parse(userData);
+      profId = user.id || user.prof_id || user.professor_id || user.user_id;
+    }
+  } catch (e) {
+    console.error('Error parsing user data:', e);
+  }
+
   const categories = {
     teaching: ['1. งานสอน', ['1.1 วิชาบรรยาย (ปริญญาตรี)', '1.2 วิชาปฏิบัติการ (ปริญญาตรี)', '1.3 สัมมนา (ปริญญาตรี)', '1.4 ซีเนียร์โปรเจก / ปัญหาพิเศษ', '1.5 สหกิจศึกษา', '1.6 วิชาบรรยาย (โท / เอก)', '1.7 วิชาปฏิบัติการ (โท / เอก)', '1.8 สัมมนา (โท / เอก)', '1.9 วิทยานิพนธ์', '1.10 ปัญหาพิเศษ (โท / เอก)', '1.11 สารนิพนธ์ / ค้นคว้าอิสระ']],
     academic: ['2. งานวิชาการ', ['2.1 รายงานวิจัยฉบับสมบูรณ์', '2.2 รายงานความก้าวหน้า', '2.3.1 บทความวิจัยนานาชาติ', '2.3.2 Short Communication / บทความปริทัศน์', '2.3.3 วารสารในฐานข้อมูล TCI', '2.3.4 วารสารนานาชาติอื่น / Proceedings / Data Article', '2.3.5 วารสารระดับชาติอื่น / Proceedings', '2.4.1 นำเสนอผลงานระดับนานาชาติ', '2.4.2 นำเสนอผลงานระดับชาติ / สถาบัน', '2.5 สิทธิบัตร / สิ่งประดิษฐ์', '2.6.1 หนังสือ / ตำรา', '2.6.2 Book Chapter', '2.7 เอกสารและสื่อการสอน', '2.8.1 ทุนวิจัยภายนอก', '2.8.2 ทุนวิจัยอื่น', '2.9 รางวัลทางวิชาการ', '2.10 การนำผลงานวิจัยไปใช้ประโยชน์']],
@@ -18,6 +21,7 @@
     service: ['4. งานบริการวิชาการและอื่น ๆ', ['4.1.1 คณะทำงาน / กรรมการระดับคณะหรือสาขา', '4.2.1 กรรมการ / คณะทำงานนอกคณะ', '4.2.2 ตำแหน่งบริหารนอกคณะใน มธ.', '4.3 บริการวิชาการแก่สังคม', '4.4 ประเมินผลงานทางวิชาการ', '4.5 ประเมินตำแหน่งทางวิชาการ', '4.6 บรรณาธิการ / Editor']],
     special: ['5. คะแนนพิเศษ', ['คะแนนพิเศษ / ผลงานเพิ่มเติม']]
   };
+
   const schemas = {
     teaching: [['course', 'รหัสวิชา', 'text'], ['role', 'หน้าที่ / บทบาท', 'text'], ['hours', 'จำนวนชั่วโมง', 'number'], ['credits', 'หน่วยกิต', 'number'], ['students', 'จำนวนนักศึกษา', 'integer'], ['quantity', 'จำนวนเรื่อง / โครงงาน', 'integer'], ['share', 'สัดส่วนความรับผิดชอบ (%)', 'percent']],
     academic: [['role', 'บทบาท / ชนิดผลงาน', 'text'], ['share', 'สัดส่วนการมีส่วนร่วม (%)', 'percent'], ['source', 'แหล่งทุน / วารสาร / การประชุม', 'text'], ['level', 'ระดับ / ฐานข้อมูล / Quartile', 'text'], ['budget', 'งบประมาณ (บาท)', 'number'], ['quantity', 'จำนวนผลงาน / Chapter', 'integer']],
@@ -25,7 +29,10 @@
     service: [['role', 'หน้าที่ / บทบาท', 'text'], ['organization', 'หน่วยงาน / วารสาร', 'text'], ['level', 'ระดับผลงาน', 'text'], ['quantity', 'จำนวนคำสั่ง / เรื่อง / คน', 'integer'], ['share', 'สัดส่วนความรับผิดชอบ (%)', 'percent']],
     special: [['role', 'ประเภทผลงาน / เหตุผลประกอบ', 'text'], ['quantity', 'จำนวนผลงาน', 'integer'], ['share', 'สัดส่วนความรับผิดชอบ (%)', 'percent']]
   };
+
   const form = document.getElementById('workload-form');
+  if (!form) return;
+
   const category = form.elements.category;
   const subtype = form.elements.subtype;
   const group = form.elements.group;
@@ -34,24 +41,31 @@
   const notice = document.getElementById('workload-notice');
   const common = ['semester', 'year', 'category', 'subtype', 'title', 'evidence_url', 'role_note', 'student_names'];
   const scoring = window.WorkloadScoring;
+
   let records = [];
-  let nextId = 1;
   let editingId = null;
   let attachments = [];
   let changed = false;
 
   function option(value, label) { const el = document.createElement('option'); el.value = value; el.textContent = label; return el; }
+  
   function activeSchema(type = subtype.value, role = form.elements.role?.value, categoryKey = category.value) {
+    if (!scoring) return [];
     const visible = scoring.fields(type, role);
     return schemas[categoryKey].filter(([name]) => visible.includes(name));
   }
+
   function detailValues() {
     return Object.fromEntries(Array.from(document.getElementById('workload-details').querySelectorAll('input, select'), input => [input.name, input.value]));
   }
+
   for (const [key, [label]] of Object.entries(categories)) {
-    category.append(option(key, label)); filter.append(option(key, label));
+    if (category) category.append(option(key, label)); 
+    if (filter) filter.append(option(key, label));
   }
+
   function details(values = {}, rebuildTypes = true) {
+    if (!scoring) return;
     if (rebuildTypes) {
       const groups = scoring.groups[category.value];
       const selected = values.subtype ? groups.find(([, , codes]) => codes.includes(values.subtype.split(' ')[0]))?.[0] : group.value;
@@ -64,6 +78,7 @@
     const config = scoring.rule(subtype.value);
     const container = document.getElementById('workload-details');
     container.replaceChildren();
+
     for (const [name, title, type] of activeSchema(subtype.value, values.role || config.roles[0]?.[0])) {
       const label = document.createElement('label'); label.textContent = scoring.fieldLabel(subtype.value, name, title);
       const input = document.createElement(name === 'role' ? 'select' : 'input'); input.name = name;
@@ -73,7 +88,7 @@
           entry.disabled = config.unavailable.includes(index);
           return entry;
         }));
-        if (!config.roles.length) input.append(option('', 'ยังไม่มีรายละเอียดใน PDF'));
+        if (!config.roles.length) input.append(option('', 'ยังไม่มีรายละเอียดในเอกสาร'));
         input.required = true;
         input.disabled = !config.roles.length;
         input.setAttribute('aria-describedby', 'role-guidance');
@@ -91,139 +106,300 @@
       }
       label.append(input); container.append(label);
     }
+
     const custom = document.createElement('label'); custom.textContent = 'หมายเหตุเกี่ยวกับบทบาท';
     const roleNote = document.createElement('input'); roleNote.name = 'role_note'; roleNote.maxLength = 300; roleNote.value = values.role_note || ''; custom.append(roleNote); container.append(custom);
-    form.elements.student_names.value = values.student_names || '';
-    document.getElementById('workload-save').disabled = !config.roles.length;
-    // เงื่อนไข/น้ำหนักเก็บใน scoring.rule สำหรับผู้พัฒนา ไม่แสดงสูตรให้ผู้กรอก
+    if (form.elements.student_names) form.elements.student_names.value = values.student_names || '';
+    
+    const saveBtn = document.getElementById('workload-save');
+    if (saveBtn) saveBtn.disabled = !config.roles.length;
+
     const guidance = document.getElementById('role-guidance');
-    guidance.textContent = !config.roles.length ? config.note : config.code === '2.5' ? 'ข้อ 4 ในเอกสารต้นฉบับไม่ครบ จึงยังเลือกไม่ได้' : '';
-    guidance.hidden = !guidance.textContent;
+    if (guidance) {
+      guidance.textContent = !config.roles.length ? config.note : config.code === '2.5' ? 'ข้อ 4 ในเอกสารต้นฉบับไม่ครบ จึงยังเลือกไม่ได้' : '';
+      guidance.hidden = !guidance.textContent;
+    }
     updateScore();
   }
-  // ===== START WORKLOAD_SCORE: อ่านข้อมูล คำนวณ และแสดงคะแนนทันที =====
+
   function currentScore() {
-    return scoring.evaluate({subtype:subtype.value, role:form.elements.role.value, students:form.elements.students?.value, credits:form.elements.credits?.value, quantity:form.elements.quantity?.value, share:form.elements.share?.value ?? '100'});
+    if (!scoring) return { status: 'pending', score: null };
+    return scoring.evaluate({
+      subtype: subtype.value, 
+      role: form.elements.role?.value, 
+      students: form.elements.students?.value, 
+      credits: form.elements.credits?.value, 
+      quantity: form.elements.quantity?.value, 
+      share: form.elements.share?.value ?? '100'
+    });
   }
+
   function updateScore() {
+    if (!scoring) return;
     const result = currentScore();
-    document.getElementById('live-score').value = result.status === 'pending' ? 'รอประเมิน' : result.score === null ? '—' : result.score.toLocaleString('th-TH', {minimumFractionDigits:2, maximumFractionDigits:2}) + ' คะแนน';
-    document.getElementById('score-help').textContent = {pending:'บันทึกข้อมูลได้ คะแนนส่วนนี้รอการประเมินจากผู้รับผิดชอบ', incomplete:'กรอกข้อมูลของงานให้ครบเพื่อคำนวณคะแนน', unavailable:'ยังไม่มีเกณฑ์สำหรับรายการนี้', calculated:'คะแนนคำนวณอัตโนมัติจากข้อมูลที่เลือก (ก่อนจำกัดเพดานหมวด)'}[result.status];
-    const withStudents = scoring.hasStudents(subtype.value, form.elements.role.value);
-    document.getElementById('student-names-field').hidden = !withStudents;
-    if (!withStudents) form.elements.student_names.value = '';
+    const liveScore = document.getElementById('live-score');
+    if (liveScore) {
+      liveScore.value = result.status === 'pending' ? 'รอประเมิน' : result.score === null ? '—' : result.score.toLocaleString('th-TH', {minimumFractionDigits:2, maximumFractionDigits:2}) + ' คะแนน';
+    }
+    const scoreHelp = document.getElementById('score-help');
+    if (scoreHelp) {
+      scoreHelp.textContent = {
+        pending:'บันทึกข้อมูลได้ คะแนนส่วนนี้รอการประเมินจากผู้รับผิดชอบ', 
+        incomplete:'กรอกข้อมูลของงานให้ครบเพื่อคำนวณคะแนน', 
+        unavailable:'ยังไม่มีเกณฑ์สำหรับรายการนี้', 
+        calculated:'คะแนนคำนวณอัตโนมัติจากข้อมูลที่เลือก'
+      }[result.status] || '';
+    }
+    const withStudents = scoring.hasStudents(subtype.value, form.elements.role?.value);
+    const studentField = document.getElementById('student-names-field');
+    if (studentField) studentField.hidden = !withStudents;
+    if (!withStudents && form.elements.student_names) form.elements.student_names.value = '';
   }
-  // ===== END WORKLOAD_SCORE =====
-  function announce(message) { notice.textContent = message; notice.hidden = false; }
+
+  function announce(message) { 
+    if (notice) {
+      notice.textContent = message; 
+      notice.hidden = false; 
+    }
+  }
+
   function reset() {
     form.reset(); editingId = null; attachments = []; changed = false; details();
     for (const input of form.elements) if (typeof input.setCustomValidity === 'function') input.setCustomValidity('');
-    document.getElementById('selected-evidence').textContent = '';
-    document.getElementById('workload-save').textContent = 'เพิ่มรายการภาระงาน';
-    document.getElementById('workload-cancel').textContent = 'ล้างข้อมูล';
+    const selectedEv = document.getElementById('selected-evidence');
+    if (selectedEv) selectedEv.textContent = '';
+    const saveBtn = document.getElementById('workload-save');
+    if (saveBtn) saveBtn.textContent = 'เพิ่มรายการภาระงาน';
+    const cancelBtn = document.getElementById('workload-cancel');
+    if (cancelBtn) cancelBtn.textContent = 'ล้างข้อมูล';
   }
+
+  // 📥 1. ดึงข้อมูลภาระงานจาก API (ยิงตรงไปที่ /workloads?professor_id=...)
+  // 1. ดึงข้อมูลภาระงานของอาจารย์ที่ล็อกอินอยู่จาก API
+  async function fetchWorkloads() {
+    try {
+      if (!token) {
+        console.warn('ไม่พบ Token การเข้าสู่ระบบ กรุณาล็อกอินใหม่');
+        return;
+      }
+      
+      // Backend จะอ่านอาจารย์ที่ล็อกอินอยู่ผ่าน Authorization Header
+      const response = await fetch(`${API_URL}/workloads`, {
+        method: 'GET',
+        headers: {
+          'Authorization': `Bearer ${token}`,
+          'Content-Type': 'application/json'
+        }
+      });
+
+      if (!response.ok) {
+        if (response.status === 401) {
+          alert('Session หมดอายุ กรุณาล็อกอินใหม่อีกครั้ง');
+          window.location.href = '/login.html';
+          return;
+        }
+        throw new Error('ไม่สามารถดึงข้อมูลภาระงานได้');
+      }
+
+      const data = await response.json();
+      records = Array.isArray(data) ? data : data.data || [];
+      render();
+    } catch (err) {
+      console.error('Fetch Workloads Error:', err);
+    }
+  }
+
   function render() {
+    if (!list) return;
     list.replaceChildren();
-    document.getElementById('workload-count').textContent = `${records.length} รายการ`;
+    const countEl = document.getElementById('workload-count');
+    if (countEl) countEl.textContent = `${records.length} รายการ`;
     const visible = records.filter(record => filter.value === 'all' || record.category === filter.value);
+    
     if (!visible.length) {
       const empty = document.createElement('p'); empty.className = 'workload-empty';
-      empty.textContent = records.length ? 'ยังไม่มีรายการในหมวดนี้' : 'ยังไม่มีภาระงาน กรอกข้อมูลด้านบนเพื่อเพิ่มรายการแรก'; list.append(empty);
+      empty.textContent = records.length ? 'ยังไม่มีรายการในหมวดนี้' : 'ยังไม่มีภาระงาน กรอกข้อมูลด้านบนเพื่อเพิ่มรายการแรก'; 
+      list.append(empty);
     }
+
     for (const record of visible) {
       const card = document.createElement('article'); card.className = 'workload-record';
-      const badge = document.createElement('p'); badge.className = 'eyebrow'; badge.textContent = `${categories[record.category][0]} · ${record.semester === 'summer' ? 'ฤดูร้อน' : 'ภาค ' + record.semester}/${record.year}`;
+      const catLabel = categories[record.category] ? categories[record.category][0] : record.category;
+      const badge = document.createElement('p'); badge.className = 'eyebrow'; badge.textContent = `${catLabel} · ${record.semester === 'summer' ? 'ฤดูร้อน' : 'ภาค ' + record.semester}/${record.year}`;
       const title = document.createElement('h4'); title.textContent = record.title;
-      const type = document.createElement('p'); type.className = 'muted'; type.textContent = record.subtype.replace(/^\d+(?:\.\d+)*\s+/, '');
+      const type = document.createElement('p'); type.className = 'muted'; type.textContent = (record.subtype || '').replace(/^\d+(?:\.\d+)*\s+/, '');
       const summary = document.createElement('p'); summary.className = 'muted';
-      summary.textContent = activeSchema(record.subtype, record.role, record.category).filter(([key]) => record[key] != null && record[key] !== '').map(([key, label]) => `${scoring.fieldLabel(record.subtype, key, label)}: ${record[key]}`).join(' · ');
+      
+      summary.textContent = activeSchema(record.subtype, record.role, record.category)
+        .filter(([key]) => record[key] != null && record[key] !== '')
+        .map(([key, label]) => `${scoring.fieldLabel(record.subtype, key, label)}: ${record[key]}`).join(' · ');
+      
       card.append(badge, title, type, summary);
-      // ===== START WORKLOAD_SCORE: คะแนนบนการ์ด ไม่มีตัวคูณให้กรอกหรือแก้ =====
+      
       const score = document.createElement('p'); score.className = 'record-score';
-      score.textContent = record.score_status === 'pending' ? 'คะแนน: รอประเมิน' : `คะแนน: ${record.score.toLocaleString('th-TH', {minimumFractionDigits: 2, maximumFractionDigits: 2})}`;
+      const scoreVal = typeof record.score === 'number' ? record.score.toLocaleString('th-TH', {minimumFractionDigits: 2, maximumFractionDigits: 2}) : '0.00';
+      score.textContent = record.score_status === 'pending' ? 'คะแนน: รอประเมิน' : `คะแนน: ${scoreVal}`;
       card.append(score);
-      // ===== END WORKLOAD_SCORE =====
+
       if (record.role_note) { const note = document.createElement('p'); note.textContent = record.role_note; card.append(note); }
       if (record.student_names) { const students = document.createElement('p'); students.className = 'student-names-summary'; students.textContent = 'นักศึกษาที่เกี่ยวข้อง:\n' + record.student_names; card.append(students); }
+      
       const more = document.createElement('details'); const heading = document.createElement('summary'); heading.textContent = 'ดูรายละเอียดและหลักฐาน'; more.append(heading);
-      for (const [label, value] of [['ไฟล์ที่เลือก', record.attachments.join(', ')]]) {
-        if (value) { const p = document.createElement('p'); p.textContent = `${label}: ${value}`; more.append(p); }
+      if (record.attachments && record.attachments.length) {
+        const p = document.createElement('p'); p.textContent = `ไฟล์ที่เลือก: ${Array.isArray(record.attachments) ? record.attachments.join(', ') : record.attachments}`;
+        more.append(p);
       }
-      if (record.evidence_url) { const a = document.createElement('a'); a.href = record.evidence_url; a.target = '_blank'; a.rel = 'noopener noreferrer'; a.textContent = 'เปิดลิงก์หลักฐาน ↗'; more.append(a); }
+      if (record.evidence_url) { 
+        const a = document.createElement('a'); a.href = record.evidence_url; a.target = '_blank'; a.rel = 'noopener noreferrer'; a.textContent = 'เปิดลิงก์หลักฐาน ↗'; 
+        more.append(a); 
+      }
       card.append(more);
+
       const actions = document.createElement('div'); actions.className = 'workload-actions';
-      for (const [action, label] of [['edit', 'แก้ไข'], ['delete', 'ลบรายการ']]) {
-        const button = document.createElement('button'); button.type = 'button'; button.className = 'secondary'; button.textContent = label;
-        button.dataset.action = action; button.dataset.id = record.id; button.setAttribute('aria-label', `${label} ${record.title}`); actions.append(button);
-      }
-      card.append(actions); list.append(card);
+      
+      // ปุ่มแก้ไข
+      const editBtn = document.createElement('button'); editBtn.type = 'button'; editBtn.className = 'secondary'; editBtn.textContent = 'แก้ไข';
+      editBtn.dataset.action = 'edit'; editBtn.dataset.id = record.id; editBtn.setAttribute('aria-label', `แก้ไข ${record.title}`); 
+      actions.append(editBtn);
+
+      card.append(actions); 
+      list.append(card);
     }
   }
-  category.addEventListener('change', () => { group.value = ''; details(); });
-  group.addEventListener('change', () => details());
-  subtype.addEventListener('change', () => {
+
+  // Event Listeners
+  if (category) category.addEventListener('change', () => { group.value = ''; details(); });
+  if (group) group.addEventListener('change', () => details());
+  if (subtype) subtype.addEventListener('change', () => {
     const values = detailValues();
     delete values.role;
     details(values, false);
   });
+
   form.addEventListener('change', event => {
     changed = true;
     if (event.target.name === 'role') {
-      details({...detailValues(), student_names:form.elements.student_names.value}, false);
-      form.elements.role.focus();
+      details({...detailValues(), student_names:form.elements.student_names?.value}, false);
+      if (form.elements.role) form.elements.role.focus();
     }
     updateScore();
   });
+
   form.addEventListener('input', event => {
     changed = true; event.target.setCustomValidity('');
     updateScore();
   });
-  form.elements.attachments.addEventListener('change', () => {
-    attachments = Array.from(form.elements.attachments.files, file => file.name);
-    document.getElementById('selected-evidence').textContent = attachments.join(', '); changed = true;
-  });
-  form.addEventListener('submit', event => {
+
+  if (form.elements.attachments) {
+    form.elements.attachments.addEventListener('change', () => {
+      attachments = Array.from(form.elements.attachments.files, file => file.name);
+      const selectedEv = document.getElementById('selected-evidence');
+      if (selectedEv) selectedEv.textContent = attachments.join(', '); 
+      changed = true;
+    });
+  }
+
+  // 📤 2. ส่งข้อมูลบันทึก / แก้ไข ไปยัง API (Backend)
+  form.addEventListener('submit', async event => {
     event.preventDefault();
     const names = [...common, ...activeSchema().map(([name]) => name)];
-    for (const name of names) { const input = form.elements.namedItem(name); input.value = input.value.trim(); input.setCustomValidity(''); }
+    for (const name of names) { 
+      const input = form.elements.namedItem(name); 
+      if (input) {
+        input.value = input.value.trim(); 
+        input.setCustomValidity(''); 
+      }
+    }
+
     if (!form.elements.title.value) form.elements.title.setCustomValidity('กรุณาระบุชื่อรายการภาระงาน');
     const url = form.elements.evidence_url;
-    if (url.value && !/^https?:\/\//i.test(url.value)) url.setCustomValidity('กรุณาใช้ลิงก์ http:// หรือ https://');
+    if (url && url.value && !/^https?:\/\//i.test(url.value)) url.setCustomValidity('กรุณาใช้ลิงก์ http:// หรือ https://');
     if (!form.reportValidity()) return;
-    const code = scoring.rule(subtype.value).code;
-    if (code === '3.3' && form.elements.role.selectedIndex === 3 && Number(form.elements.students.value) <= 300) {
-      announce('คะแนนเพิ่มข้อ 3.3 ต้องมีนักศึกษามากกว่า 300 คน กรุณากรอกจำนวนจริง'); return;
-    }
-    if (code === '3.5' && records.some(item => item.id !== editingId && item.subtype === subtype.value && item.role === form.elements.role.value && item.semester === form.elements.semester.value && item.year === form.elements.year.value)) {
-      announce('ข้อ 3.5 บันทึกแต่ละบทบาทได้อย่างละ 1 รายการต่อภาคการศึกษา กรุณาแก้ไขรายการเดิม'); return;
-    }
-    // WORKLOAD_SCORE: ตรวจคะแนนก่อนบันทึก และเก็บ score ใน record ด้านล่าง
+
     const result = currentScore();
     if (!['calculated', 'pending'].includes(result.status)) { announce('กรุณาเลือกบทบาทและกรอกข้อมูลของงานให้ครบถ้วน'); return; }
-    const wasEditing = editingId !== null;
-    const record = {id: editingId || `workload-${nextId++}`, ...Object.fromEntries(names.map(name => [name, form.elements.namedItem(name).value])), score:result.score, score_status:result.status, attachments: [...attachments]};
-    if (wasEditing) records = records.map(item => item.id === editingId ? record : item); else records.push(record);
-    filter.value = 'all'; reset(); render(); announce(wasEditing ? 'แก้ไขรายการภาระงานแล้ว' : 'เพิ่มรายการภาระงานแล้ว');
+
+    const isEditing = editingId !== null;
+    const payload = {
+      professor_id: profId,
+      ...Object.fromEntries(names.map(name => [name, form.elements.namedItem(name)?.value || ''])),
+      score: result.score || 0,
+      score_status: result.status,
+      attachments: attachments
+    };
+
+    try {
+      const targetEndpoint = isEditing 
+        ? `${API_URL}/workloads/${editingId}` 
+        : `${API_URL}/workloads`;
+
+      const method = isEditing ? 'PUT' : 'POST';
+
+      const response = await fetch(targetEndpoint, {
+        method: method,
+        headers: {
+          'Authorization': `Bearer ${token}`,
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify(payload)
+      });
+
+      if (!response.ok) {
+        const errJson = await response.json().catch(() => ({}));
+        throw new Error(errJson.detail || 'ไม่สามารถบันทึกข้อมูลภาระงานลงฐานข้อมูลได้');
+      }
+
+      announce(isEditing ? 'แก้ไขรายการภาระงานเรียบร้อยแล้ว' : 'เพิ่มรายการภาระงานเรียบร้อยแล้ว');
+      filter.value = 'all'; 
+      reset(); 
+      await fetchWorkloads(); // โหลดข้อมูลใหม่จาก DB
+
+    } catch (err) {
+      console.error('Save Workload Error:', err);
+      announce(err.message);
+    }
   });
-  document.getElementById('workload-cancel').addEventListener('click', () => { reset(); announce('ยกเลิกข้อมูลในฟอร์มแล้ว'); });
-  filter.addEventListener('change', render);
+
+  const cancelBtn = document.getElementById('workload-cancel');
+  if (cancelBtn) cancelBtn.addEventListener('click', () => { reset(); announce('ยกเลิกข้อมูลในฟอร์มแล้ว'); });
+  if (filter) filter.addEventListener('change', render);
+
+  // ✏️ 3. จัดการปุ่มแก้ไขในตาราง
   list.addEventListener('click', event => {
     const button = event.target.closest('button[data-action]'); if (!button) return;
-    const record = records.find(item => item.id === button.dataset.id); if (!record) return;
-    if (button.dataset.action === 'delete') {
-      if (!window.confirm(`ลบรายการ “${record.title}” หรือไม่?`)) return;
-      records = records.filter(item => item.id !== record.id); if (editingId === record.id) reset(); render(); announce('ลบรายการภาระงานแล้ว'); return;
+    const record = records.find(item => String(item.id) === String(button.dataset.id)); if (!record) return;
+
+    if (button.dataset.action === 'edit') {
+      if (changed && !window.confirm('มีข้อมูลที่ยังไม่ได้บันทึก ต้องการเปลี่ยนไปแก้ไขรายการนี้หรือไม่?')) return;
+      reset(); 
+      if (category) category.value = record.category; 
+      details(record);
+      
+      for (const name of common) {
+        if (form.elements.namedItem(name)) {
+          form.elements.namedItem(name).value = record[name] || '';
+        }
+      }
+      
+      updateScore();
+      editingId = record.id; 
+      attachments = Array.isArray(record.attachments) ? [...record.attachments] : [];
+      
+      const selectedEv = document.getElementById('selected-evidence');
+      if (selectedEv) selectedEv.textContent = attachments.join(', ');
+      
+      const saveBtn = document.getElementById('workload-save');
+      if (saveBtn) saveBtn.textContent = 'บันทึกการแก้ไขภาระงาน';
+      
+      const cancelBtn = document.getElementById('workload-cancel');
+      if (cancelBtn) cancelBtn.textContent = 'ยกเลิกการแก้ไข';
+      
+      announce('กำลังแก้ไข: ' + record.title); 
+      if (form.elements.title) form.elements.title.focus();
     }
-    if (changed && !window.confirm('มีข้อมูลที่ยังไม่ได้เพิ่ม ต้องการเปลี่ยนไปแก้ไขรายการนี้หรือไม่?')) return;
-    reset(); category.value = record.category; details(record);
-    for (const name of common) form.elements.namedItem(name).value = record[name];
-    updateScore();
-    editingId = record.id; attachments = [...record.attachments];
-    document.getElementById('selected-evidence').textContent = attachments.join(', ');
-    document.getElementById('workload-save').textContent = 'บันทึกการแก้ไขภาระงาน';
-    document.getElementById('workload-cancel').textContent = 'ยกเลิกการแก้ไข';
-    announce('กำลังแก้ไข: ' + record.title); form.elements.title.focus();
   });
-  window.addEventListener('beforeunload', event => { if (changed) { event.preventDefault(); event.returnValue = ''; } });
-  details(); render();
+
+  // โหลดข้อมูลเมื่อเริ่มต้น
+  details(); 
+  await fetchWorkloads();
 })();

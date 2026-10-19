@@ -1,5 +1,5 @@
 // ดึง API_BASE_URL จาก config.js (ถ้าไม่มีจะใช้ค่า IP ของ EC2)
-const API_URL = typeof API_BASE_URL !== 'undefined' ? API_BASE_URL : 'http://54.83.108.19/api';
+const API_URL = typeof API_BASE_URL !== 'undefined' ? API_BASE_URL : 'http://34.236.42.23/api';
 
 let currentTab = 'authors';
 let currentPage = 1;

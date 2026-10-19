@@ -1,7 +1,7 @@
 // =========================================================================
 // 1. CONFIGURATION & STATE MANAGEMENT
 // =========================================================================
-const API_BASE_URL = "http://54.83.108.19/api";
+const API_BASE_URL = "http://34.236.42.23/api";
 
 const state = {
   teacherId: new URLSearchParams(window.location.search).get('id'),
@@ -320,37 +320,6 @@ function switchWorkloadTab(category, btnEl) {
   loadCategoryWorkloads(state.currentCategory);
 }
 
-function renderEditButton() {
-  const userStr = localStorage.getItem('user');
-  if (!userStr || !state.teacherId) return;
-
-  try {
-    const currentUser = JSON.parse(userStr);
-    const actionsContainer = document.getElementById('profile-actions');
-    if (!actionsContainer) return;
-
-    const isSelf = String(currentUser.id) === String(state.teacherId);
-    const isAdmin = currentUser.role === 'admin' || currentUser.role === 'staff';
-
-    if (isSelf || isAdmin) {
-      actionsContainer.innerHTML = `
-        <button id="edit-profile-btn" onclick="handleEditProfile()" style="
-          background-color: #8C1D24; color: #ffffff; border: none; padding: 8px 16px;
-          border-radius: 6px; cursor: pointer; font-size: 14px; font-weight: 500;
-          display: inline-flex; align-items: center; gap: 8px; box-shadow: 0 2px 5px rgba(0,0,0,0.15);
-        ">
-          <i class="fa fa-pencil"></i> แก้ไข
-        </button>
-      `;
-    }
-  } catch (error) {
-    console.error('Error checking profile permission:', error);
-  }
-}
-
-function handleEditProfile() {
-  alert('ผ่านการทดสอบสิทธิ์! คุณมีสิทธิ์จัดการและแก้ไขข้อมูลในหน้าโปรไฟล์นี้');
-}
 
 // =========================================================================
 // 6. INITIALIZATION

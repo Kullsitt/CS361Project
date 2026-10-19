@@ -37,7 +37,7 @@ def root_check():
         "documentation": "/docs"
     }
 
-app.mount("/", StaticFiles(directory="public", html=True), name="public")
+# app.mount("/", StaticFiles(directory="public", html=True), name="public")
 
 if __name__ == "__main__":
     uvicorn.run(
