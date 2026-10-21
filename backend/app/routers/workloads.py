@@ -1,159 +1,242 @@
-"""Authenticated teacher CRUD. Deploy only after the dashboard migration."""
-import logging
-from uuid import UUID, uuid4
-from fastapi import APIRouter, Depends, HTTPException
+from typing import Optional
+from uuid import UUID
+from fastapi import APIRouter, Depends, Query, HTTPException, status
 from psycopg2.extras import RealDictCursor
+from pydantic import BaseModel
 from app.core.database import get_db
-from app.routers.auth import get_current_user
-from app.workload_records import MAPPINGS, columns, from_row, validate
 
-router = APIRouter(prefix='/workloads', tags=['Teacher workload management'])
-log = logging.getLogger(__name__)
+router = APIRouter(prefix="/workloads", tags=["Workloads"])
+
+class StatusUpdatePayload(BaseModel):
+    status: str  # 'PASS', 'FAIL', 'PENDING', 'APPROVED', 'REJECTED'
 
 
-def key_parts(key):
+# ---------------- 1. ดึงข้อมูลภาระงานแยกตามหมวดหมู่ ----------------
+@router.get("/by-category", summary="ดึงข้อมูลภาระงานแยกตามหมวดหมู่ (ไม่รวมงานวิจัย)")
+def get_workloads_by_category(
+    professor_id: str = Query(..., description="ID ของอาจารย์ (professor_id)"),
+    category: str = Query("TEACHING", description="TEACHING, ADVISING, ADMINISTRATIVE, SERVICE"),
+    conn = Depends(get_db)
+):
+    cursor = conn.cursor(cursor_factory=RealDictCursor)
     try:
-        table, raw_id = key.split(':', 1)
-        if table not in MAPPINGS:
-            raise ValueError()
-        return table, str(UUID(raw_id))
-    except ValueError:
-        raise HTTPException(404, 'ไม่พบรายการภาระงาน') from None
+        cat = category.upper()
+
+        if cat == "TEACHING":
+            query = """
+                SELECT 
+                    tw.id::text, tw.course_code, tw.course_code AS title, tw.section,
+                    tw.credits, tw.student_count, tw.workload_hours, tw.is_selected, 
+                    tw.score, ws.semester, ws.academic_year
+                FROM teaching_workloads tw
+                JOIN workload_submissions ws ON ws.id = tw.submission_id
+                WHERE ws.professor_id::text = %s
+                ORDER BY ws.academic_year DESC, ws.semester DESC;
+            """
+            params = (str(professor_id),)
+
+        elif cat == "ADVISING":
+            query = """
+                SELECT 
+                    ts.id::text, ts.course_code, ts.student_name AS advisee_name, 
+                    ts.degree_level, ts.role_type AS role, ts.is_selected, ts.score, 
+                    ws.semester, ws.academic_year
+                FROM thesis_supervisions ts
+                JOIN workload_submissions ws ON ws.id = ts.submission_id
+                WHERE ws.professor_id::text = %s
+
+                UNION ALL
+
+                SELECT 
+                    sps.id::text, sps.course_code, 
+                    CONCAT('โครงงานนักศึกษา (', sps.project_count, ' โครงงาน)') AS advisee_name, 
+                    'ปริญญาตรี' AS degree_level, sps.role_type AS role, sps.is_selected, sps.score, 
+                    ws.semester, ws.academic_year
+                FROM student_project_supervisions sps
+                JOIN workload_submissions ws ON ws.id = sps.submission_id
+                WHERE ws.professor_id::text = %s;
+            """
+            params = (str(professor_id), str(professor_id))
+
+        elif cat == "ADMINISTRATIVE":
+            query = """
+                SELECT 
+                    awi.id::text, awi.position_or_task_name AS title, awi.organization, 
+                    awi.appointment_no, awi.start_date::text, awi.end_date::text, 
+                    awi.weight, awi.is_selected, awi.score, ws.semester, ws.academic_year
+                FROM administrative_work_items awi
+                JOIN workload_submissions ws ON ws.id = awi.submission_id
+                WHERE ws.professor_id::text = %s;
+            """
+            params = (str(professor_id),)
+
+        elif cat in ["SERVICE", "EXTRA"]:
+            query = """
+                SELECT 
+                    swi.id::text, swi.title, swi.role_type AS role, swi.organization, 
+                    swi.service_date::text, swi.weight, swi.is_selected, swi.score, 
+                    ws.semester, ws.academic_year
+                FROM service_work_items swi
+                JOIN workload_submissions ws ON ws.id = swi.submission_id
+                WHERE ws.professor_id::text = %s
+
+                UNION ALL
+
+                SELECT 
+                    esi.id::text, esi.title, 'Extra Score' AS role, esi.description AS organization, 
+                    NULL AS service_date, 1.0 AS weight, esi.is_selected, esi.score, 
+                    ws.semester, ws.academic_year
+                FROM extra_score_items esi
+                JOIN workload_submissions ws ON ws.id = esi.submission_id
+                WHERE ws.professor_id::text = %s;
+            """
+            params = (str(professor_id), str(professor_id))
+
+        else:
+            return []
+
+        cursor.execute(query, params)
+        return cursor.fetchall()
+
+    except Exception as e:
+        raise HTTPException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            detail=f"Database Query Error: {str(e)}"
+        )
+    finally:
+        cursor.close()
 
 
-def lock_owner(cur, user):
-    cur.execute('SELECT id FROM professors WHERE id::text = %s FOR UPDATE', (user['id'],))
-    if not cur.fetchone():
-        raise HTTPException(404, 'ไม่พบข้อมูลอาจารย์')
-
-
-def owned_item(cur, key, user):
-    table, item_id = key_parts(key)
-    cur.execute(f'''SELECT i.*, s.status FROM {table} i
-        JOIN workload_submissions s ON s.id = i.submission_id
-        WHERE i.id::text = %s AND s.professor_id::text = %s FOR UPDATE OF i, s''',
-        (item_id, user['id']))
-    row = cur.fetchone()
-    if not row:
-        raise HTTPException(404, 'ไม่พบรายการภาระงาน')
-    return table, item_id, row
-
-
-def submission(cur, user, record):
-    semester = 3 if record['semester'] == 'summer' else int(record['semester'])
-    cur.execute('''SELECT id, status FROM workload_submissions
-        WHERE professor_id::text = %s AND academic_year = %s AND semester = %s
-        ORDER BY created_at DESC LIMIT 1 FOR UPDATE''', (user['id'], record['year'], semester))
-    rows = cur.fetchall()
-    
-    if rows:
-        sid = str(rows[0]['id'])
-        # เมื่อมีการบันทึก/แก้ไขข้อมูลใหม่ ให้เปลี่ยนสถานะชุดงานเป็น 'PENDING' (รอตรวจ) อัตโนมัติทันที
-        cur.execute("UPDATE workload_submissions SET status = 'PENDING', updated_at = NOW() WHERE id = %s", (sid,))
-        return sid
-        
-    new_id = str(uuid4())
-    cur.execute('''INSERT INTO workload_submissions
-        (id, professor_id, academic_year, semester, total_score, status, created_at, updated_at)
-        VALUES (%s, %s, %s, %s, 0, 'PENDING', NOW(), NOW())''',
-        (new_id, user['id'], record['year'], semester))
-    return new_id
-
-
-def recalculate(cur, submission_id):
-    tables = [*MAPPINGS, 'extra_score_items']
-    query = ' UNION ALL '.join(f'SELECT score FROM {t} WHERE submission_id = %s AND is_selected IS TRUE' for t in tables)
-    cur.execute(f'''UPDATE workload_submissions SET total_score =
-        (SELECT COALESCE(SUM(score), 0) FROM ({query}) scores), updated_at = NOW()
-        WHERE id = %s''', tuple([submission_id] * len(tables) + [submission_id]))
-
-
-@router.get('')
-def list_workloads(user=Depends(get_current_user), conn=Depends(get_db)):
+# ---------------- 2. Officer Dashboard (คำนวณสรุปรายอาจารย์) ----------------
+@router.get("/officer/dashboard", summary="ดึงข้อมูลสรุปภาระงานอาจารย์ทั้งหมดสำหรับ Officer")
+def get_officer_dashboard(
+    academic_year: Optional[int] = Query(None),
+    semester: Optional[int] = Query(None),
+    status_filter: Optional[str] = Query(None, alias="status"),
+    search: Optional[str] = Query(None),
+    conn = Depends(get_db)
+):
+    cursor = conn.cursor(cursor_factory=RealDictCursor)
     try:
-        result = []
-        with conn.cursor(cursor_factory=RealDictCursor) as cur:
-            for table in MAPPINGS:
-                cur.execute(f'''SELECT i.*, s.academic_year, s.semester, s.status AS submission_status
-                    FROM {table} i JOIN workload_submissions s ON s.id = i.submission_id
-                    WHERE s.professor_id::text = %s ORDER BY s.academic_year DESC, s.semester DESC, i.created_at DESC''', (user['id'],))
-                for row in cur.fetchall():
-                    item = from_row(table, row)
-                    item['editable'] = True
-                    item['deletable'] = True
-                    result.append(item)
-        return result
-    except Exception:
-        log.exception('Could not list workloads')
-        raise HTTPException(500, 'โหลดภาระงานไม่สำเร็จ กรุณาลองใหม่') from None
+        query = """
+            SELECT 
+                p.id::text AS id,
+                CONCAT(COALESCE(p.title, ''), p.first_name_th, ' ', p.last_name_th) AS name,
+                COALESCE(p.academic_rank, 'อาจารย์') AS position,
+                ws.id::text AS submission_id,
+                COALESCE(ws.academic_year, 2567) AS academic_year,
+                COALESCE(ws.semester, 2) AS semester,
+                COALESCE(ws.status, 'PENDING') AS status,
+                
+                -- คำนวณหน่วยกิตสอนรวม
+                COALESCE((SELECT SUM(credits) FROM teaching_workloads WHERE submission_id = ws.id), 0) AS credits,
+                
+                -- หมวด 1: งานสอน (เพดาน 900)
+                COALESCE((SELECT SUM(score) FROM teaching_workloads WHERE submission_id = ws.id), 0) AS m1_actual,
+                LEAST(COALESCE((SELECT SUM(score) FROM teaching_workloads WHERE submission_id = ws.id), 0), 900.0) AS m1_calc,
+                
+                -- หมวด 2: งานวิชาการ (เพดาน 900)
+                COALESCE((SELECT SUM(score) FROM academic_work_items WHERE submission_id = ws.id), 0) 
+                + COALESCE((SELECT SUM(calculated_score) FROM professor_publications WHERE professor_id = p.id), 0) AS m2_actual,
+                LEAST(
+                    COALESCE((SELECT SUM(score) FROM academic_work_items WHERE submission_id = ws.id), 0) 
+                    + COALESCE((SELECT SUM(calculated_score) FROM professor_publications WHERE professor_id = p.id), 0), 900.0
+                ) AS m2_calc,
+                
+                -- หมวด 3: งานบริหาร (เพดาน 400)
+                COALESCE((SELECT SUM(score) FROM administrative_work_items WHERE submission_id = ws.id), 0) AS m3_actual,
+                LEAST(COALESCE((SELECT SUM(score) FROM administrative_work_items WHERE submission_id = ws.id), 0), 400.0) AS m3_calc,
+                
+                -- หมวด 4: งานบริการ (เพดาน 300)
+                COALESCE((SELECT SUM(score) FROM service_work_items WHERE submission_id = ws.id), 0) AS m4_actual,
+                LEAST(COALESCE((SELECT SUM(score) FROM service_work_items WHERE submission_id = ws.id), 0), 300.0) AS m4_calc,
+                
+                -- หมวด 5: คะแนนพิเศษ (เพดาน 100)
+                COALESCE((SELECT SUM(score) FROM extra_score_items WHERE submission_id = ws.id), 0) AS m5_actual,
+                LEAST(COALESCE((SELECT SUM(score) FROM extra_score_items WHERE submission_id = ws.id), 0), 100.0) AS m5_calc
+            FROM professors p
+            LEFT JOIN workload_submissions ws ON ws.professor_id = p.id
+            WHERE 1=1
+        """
+        params = []
+
+        if academic_year:
+            query += " AND (ws.academic_year = %s OR ws.academic_year IS NULL)"
+            params.append(academic_year)
+        if semester:
+            query += " AND (ws.semester = %s OR ws.semester IS NULL)"
+            params.append(semester)
+        if status_filter and status_filter != "ALL":
+            query += " AND ws.status = %s"
+            params.append(status_filter)
+        if search:
+            query += " AND (p.first_name_th ILIKE %s OR p.last_name_th ILIKE %s)"
+            search_pattern = f"%{search}%"
+            params.extend([search_pattern, search_pattern])
+
+        query += " ORDER BY p.first_name_th ASC;"
+
+        cursor.execute(query, params)
+        return cursor.fetchall()
+
+    except Exception as e:
+        raise HTTPException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            detail=f"Database Query Error: {str(e)}"
+        )
+    finally:
+        cursor.close()
 
 
-def save(payload, user, conn, key=None):
+# ---------------- 3. ตรวจสอบรายละเอียดภาระงานอาจารย์ ----------------
+@router.get("/officer/inspect/{professor_id}", summary="ดึงรายละเอียดภาระงานรายวิชาเฉพาะอาจารย์")
+def inspect_professor_workload(professor_id: str, conn = Depends(get_db)):
+    cursor = conn.cursor(cursor_factory=RealDictCursor)
     try:
-        record = validate(payload)
-    except ValueError as exc:
-        raise HTTPException(422, str(exc)) from None
+        teaching_query = """
+            SELECT tw.course_code AS code, tw.course_code AS name, tw.section,
+                   tw.credits, tw.workload_hours AS hours, tw.score
+            FROM teaching_workloads tw
+            JOIN workload_submissions ws ON ws.id = tw.submission_id
+            WHERE ws.professor_id::text = %s;
+        """
+        cursor.execute(teaching_query, (str(professor_id),))
+        teaching = cursor.fetchall()
+
+        return {"teaching": teaching}
+    except Exception as e:
+        raise HTTPException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            detail=f"Database Error: {str(e)}"
+        )
+    finally:
+        cursor.close()
+
+
+# ---------------- 4. อัปเดตสถานะการอนุมัติภาระงาน ----------------
+@router.patch("/submissions/{submission_id}/status", summary="อัปเดตสถานะการอนุมัติภาระงาน")
+def update_submission_status(submission_id: str, payload: StatusUpdatePayload, conn = Depends(get_db)):
+    cursor = conn.cursor(cursor_factory=RealDictCursor)
     try:
-        with conn.cursor(cursor_factory=RealDictCursor) as cur:
-            lock_owner(cur, user)
-            old = owned_item(cur, key, user) if key else None
-            sid = submission(cur, user, record)
-            table, values = columns(record)
-            if record['subtype'].split(' ')[0] == '3.5':
-                cur.execute('''SELECT id::text FROM administrative_work_items
-                    WHERE submission_id = %s AND workload_subtype LIKE '3.5 %%' AND role_type = %s''', (sid, record['role']))
-                if any(not old or old[0] != table or row['id'] != old[1] for row in cur.fetchall()):
-                    raise HTTPException(409, 'บทบาทอาจารย์ที่ปรึกษานี้มีแล้วในภาคเรียนเดียวกัน')
-            if old and old[0] == table:
-                item_id = old[1]
-                values['submission_id'] = sid
-                assignments = ', '.join(f'{column} = %s' for column in values)
-                cur.execute(f'UPDATE {table} SET {assignments} WHERE id = %s', (*values.values(), item_id))
-            else:
-                item_id = str(uuid4())
-                values.update(id=item_id, submission_id=sid, is_selected=True)
-                names = ', '.join(values)
-                placeholders = ', '.join(['%s'] * len(values))
-                cur.execute(f'INSERT INTO {table} ({names}) VALUES ({placeholders})', tuple(values.values()))
-                if old:
-                    cur.execute(f'DELETE FROM {old[0]} WHERE id = %s', (old[1],))
-            recalculate(cur, sid)
-            if old and str(old[2]['submission_id']) != sid:
-                recalculate(cur, str(old[2]['submission_id']))
+        update_query = """
+            UPDATE workload_submissions 
+            SET status = %s, updated_at = NOW()
+            WHERE id::text = %s
+            RETURNING id::text, status;
+        """
+        cursor.execute(update_query, (payload.status, str(submission_id)))
+        updated = cursor.fetchone()
         conn.commit()
-        return dict(record, id=f'{table}:{item_id}', editable=True, deletable=True)
-    except HTTPException:
+
+        if not updated:
+            raise HTTPException(status_code=404, detail="ไม่พบข้อมูลการยื่นภาระงาน")
+
+        return {"message": "อัปเดตสถานะสำเร็จ", "data": updated}
+    except Exception as e:
         conn.rollback()
-        raise
-    except Exception:
-        conn.rollback()
-        log.exception('Could not save workload')
-        raise HTTPException(500, 'บันทึกภาระงานไม่สำเร็จ กรุณาลองใหม่') from None
-
-
-@router.post('', status_code=201)
-def create_workload(payload: dict, user=Depends(get_current_user), conn=Depends(get_db)):
-    return save(payload, user, conn)
-
-
-@router.put('/{key}')
-def update_workload(key: str, payload: dict, user=Depends(get_current_user), conn=Depends(get_db)):
-    return save(payload, user, conn, key)
-
-
-@router.delete('/{key}', status_code=204)
-def delete_workload(key: str, user=Depends(get_current_user), conn=Depends(get_db)):
-    try:
-        with conn.cursor(cursor_factory=RealDictCursor) as cur:
-            lock_owner(cur, user)
-            table, item_id, row = owned_item(cur, key, user)
-            cur.execute(f'DELETE FROM {table} WHERE id = %s', (item_id,))
-            recalculate(cur, str(row['submission_id']))
-        conn.commit()
-    except HTTPException:
-        conn.rollback()
-        raise
-    except Exception:
-        conn.rollback()
-        log.exception('Could not delete workload')
-        raise HTTPException(500, 'ลบภาระงานไม่สำเร็จ กรุณาลองใหม่') from None
+        raise HTTPException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            detail=f"Database Update Error: {str(e)}"
+        )
+    finally:
+        cursor.close()
