@@ -8,7 +8,32 @@ function getApiBaseUrl() {
     return 'http://34.236.42.23/api';
 }
 
+// 🌟 ฟังก์ชันตรวจสอบ Token และ สิทธิ์การใช้งาน (Role-Based Authentication Check)
+function checkAuth() {
+    const token = localStorage.getItem('token') || localStorage.getItem('access_token');
+    const userObj = JSON.parse(localStorage.getItem('user') || '{}');
+    const role = (localStorage.getItem('user_role') || userObj.role || '').toLowerCase();
+
+    // 1. ถ้าไม่มี Token ให้ส่งกลับไปหน้า Login ทันที
+    if (!token) {
+        window.location.href = 'login.html';
+        return null;
+    }
+
+    // 2. ถ้าไม่ใช่เจ้าหน้าที่ (staff / officer / admin) ให้ดีดไปหน้าอาจารย์
+    if (role && !['staff', 'officer', 'admin'].includes(role)) {
+        alert('เฉพาะเจ้าหน้าที่เท่านั้นที่มีสิทธิ์เข้าถึงหน้านี้');
+        window.location.href = 'teacher-dashboard.html';
+        return null;
+    }
+
+    return token;
+}
+
 document.addEventListener('DOMContentLoaded', () => {
+    // ตรวจสอบสิทธิ์ตั้งแต่เริ่มโหลดหน้าเว็บ
+    if (!checkAuth()) return;
+
     const termFilter = document.getElementById('term-filter');
     const statusFilter = document.getElementById('status-filter');
     const searchInput = document.getElementById('search-lecturer');
@@ -21,6 +46,9 @@ document.addEventListener('DOMContentLoaded', () => {
 });
 
 async function loadDashboardData() {
+    const token = checkAuth();
+    if (!token) return;
+
     const termVal = document.getElementById('term-filter')?.value || '2-2567';
     const statusVal = document.getElementById('status-filter')?.value || 'ALL';
     const searchVal = document.getElementById('search-lecturer')?.value || '';
@@ -34,15 +62,30 @@ async function loadDashboardData() {
     if (searchVal) params.append('search', searchVal.trim());
 
     const baseUrl = getApiBaseUrl();
-    const token = localStorage.getItem('token') || localStorage.getItem('access_token');
-    const headers = { 'Content-Type': 'application/json' };
-    if (token) headers['Authorization'] = `Bearer ${token}`;
+    const headers = { 
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${token}`
+    };
 
     try {
         const response = await fetch(`${baseUrl}/workloads/officer/dashboard?${params.toString()}`, {
             method: 'GET',
             headers: headers
         });
+
+        // 🌟 ดักจับกรณี Token หมดอายุ (401) หรือ สิทธิ์ไม่ถึง (403)
+        if (response.status === 401) {
+            localStorage.clear();
+            alert('เซสชันหมดอายุ กรุณาเข้าสู่ระบบใหม่อีกครั้ง');
+            window.location.href = 'login.html';
+            return;
+        }
+
+        if (response.status === 403) {
+            alert('คุณไม่มีสิทธิ์เข้าถึงข้อมูลหน้าจัดการของเจ้าหน้าที่');
+            window.location.href = 'teacher-dashboard.html';
+            return;
+        }
 
         if (!response.ok) throw new Error('ไม่สามารถดึงข้อมูลภาระงานได้');
 
@@ -55,13 +98,12 @@ async function loadDashboardData() {
             rawList = resData.submissions;
         }
 
-        // 🌟 กรองเฉพาะอาจารย์ที่มีการยื่นภาระงานจริง (คะแนนรวม หรือหน่วยกิต > 0)
+        // กรองเฉพาะอาจารย์ที่มีการยื่นภาระงานจริง
         globalLecturersData = rawList.filter(item => {
             const totalActual = Number(item.m1_actual || 0) + Number(item.m2_actual || 0) + Number(item.m3_actual || 0) + Number(item.m4_actual || 0) + Number(item.m5_actual || 0);
             const totalCalc = Number(item.m1_calc || 0) + Number(item.m2_calc || 0) + Number(item.m3_calc || 0) + Number(item.m4_calc || 0) + Number(item.m5_calc || 0) || Number(item.total_score || 0);
             const credits = Number(item.credits || 0);
 
-            // ต้องมีคะแนนหรือหน่วยกิตมากกว่า 0 ถึงจะถือว่ามีการยื่นภาระงานมาแล้ว
             const hasSubmittedData = (totalCalc > 0 || totalActual > 0 || credits > 0);
             const isNotUnsubmitted = item.status && !['UNSUBMITTED', 'NOT_SUBMITTED', 'DRAFT'].includes(item.status.toUpperCase());
 
@@ -173,6 +215,9 @@ function filterData() {
 }
 
 async function openInspectModal(profId) {
+    const token = checkAuth();
+    if (!token) return;
+
     const lecturer = globalLecturersData.find(l => (l.id === profId || l.submission_id === profId || l.professor_id === profId));
     if (!lecturer) return;
 
@@ -206,9 +251,10 @@ async function openInspectModal(profId) {
     `;
 
     const baseUrl = getApiBaseUrl();
-    const token = localStorage.getItem('token') || localStorage.getItem('access_token');
-    const headers = { 'Content-Type': 'application/json' };
-    if (token) headers['Authorization'] = `Bearer ${token}`;
+    const headers = { 
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${token}`
+    };
 
     try {
         const res = await fetch(`${baseUrl}/workloads/officer/inspect/${profId}`, { headers });
@@ -250,10 +296,14 @@ async function openInspectModal(profId) {
 }
 
 async function changeSubmissionStatus(subId, statusVal) {
+    const token = checkAuth();
+    if (!token) return;
+
     const baseUrl = getApiBaseUrl();
-    const token = localStorage.getItem('token') || localStorage.getItem('access_token');
-    const headers = { 'Content-Type': 'application/json' };
-    if (token) headers['Authorization'] = `Bearer ${token}`;
+    const headers = { 
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${token}`
+    };
 
     try {
         const res = await fetch(`${baseUrl}/workloads/submissions/${subId}/status`, {
@@ -279,4 +329,10 @@ function closeModal() {
 
 function exportCSV() {
     alert("ระบบกำลังส่งออกไฟล์รายงาน CSV สรุปคะแนนภาระงานอาจารย์...");
+}
+
+// 🌟 ฟังก์ชัน Logout ออกจากระบบ
+function logout() {
+    localStorage.clear();
+    window.location.href = 'login.html';
 }
