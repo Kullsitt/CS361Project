@@ -112,11 +112,17 @@ class DashboardTests(unittest.TestCase):
                 app.dependency_overrides[current_user_dependency] = lambda: {
                     'id': owner_id, 'role': 'officer'
                 }
+                cursor.fetchone.side_effect = [
+                    {'id': owner_id, 'status': 'PENDING'},
+                    {'id': owner_id, 'status': 'APPROVED'},
+                ]
                 response = await client.patch(
                     f'/api/workloads/submissions/{owner_id}/status',
                     json={'status': 'APPROVED'},
                 )
-                self.assertEqual(response.status_code, 403)
+                self.assertEqual(response.status_code, 200)
+                self.assertEqual(response.json()['data']['status'], 'APPROVED')
+                conn.commit.assert_called_once()
 
                 app.dependency_overrides[current_user_dependency] = lambda: {'id': owner_id, 'role': 'reviewer'}
                 response = await client.patch(
@@ -194,53 +200,60 @@ class DashboardTests(unittest.TestCase):
 
     def test_reviewer_can_approve_only_open_submission(self):
         from unittest.mock import Mock
-        from app.routers.auth import get_current_user as current_user_dependency
+        from app.routers.workloads import StatusUpdatePayload, update_submission_status
+        from fastapi import HTTPException
         submission_id = '00000000-0000-0000-0000-000000000003'
+
+        for original_status, next_status in (
+            ('PENDING', 'APPROVED'),
+            ('REJECTED', 'APPROVED'),
+        ):
+            cursor = Mock()
+            cursor.fetchone.side_effect = [
+                {'id': submission_id, 'status': original_status},
+                {'id': submission_id, 'status': next_status},
+            ]
+            conn = Mock()
+            conn.cursor.return_value = cursor
+            result = update_submission_status(
+                submission_id=submission_id,
+                payload=StatusUpdatePayload(status=next_status),
+                current_user={'id': submission_id, 'role': 'reviewer'},
+                conn=conn,
+            )
+            self.assertEqual(result['data']['status'], next_status)
+            conn.commit.assert_called_once()
+
         cursor = Mock()
-        cursor.fetchone.side_effect = [
-            {'id': submission_id, 'status': 'PENDING'},
-            {'id': submission_id, 'status': 'APPROVED'},
-        ]
+        cursor.fetchone.return_value = {'id': submission_id, 'status': 'APPROVED'}
+        conn = Mock()
+        conn.cursor.return_value = cursor
+        with self.assertRaises(HTTPException) as error:
+            update_submission_status(
+                submission_id=submission_id,
+                payload=StatusUpdatePayload(status='REJECTED'),
+                current_user={'id': submission_id, 'role': 'reviewer'},
+                conn=conn,
+            )
+        self.assertEqual(error.exception.status_code, 409)
+        conn.rollback.assert_called_once()
+
+    def test_dashboard_teaching_score_includes_supervision_items(self):
+        from unittest.mock import Mock
+        from app.routers.workloads import get_officer_dashboard
+        cursor = Mock()
+        cursor.fetchall.return_value = []
         conn = Mock()
         conn.cursor.return_value = cursor
 
-        async def check():
-            app.dependency_overrides[get_db] = lambda: conn
-            app.dependency_overrides[current_user_dependency] = lambda: {
-                'id': submission_id, 'role': 'reviewer'
-            }
-            async with httpx.AsyncClient(
-                transport=httpx.ASGITransport(app=app),
-                base_url='http://test',
-            ) as client:
-                response = await client.patch(
-                    f'/api/workloads/submissions/{submission_id}/status',
-                    json={'status': 'APPROVED'},
-                )
-            self.assertEqual(response.status_code, 200)
-            self.assertEqual(response.json()['data']['status'], 'APPROVED')
-            conn.commit.assert_called_once()
+        get_officer_dashboard(
+            current_user={'id': 'reviewer', 'role': 'reviewer'},
+            conn=conn,
+        )
 
-            closed_cursor = Mock()
-            closed_cursor.fetchone.return_value = {'id': submission_id, 'status': 'APPROVED'}
-            closed_conn = Mock()
-            closed_conn.cursor.return_value = closed_cursor
-            app.dependency_overrides[get_db] = lambda: closed_conn
-            async with httpx.AsyncClient(
-                transport=httpx.ASGITransport(app=app),
-                base_url='http://test',
-            ) as client:
-                response = await client.patch(
-                    f'/api/workloads/submissions/{submission_id}/status',
-                    json={'status': 'REJECTED'},
-                )
-            self.assertEqual(response.status_code, 409)
-            closed_conn.rollback.assert_called_once()
-
-        try:
-            asyncio.run(check())
-        finally:
-            app.dependency_overrides.clear()
+        query = cursor.execute.call_args.args[0]
+        self.assertIn('FROM thesis_supervisions WHERE submission_id = ws.id AND is_selected IS TRUE', query)
+        self.assertIn('FROM student_project_supervisions WHERE submission_id = ws.id AND is_selected IS TRUE', query)
 
     def test_ownership_and_locked_submission(self):
         from unittest.mock import Mock

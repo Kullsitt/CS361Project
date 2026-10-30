@@ -145,11 +145,18 @@ def get_officer_dashboard(
                 COALESCE(ws.status, 'PENDING') AS status,
                 
                 -- คำนวณหน่วยกิตสอนรวม
-                COALESCE((SELECT SUM(credits) FROM teaching_workloads WHERE submission_id = ws.id), 0) AS credits,
+                COALESCE((SELECT SUM(credits) FROM teaching_workloads WHERE submission_id = ws.id AND is_selected IS TRUE), 0) AS credits,
                 
                 -- หมวด 1: งานสอน (เพดาน 900)
-                COALESCE((SELECT SUM(score) FROM teaching_workloads WHERE submission_id = ws.id), 0) AS m1_actual,
-                LEAST(COALESCE((SELECT SUM(score) FROM teaching_workloads WHERE submission_id = ws.id), 0), 900.0) AS m1_calc,
+                COALESCE((SELECT SUM(score) FROM teaching_workloads WHERE submission_id = ws.id AND is_selected IS TRUE), 0)
+                + COALESCE((SELECT SUM(score) FROM thesis_supervisions WHERE submission_id = ws.id AND is_selected IS TRUE), 0)
+                + COALESCE((SELECT SUM(score) FROM student_project_supervisions WHERE submission_id = ws.id AND is_selected IS TRUE), 0) AS m1_actual,
+                LEAST(
+                    COALESCE((SELECT SUM(score) FROM teaching_workloads WHERE submission_id = ws.id AND is_selected IS TRUE), 0)
+                    + COALESCE((SELECT SUM(score) FROM thesis_supervisions WHERE submission_id = ws.id AND is_selected IS TRUE), 0)
+                    + COALESCE((SELECT SUM(score) FROM student_project_supervisions WHERE submission_id = ws.id AND is_selected IS TRUE), 0),
+                    900.0
+                ) AS m1_calc,
                 
                 -- หมวด 2: งานวิชาการ (เพดาน 900)
                 COALESCE((SELECT SUM(score) FROM academic_work_items WHERE submission_id = ws.id), 0) 
@@ -238,7 +245,7 @@ def inspect_professor_workload(
 def update_submission_status(
     submission_id: UUID,
     payload: StatusUpdatePayload,
-    current_user: dict = Depends(require_roles({"reviewer", "admin"})),
+    current_user: dict = Depends(require_roles({"officer", "reviewer", "admin"})),
     conn=Depends(get_db),
 ):
     cursor = conn.cursor(cursor_factory=RealDictCursor)
@@ -250,7 +257,13 @@ def update_submission_status(
         submission = cursor.fetchone()
         if not submission:
             raise HTTPException(status_code=404, detail="ไม่พบข้อมูลการยื่นภาระงาน")
-        if str(submission["status"] or "").upper() not in ("PENDING", "DRAFT"):
+        current_status = str(submission["status"] or "").upper()
+        allowed_from = (
+            ("PENDING", "DRAFT", "REJECTED")
+            if payload.status == "APPROVED"
+            else ("PENDING", "DRAFT")
+        )
+        if current_status not in allowed_from:
             raise HTTPException(status_code=409, detail="สถานะภาระงานนี้ไม่สามารถเปลี่ยนได้")
 
         update_query = """

@@ -11,6 +11,7 @@
 - `POST /api/workloads`: เพิ่มรายการ พร้อมคำนวณคะแนนที่เซิร์ฟเวอร์
 - `PUT /api/workloads/{key}`: แก้ไข/ย้ายประเภทและภาคเรียนใน transaction เดียว
 - `DELETE /api/workloads/{key}`: ลบเฉพาะรายการของผู้ล็อกอินที่ยังไม่ผ่านการพิจารณา
+- `PATCH /api/workloads/submissions/{id}/status`: เจ้าหน้าที่สาขา, ผู้ตรวจสอบ หรือ admin อนุมัติ/ส่งกลับรายการได้; อนุญาตให้แก้ `REJECTED` เป็น `APPROVED` เมื่อผู้มีสิทธิ์ตัดสินใจใหม่ และไม่อนุญาตให้เปลี่ยนรายการที่ `APPROVED` แล้ว
 
 `key` คือ `table_name:uuid` ที่ API ส่งกลับ ต้อง URL-encode ก่อนใช้ใน path
 

@@ -8,7 +8,51 @@ function getApiBaseUrl() {
     return 'http://34.236.42.23/api';
 }
 
+function getStoredRole() {
+    try {
+        const user = JSON.parse(localStorage.getItem('user') || '{}');
+        return String(user.role || '').trim().toLowerCase();
+    } catch (error) {
+        console.error('Invalid stored user data:', error);
+        return '';
+    }
+}
+
+function hasOfficerDashboardRole(role = getStoredRole()) {
+    return [
+        'officer', 'staff', 'branch_officer', 'department_officer',
+        'reviewer', 'auditor', 'data_owner', 'data-owner', 'data_reviewer',
+        'manager', 'executive', 'admin', 'administrator', 'system_admin'
+    ].includes(role);
+}
+
+function canReviewSubmissions(role = getStoredRole()) {
+    return [
+        'officer', 'staff', 'branch_officer', 'department_officer',
+        'reviewer', 'auditor', 'data_owner', 'data-owner', 'data_reviewer',
+        'admin', 'administrator', 'system_admin'
+    ].includes(role);
+}
+
+function canInspectWorkloads(role = getStoredRole()) {
+    return [
+        'officer', 'staff', 'branch_officer', 'department_officer',
+        'reviewer', 'auditor', 'data_owner', 'data-owner', 'data_reviewer',
+        'admin', 'administrator', 'system_admin'
+    ].includes(role);
+}
+
 document.addEventListener('DOMContentLoaded', () => {
+    const token = localStorage.getItem('token') || localStorage.getItem('access_token');
+    if (!token) {
+        window.location.replace('login.html');
+        return;
+    }
+    if (!hasOfficerDashboardRole()) {
+        window.location.replace('index.html');
+        return;
+    }
+
     const termFilter = document.getElementById('term-filter');
     const statusFilter = document.getElementById('status-filter');
     const searchInput = document.getElementById('search-lecturer');
@@ -30,7 +74,6 @@ async function loadDashboardData() {
     const params = new URLSearchParams();
     if (year) params.append('academic_year', year);
     if (semester) params.append('semester', semester);
-    if (statusVal !== 'ALL') params.append('status', statusVal);
     if (searchVal) params.append('search', searchVal.trim());
 
     const baseUrl = getApiBaseUrl();
@@ -44,6 +87,17 @@ async function loadDashboardData() {
             headers: headers
         });
 
+        if (response.status === 401) {
+            localStorage.removeItem('token');
+            localStorage.removeItem('access_token');
+            localStorage.removeItem('user');
+            window.location.replace('login.html');
+            return;
+        }
+        if (response.status === 403) {
+            window.location.replace('index.html');
+            return;
+        }
         if (!response.ok) throw new Error('ไม่สามารถดึงข้อมูลภาระงานได้');
 
         const resData = await response.json();
@@ -58,15 +112,26 @@ async function loadDashboardData() {
         // 🌟 กรองเฉพาะอาจารย์ที่มีการยื่นภาระงานจริง (คะแนนรวม หรือหน่วยกิต > 0)
         globalLecturersData = rawList.filter(item => {
             const totalActual = Number(item.m1_actual || 0) + Number(item.m2_actual || 0) + Number(item.m3_actual || 0) + Number(item.m4_actual || 0) + Number(item.m5_actual || 0);
-            const totalCalc = Number(item.m1_calc || 0) + Number(item.m2_calc || 0) + Number(item.m3_calc || 0) + Number(item.m4_calc || 0) + Number(item.m5_calc || 0) || Number(item.total_score || 0);
+            const totalCalc = getTotalCalculatedScore(item);
             const credits = Number(item.credits || 0);
 
             // ต้องมีคะแนนหรือหน่วยกิตมากกว่า 0 ถึงจะถือว่ามีการยื่นภาระงานมาแล้ว
             const hasSubmittedData = (totalCalc > 0 || totalActual > 0 || credits > 0);
-            const isNotUnsubmitted = item.status && !['UNSUBMITTED', 'NOT_SUBMITTED', 'DRAFT'].includes(item.status.toUpperCase());
+            const isNotUnsubmitted = item.status && !['UNSUBMITTED', 'NOT_SUBMITTED'].includes(item.status.toUpperCase());
 
             return hasSubmittedData && isNotUnsubmitted;
         });
+
+        const reviewStatus = statusVal.toUpperCase();
+        if (reviewStatus === 'PASS') {
+            globalLecturersData = globalLecturersData.filter(isScorePassing);
+        } else if (reviewStatus === 'FAIL') {
+            globalLecturersData = globalLecturersData.filter(item => !isScorePassing(item));
+        } else if (reviewStatus === 'PENDING') {
+            globalLecturersData = globalLecturersData.filter(item =>
+                ['PENDING', 'DRAFT'].includes(String(item.status || '').toUpperCase())
+            );
+        }
 
         updateKPIs(globalLecturersData, rawList.length);
         renderTable(globalLecturersData);
@@ -79,6 +144,15 @@ async function loadDashboardData() {
     }
 }
 
+function getTotalCalculatedScore(item) {
+    return ['m1_calc', 'm2_calc', 'm3_calc', 'm4_calc', 'm5_calc']
+        .reduce((total, key) => total + Number(item[key] || 0), 0) || Number(item.total_score || 0);
+}
+
+function isScorePassing(item) {
+    return getTotalCalculatedScore(item) >= 650 || String(item.status || '').toUpperCase() === 'PASS';
+}
+
 function updateKPIs(data, totalLecturersCount = 0) {
     const submittedCount = data.length;
     let passCount = 0;
@@ -88,12 +162,12 @@ function updateKPIs(data, totalLecturersCount = 0) {
 
     data.forEach(item => {
         const totalActual = Number(item.m1_actual || 0) + Number(item.m2_actual || 0) + Number(item.m3_actual || 0) + Number(item.m4_actual || 0) + Number(item.m5_actual || 0);
-        const totalCalc = Number(item.m1_calc || 0) + Number(item.m2_calc || 0) + Number(item.m3_calc || 0) + Number(item.m4_calc || 0) + Number(item.m5_calc || 0) || Number(item.total_score || 0);
+        const totalCalc = getTotalCalculatedScore(item);
 
         totalActualScoreSum += totalActual;
         totalCalcScoreSum += totalCalc;
 
-        if (totalCalc >= 650 || item.status === 'PASS' || item.status === 'APPROVED') {
+        if (isScorePassing(item)) {
             passCount++;
         }
         if (item.status === 'PENDING') {
@@ -128,18 +202,23 @@ function renderTable(data) {
     tbody.innerHTML = data.map(item => {
         const name = item.name || `${item.title || ''}${item.first_name_th || ''} ${item.last_name_th || ''}`.trim() || 'ไม่ระบุชื่อ';
         const position = item.position || item.academic_rank || 'อาจารย์';
-        const profId = item.id || item.submission_id || item.professor_id;
+        const profId = item.id || item.professor_id;
 
         const totalActual = Number(item.m1_actual || 0) + Number(item.m2_actual || 0) + Number(item.m3_actual || 0) + Number(item.m4_actual || 0) + Number(item.m5_actual || 0);
-        const totalCalc = Number(item.m1_calc || 0) + Number(item.m2_calc || 0) + Number(item.m3_calc || 0) + Number(item.m4_calc || 0) + Number(item.m5_calc || 0) || Number(item.total_score || 0);
+        const totalCalc = getTotalCalculatedScore(item);
 
         let statusBadge = '';
-        if (totalCalc >= 650 || item.status === 'PASS' || item.status === 'APPROVED') {
-            statusBadge = `<span class="badge-status status-pass"><i class="fa fa-check-circle"></i> ผ่านเกณฑ์</span>`;
-        } else if (item.status === 'FAIL' || item.status === 'REJECTED') {
-            statusBadge = `<span class="badge-status status-fail"><i class="fa fa-times-circle"></i> ต่ำกว่าเกณฑ์</span>`;
-        } else {
+        const reviewStatus = String(item.status || '').toUpperCase();
+        if (reviewStatus === 'APPROVED') {
+            statusBadge = `<span class="badge-status status-pass"><i class="fa fa-check-circle"></i> อนุมัติแล้ว</span>`;
+        } else if (reviewStatus === 'REJECTED') {
+            statusBadge = `<span class="badge-status status-fail"><i class="fa fa-times-circle"></i> ส่งกลับแก้ไข</span>`;
+        } else if (['PENDING', 'DRAFT'].includes(reviewStatus)) {
             statusBadge = `<span class="badge-status status-pending"><i class="fa fa-clock-o"></i> รอตรวจ</span>`;
+        } else if (isScorePassing(item)) {
+            statusBadge = `<span class="badge-status status-pass"><i class="fa fa-check-circle"></i> ผ่านเกณฑ์</span>`;
+        } else {
+            statusBadge = `<span class="badge-status status-fail"><i class="fa fa-times-circle"></i> ต่ำกว่าเกณฑ์</span>`;
         }
 
         return `
@@ -158,10 +237,10 @@ function renderTable(data) {
                 <td style="color:#555;">${totalActual.toFixed(0)}</td>
                 <td><b style="color:#8C1D24;">${totalCalc.toFixed(0)}</b></td>
                 <td>${statusBadge}</td>
-                <td>
+                <td>${canInspectWorkloads() ? `
                     <button class="btn-action btn-inspect" onclick="openInspectModal('${profId}')">
                         <i class="fa fa-search"></i> ตรวจสอบ
-                    </button>
+                    </button>` : '—'}
                 </td>
             </tr>
         `;
@@ -231,8 +310,8 @@ async function openInspectModal(profId) {
         console.error("Error fetching inspect details:", e);
     }
 
-    const submissionId = lecturer.submission_id || lecturer.id;
-    if (submissionId) {
+    const submissionId = lecturer.submission_id;
+    if (submissionId && canReviewSubmissions() && String(lecturer.status || '').toUpperCase() !== 'APPROVED') {
         html += `
           <div style="margin-top:24px; display:flex; gap:12px;">
             <button style="background:#15803d; color:white; border:none; padding:10px 20px; border-radius:6px; font-weight:700; cursor:pointer;" onclick="changeSubmissionStatus('${submissionId}', 'APPROVED')">
@@ -266,10 +345,12 @@ async function changeSubmissionStatus(subId, statusVal) {
             closeModal();
             loadDashboardData();
         } else {
-            alert('ไม่สามารถอัปเดตสถานะได้');
+            const result = await res.json().catch(() => ({}));
+            alert(result.detail || 'ไม่สามารถอัปเดตสถานะได้ กรุณาลองใหม่');
         }
     } catch (e) {
         console.error('Error changing status:', e);
+        alert('เชื่อมต่อระบบไม่สำเร็จ กรุณาตรวจสอบเครือข่ายแล้วลองใหม่');
     }
 }
 
@@ -280,4 +361,3 @@ function closeModal() {
 function exportCSV() {
     alert("ระบบกำลังส่งออกไฟล์รายงาน CSV สรุปคะแนนภาระงานอาจารย์...");
 }
-
