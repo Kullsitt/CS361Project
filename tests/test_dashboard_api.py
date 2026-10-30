@@ -11,6 +11,7 @@ from app.main import app
 from app.core.database import get_db
 from app.workload_records import RULES, validate, columns, from_row
 from app.routers.dashboard_workloads import key_parts, owned_item, check_editable
+from app.routers.auth import create_access_token, get_current_user
 from app.routers.dashboard_profile import convert, update_profile
 from fastapi import HTTPException
 
@@ -60,13 +61,183 @@ class DashboardTests(unittest.TestCase):
     def test_auth_required(self):
         app.dependency_overrides[get_db] = lambda: None
         try:
+            owner_id = '00000000-0000-0000-0000-000000000001'
             async def check():
               async with httpx.AsyncClient(transport=httpx.ASGITransport(app=app), base_url='http://test') as client:
                 for method, path in [('GET','/api/workloads'), ('POST','/api/workloads'),
                                      ('PUT','/api/workloads/x'), ('DELETE','/api/workloads/x'),
-                                     ('GET','/api/profile/me'), ('PUT','/api/profile/me')]:
+                                     ('GET','/api/profile/me'), ('PUT','/api/profile/me'),
+                                     ('GET','/api/workloads/officer/dashboard'),
+                                     ('GET',f'/api/workloads/officer/inspect/{owner_id}')]:
                     response = await client.request(method, path, json={})
                     self.assertEqual(response.status_code, 401)
+            asyncio.run(check())
+        finally:
+            app.dependency_overrides.clear()
+
+    def test_staff_api_permissions(self):
+        from unittest.mock import Mock
+        from app.routers.auth import get_current_user as current_user_dependency
+        owner_id = '00000000-0000-0000-0000-000000000001'
+        cursor = Mock()
+        cursor.fetchall.return_value = []
+        conn = Mock()
+        conn.cursor.return_value = cursor
+
+        async def check():
+            transport = httpx.ASGITransport(app=app)
+            async with httpx.AsyncClient(transport=transport, base_url='http://test') as client:
+                app.dependency_overrides[get_db] = lambda: conn
+                app.dependency_overrides[current_user_dependency] = lambda: {'id': owner_id, 'role': 'teacher'}
+                for path in ('/api/workloads/officer/dashboard',
+                             f'/api/workloads/officer/inspect/{owner_id}'):
+                    response = await client.get(path)
+                    self.assertEqual(response.status_code, 403)
+
+                app.dependency_overrides[current_user_dependency] = lambda: {'id': owner_id, 'role': 'officer'}
+                response = await client.get('/api/workloads/officer/dashboard')
+                self.assertEqual(response.status_code, 200)
+                response = await client.get(
+                    f'/api/workloads/officer/inspect/{owner_id}',
+                )
+                self.assertEqual(response.status_code, 200)
+                app.dependency_overrides[current_user_dependency] = lambda: {
+                    'id': owner_id, 'role': 'manager'
+                }
+                response = await client.get('/api/workloads/officer/dashboard')
+                self.assertEqual(response.status_code, 200)
+                response = await client.get(f'/api/workloads/officer/inspect/{owner_id}')
+                self.assertEqual(response.status_code, 403)
+
+                app.dependency_overrides[current_user_dependency] = lambda: {
+                    'id': owner_id, 'role': 'officer'
+                }
+                response = await client.patch(
+                    f'/api/workloads/submissions/{owner_id}/status',
+                    json={'status': 'APPROVED'},
+                )
+                self.assertEqual(response.status_code, 403)
+
+                app.dependency_overrides[current_user_dependency] = lambda: {'id': owner_id, 'role': 'reviewer'}
+                response = await client.patch(
+                    f'/api/workloads/submissions/{owner_id}/status',
+                    json={'status': 'NOT_A_STATUS'},
+                )
+                self.assertEqual(response.status_code, 422)
+
+        try:
+            asyncio.run(check())
+        finally:
+            app.dependency_overrides.clear()
+
+    def test_public_workloads_are_approved_selected_and_minimized(self):
+        from unittest.mock import Mock
+        professor_id = '00000000-0000-0000-0000-000000000001'
+        cursor = Mock()
+        cursor.fetchall.return_value = []
+        conn = Mock()
+        conn.cursor.return_value = cursor
+
+        async def check():
+            app.dependency_overrides[get_db] = lambda: conn
+            async with httpx.AsyncClient(
+                transport=httpx.ASGITransport(app=app),
+                base_url='http://test',
+            ) as client:
+                response = await client.get(
+                    '/api/workloads/by-category',
+                    params={'professor_id': professor_id, 'category': 'ADVISING'},
+                )
+            self.assertEqual(response.status_code, 200)
+            self.assertEqual(response.json(), [])
+            query = cursor.execute.call_args.args[0]
+            self.assertEqual(query.count("UPPER(ws.status) = 'APPROVED'"), 2)
+            self.assertIn('ts.is_selected IS TRUE', query)
+            self.assertIn('sps.is_selected IS TRUE', query)
+            self.assertNotIn('ts.student_name AS advisee_name', query)
+            self.assertNotIn('ts.score', query)
+
+        try:
+            asyncio.run(check())
+        finally:
+            app.dependency_overrides.clear()
+
+    def test_current_role_comes_from_database(self):
+        from unittest.mock import Mock
+        user_id = '00000000-0000-0000-0000-000000000001'
+        token = create_access_token({
+            'sub': user_id,
+            'email': 'teacher@example.com',
+            'role': 'teacher',
+        })
+        cursor = Mock()
+        cursor.__enter__ = Mock(return_value=cursor)
+        cursor.__exit__ = Mock(return_value=False)
+        cursor.fetchone.return_value = {
+            'id': user_id,
+            'email': 'teacher@example.com',
+            'role': 'officer',
+        }
+        conn = Mock()
+        conn.cursor.return_value = cursor
+
+        user = get_current_user(token=token, conn=conn)
+
+        self.assertEqual(user['role'], 'officer')
+
+    def test_role_aliases_map_to_least_privilege_groups(self):
+        from app.routers.auth import normalize_role
+        self.assertEqual(normalize_role('branch_officer'), 'officer')
+        self.assertEqual(normalize_role('data_reviewer'), 'reviewer')
+        self.assertEqual(normalize_role('executive'), 'manager')
+        self.assertIsNone(normalize_role('unknown'))
+
+    def test_reviewer_can_approve_only_open_submission(self):
+        from unittest.mock import Mock
+        from app.routers.auth import get_current_user as current_user_dependency
+        submission_id = '00000000-0000-0000-0000-000000000003'
+        cursor = Mock()
+        cursor.fetchone.side_effect = [
+            {'id': submission_id, 'status': 'PENDING'},
+            {'id': submission_id, 'status': 'APPROVED'},
+        ]
+        conn = Mock()
+        conn.cursor.return_value = cursor
+
+        async def check():
+            app.dependency_overrides[get_db] = lambda: conn
+            app.dependency_overrides[current_user_dependency] = lambda: {
+                'id': submission_id, 'role': 'reviewer'
+            }
+            async with httpx.AsyncClient(
+                transport=httpx.ASGITransport(app=app),
+                base_url='http://test',
+            ) as client:
+                response = await client.patch(
+                    f'/api/workloads/submissions/{submission_id}/status',
+                    json={'status': 'APPROVED'},
+                )
+            self.assertEqual(response.status_code, 200)
+            self.assertEqual(response.json()['data']['status'], 'APPROVED')
+            conn.commit.assert_called_once()
+
+            closed_cursor = Mock()
+            closed_cursor.fetchone.return_value = {'id': submission_id, 'status': 'APPROVED'}
+            closed_conn = Mock()
+            closed_conn.cursor.return_value = closed_cursor
+            app.dependency_overrides[get_db] = lambda: closed_conn
+            async with httpx.AsyncClient(
+                transport=httpx.ASGITransport(app=app),
+                base_url='http://test',
+            ) as client:
+                response = await client.patch(
+                    f'/api/workloads/submissions/{submission_id}/status',
+                    json={'status': 'REJECTED'},
+                )
+            self.assertEqual(response.status_code, 409)
+            closed_conn.rollback.assert_called_once()
+
+        try:
             asyncio.run(check())
         finally:
             app.dependency_overrides.clear()

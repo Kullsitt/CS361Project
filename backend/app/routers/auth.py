@@ -1,7 +1,7 @@
 import bcrypt
 import jwt
 from datetime import datetime, timedelta, timezone
-from typing import Optional, List
+from typing import Optional, Collection
 from fastapi import APIRouter, Depends, HTTPException, status
 from fastapi.security import OAuth2PasswordBearer
 from pydantic import BaseModel, EmailStr
@@ -17,6 +17,32 @@ ALGORITHM = "HS256"
 ACCESS_TOKEN_EXPIRE_MINUTES = 60 * 24
 
 oauth2_scheme = OAuth2PasswordBearer(tokenUrl="/api/login")
+
+ROLE_ALIASES = {
+    "teacher": "teacher",
+    "professor": "teacher",
+    "officer": "officer",
+    "staff": "officer",
+    "branch_officer": "officer",
+    "department_officer": "officer",
+    "reviewer": "reviewer",
+    "auditor": "reviewer",
+    "data_owner": "reviewer",
+    "data-owner": "reviewer",
+    "data_reviewer": "reviewer",
+    "admin": "admin",
+    "administrator": "admin",
+    "system_admin": "admin",
+    "executive": "manager",
+    "manager": "manager",
+}
+
+
+def normalize_role(role: Optional[str]) -> Optional[str]:
+    if not role:
+        return None
+    return ROLE_ALIASES.get(role.strip().lower())
+
 
 def verify_password(plain_password: str, hashed_password: str) -> bool:
     if not hashed_password:
@@ -52,7 +78,7 @@ class TokenResponse(BaseModel):
     user: dict
 
 
-def get_current_user(token: str = Depends(oauth2_scheme)):
+def get_current_user(token: str = Depends(oauth2_scheme), conn=Depends(get_db)):
     credentials_exception = HTTPException(
         status_code=status.HTTP_401_UNAUTHORIZED,
         detail="Token ไม่ถูกต้องหรือหมดอายุแล้ว กรุณาเข้าสู่ระบบใหม่",
@@ -62,25 +88,24 @@ def get_current_user(token: str = Depends(oauth2_scheme)):
         payload = jwt.decode(token, SECRET_KEY, algorithms=[ALGORITHM])
         user_id: str = payload.get("sub")
         email: str = payload.get("email")
-        role: str = payload.get("role")
         
-        if user_id is None or email is None:
+        if user_id is None:
             raise credentials_exception
-            
-        return {
-            "id": user_id,
-            "email": email,
-            "role": role or "professor"
-        }
+
+        with conn.cursor(cursor_factory=RealDictCursor) as cursor:
+            cursor.execute(
+                "SELECT id::text AS id, email, role FROM professors WHERE id::text = %s",
+                (user_id,),
+            )
+            user = cursor.fetchone()
+        if not user:
+            raise credentials_exception
+
+        return {"id": user["id"], "email": user["email"], "role": normalize_role(user["role"])}
     except jwt.PyJWTError:
         raise credentials_exception
 
-# เพิ่มฟังก์ชันนี้ต่อจาก get_current_user ในไฟล์ backend/app/routers/auth.py
-
-def require_roles(allowed_roles: List[str]):
-    """
-    ตัวตรวจสอบระดับสิทธิ์ (Role Checker Guard)
-    """
+def require_roles(allowed_roles: Collection[str]):
     def role_checker(current_user: dict = Depends(get_current_user)):
         if current_user.get("role") not in allowed_roles:
             raise HTTPException(

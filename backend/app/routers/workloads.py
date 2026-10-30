@@ -1,23 +1,26 @@
-from typing import Optional
+from typing import Literal, Optional
 from uuid import UUID
 from fastapi import APIRouter, Depends, Query, HTTPException, status
 from psycopg2.extras import RealDictCursor
 from pydantic import BaseModel
 from app.core.database import get_db
+from app.routers.auth import get_current_user, require_roles
 
 router = APIRouter(prefix="/workloads", tags=["Workloads"])
 
 class StatusUpdatePayload(BaseModel):
-    status: str  # 'PASS', 'FAIL', 'PENDING', 'APPROVED', 'REJECTED'
+    status: Literal["APPROVED", "REJECTED"]
 
 
 # ---------------- 1. ดึงข้อมูลภาระงานแยกตามหมวดหมู่ ----------------
 @router.get("/by-category", summary="ดึงข้อมูลภาระงานแยกตามหมวดหมู่ (ไม่รวมงานวิจัย)")
 def get_workloads_by_category(
-    professor_id: str = Query(..., description="ID ของอาจารย์ (professor_id)"),
+    professor_id: UUID = Query(..., description="ID ของอาจารย์ (professor_id)"),
     category: str = Query("TEACHING", description="TEACHING, ADVISING, ADMINISTRATIVE, SERVICE"),
     conn = Depends(get_db)
 ):
+    professor_id = str(professor_id)
+
     cursor = conn.cursor(cursor_factory=RealDictCursor)
     try:
         cat = category.upper()
@@ -26,11 +29,13 @@ def get_workloads_by_category(
             query = """
                 SELECT 
                     tw.id::text, tw.course_code, tw.course_code AS title, tw.section,
-                    tw.credits, tw.student_count, tw.workload_hours, tw.is_selected, 
-                    tw.score, ws.semester, ws.academic_year
+                    tw.credits, tw.workload_hours,
+                    ws.semester, ws.academic_year
                 FROM teaching_workloads tw
                 JOIN workload_submissions ws ON ws.id = tw.submission_id
                 WHERE ws.professor_id::text = %s
+                  AND UPPER(ws.status) = 'APPROVED'
+                  AND tw.is_selected IS TRUE
                 ORDER BY ws.academic_year DESC, ws.semester DESC;
             """
             params = (str(professor_id),)
@@ -38,23 +43,27 @@ def get_workloads_by_category(
         elif cat == "ADVISING":
             query = """
                 SELECT 
-                    ts.id::text, ts.course_code, ts.student_name AS advisee_name, 
-                    ts.degree_level, ts.role_type AS role, ts.is_selected, ts.score, 
+                    ts.id::text, ts.course_code, 'นักศึกษา' AS advisee_name,
+                    ts.degree_level, ts.role_type AS role,
                     ws.semester, ws.academic_year
                 FROM thesis_supervisions ts
                 JOIN workload_submissions ws ON ws.id = ts.submission_id
                 WHERE ws.professor_id::text = %s
+                  AND UPPER(ws.status) = 'APPROVED'
+                  AND ts.is_selected IS TRUE
 
                 UNION ALL
 
                 SELECT 
-                    sps.id::text, sps.course_code, 
-                    CONCAT('โครงงานนักศึกษา (', sps.project_count, ' โครงงาน)') AS advisee_name, 
-                    'ปริญญาตรี' AS degree_level, sps.role_type AS role, sps.is_selected, sps.score, 
+                    sps.id::text, sps.course_code,
+                    CONCAT('โครงงานนักศึกษา (', sps.project_count, ' โครงงาน)') AS advisee_name,
+                    'ปริญญาตรี' AS degree_level, sps.role_type AS role,
                     ws.semester, ws.academic_year
                 FROM student_project_supervisions sps
                 JOIN workload_submissions ws ON ws.id = sps.submission_id
-                WHERE ws.professor_id::text = %s;
+                WHERE ws.professor_id::text = %s
+                  AND UPPER(ws.status) = 'APPROVED'
+                  AND sps.is_selected IS TRUE
             """
             params = (str(professor_id), str(professor_id))
 
@@ -62,11 +71,13 @@ def get_workloads_by_category(
             query = """
                 SELECT 
                     awi.id::text, awi.position_or_task_name AS title, awi.organization, 
-                    awi.appointment_no, awi.start_date::text, awi.end_date::text, 
-                    awi.weight, awi.is_selected, awi.score, ws.semester, ws.academic_year
+                    awi.start_date::text, awi.end_date::text,
+                    ws.semester, ws.academic_year
                 FROM administrative_work_items awi
                 JOIN workload_submissions ws ON ws.id = awi.submission_id
-                WHERE ws.professor_id::text = %s;
+                WHERE ws.professor_id::text = %s
+                  AND UPPER(ws.status) = 'APPROVED'
+                  AND awi.is_selected IS TRUE;
             """
             params = (str(professor_id),)
 
@@ -74,21 +85,25 @@ def get_workloads_by_category(
             query = """
                 SELECT 
                     swi.id::text, swi.title, swi.role_type AS role, swi.organization, 
-                    swi.service_date::text, swi.weight, swi.is_selected, swi.score, 
+                    swi.service_date::text,
                     ws.semester, ws.academic_year
                 FROM service_work_items swi
                 JOIN workload_submissions ws ON ws.id = swi.submission_id
                 WHERE ws.professor_id::text = %s
+                  AND UPPER(ws.status) = 'APPROVED'
+                  AND swi.is_selected IS TRUE
 
                 UNION ALL
 
                 SELECT 
                     esi.id::text, esi.title, 'Extra Score' AS role, esi.description AS organization, 
-                    NULL AS service_date, 1.0 AS weight, esi.is_selected, esi.score, 
+                    NULL AS service_date,
                     ws.semester, ws.academic_year
                 FROM extra_score_items esi
                 JOIN workload_submissions ws ON ws.id = esi.submission_id
-                WHERE ws.professor_id::text = %s;
+                WHERE ws.professor_id::text = %s
+                  AND UPPER(ws.status) = 'APPROVED'
+                  AND esi.is_selected IS TRUE;
             """
             params = (str(professor_id), str(professor_id))
 
@@ -114,6 +129,7 @@ def get_officer_dashboard(
     semester: Optional[int] = Query(None),
     status_filter: Optional[str] = Query(None, alias="status"),
     search: Optional[str] = Query(None),
+    current_user: dict = Depends(require_roles({"officer", "reviewer", "manager", "admin"})),
     conn = Depends(get_db)
 ):
     cursor = conn.cursor(cursor_factory=RealDictCursor)
@@ -190,7 +206,11 @@ def get_officer_dashboard(
 
 # ---------------- 3. ตรวจสอบรายละเอียดภาระงานอาจารย์ ----------------
 @router.get("/officer/inspect/{professor_id}", summary="ดึงรายละเอียดภาระงานรายวิชาเฉพาะอาจารย์")
-def inspect_professor_workload(professor_id: str, conn = Depends(get_db)):
+def inspect_professor_workload(
+    professor_id: UUID,
+    current_user: dict = Depends(require_roles({"officer", "reviewer", "admin"})),
+    conn=Depends(get_db),
+):
     cursor = conn.cursor(cursor_factory=RealDictCursor)
     try:
         teaching_query = """
@@ -215,28 +235,42 @@ def inspect_professor_workload(professor_id: str, conn = Depends(get_db)):
 
 # ---------------- 4. อัปเดตสถานะการอนุมัติภาระงาน ----------------
 @router.patch("/submissions/{submission_id}/status", summary="อัปเดตสถานะการอนุมัติภาระงาน")
-def update_submission_status(submission_id: str, payload: StatusUpdatePayload, conn = Depends(get_db)):
+def update_submission_status(
+    submission_id: UUID,
+    payload: StatusUpdatePayload,
+    current_user: dict = Depends(require_roles({"reviewer", "admin"})),
+    conn=Depends(get_db),
+):
     cursor = conn.cursor(cursor_factory=RealDictCursor)
     try:
+        cursor.execute(
+            "SELECT id::text, status FROM workload_submissions WHERE id = %s FOR UPDATE;",
+            (str(submission_id),),
+        )
+        submission = cursor.fetchone()
+        if not submission:
+            raise HTTPException(status_code=404, detail="ไม่พบข้อมูลการยื่นภาระงาน")
+        if str(submission["status"] or "").upper() not in ("PENDING", "DRAFT"):
+            raise HTTPException(status_code=409, detail="สถานะภาระงานนี้ไม่สามารถเปลี่ยนได้")
+
         update_query = """
             UPDATE workload_submissions 
             SET status = %s, updated_at = NOW()
-            WHERE id::text = %s
+            WHERE id = %s
             RETURNING id::text, status;
         """
         cursor.execute(update_query, (payload.status, str(submission_id)))
         updated = cursor.fetchone()
         conn.commit()
-
-        if not updated:
-            raise HTTPException(status_code=404, detail="ไม่พบข้อมูลการยื่นภาระงาน")
-
         return {"message": "อัปเดตสถานะสำเร็จ", "data": updated}
+    except HTTPException:
+        conn.rollback()
+        raise
     except Exception as e:
         conn.rollback()
         raise HTTPException(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
-            detail=f"Database Update Error: {str(e)}"
-        )
+            detail="ไม่สามารถอัปเดตสถานะภาระงานได้ กรุณาลองใหม่"
+        ) from e
     finally:
         cursor.close()

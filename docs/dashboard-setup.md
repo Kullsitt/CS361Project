@@ -4,6 +4,7 @@
 
 ## เส้นทาง API
 
+- `GET /api/workloads/by-category`: public endpoint สำหรับหน้าโปรไฟล์ แสดงเฉพาะรายการที่เลือกและอยู่ใน submission สถานะ `APPROVED`; ไม่คืนชื่อนักศึกษารายบุคคล คะแนน หรือข้อมูลที่ใช้ตรวจภายใน
 - `GET /api/profile/me`: โหลดอาจารย์จาก JWT
 - `PUT /api/profile/me`: แก้ไขข้อมูลส่วนตัว ยกเว้นคณะ สาขา สิทธิ์ และรหัสผ่าน
 - `GET /api/workloads`: โหลดเฉพาะรายการของผู้ล็อกอิน
@@ -18,8 +19,9 @@
 1. ใช้ `backend/.env` สำหรับ DB_HOST, DB_PORT, DB_NAME, DB_USER, DB_PASSWORD และ SECRET_KEY จริงของระบบ ห้าม commit ไฟล์นี้
 2. ตรวจและสำรองฐานข้อมูลก่อนใช้ `backend/migrations/001_dashboard_fields.sql` ภายใน transaction ไฟล์นี้เพิ่มช่องที่ฟอร์มต้องเก็บ และขยายชนิดของหน่วยกิต/ชื่อบทบาท/คะแนน/น้ำหนัก ไม่ลบแถวเดิม ใช้ `python scripts/apply-dashboard-migration.py` เพื่อตรวจ และเพิ่ม `--apply` เมื่อต้องการนำไปใช้จริง
 3. ติดตั้ง `backend/requirements.txt` และรันจาก root: `python -m uvicorn app.main:app --app-dir backend --host 127.0.0.1 --port 8000`
-4. เปิดหน้า login.html จากนั้นเข้า teacher-dashboard.html หน้าเว็บใช้ API_BASE_URL หากกำหนดไว้ มิฉะนั้นใช้ `http://34.236.42.23/api` ทั้ง Live Server และเว็บที่เผยแพร่ โดยไม่แยกตาม hostname
-5. Deploy Backend และไฟล์ public ไปยัง EC2/hosting ที่ใช้จริง แล้วตรวจ `/openapi.json` ว่ามีเส้นทางข้างต้น
+4. เปิดหน้า `login.html` จากนั้นเข้า `teacher-dashboard.html`; ก่อนเผยแพร่ ให้ตั้ง URL สาธารณะ HTTPS ของ FastAPI ในไฟล์ frontend ที่เรียก API
+5. สำหรับ production ให้ deploy backend และ frontend ไปยัง EC2, ตั้งค่า `DB_HOST`, `DB_PORT`, `DB_NAME`, `DB_USER`, `DB_PASSWORD` และ `SECRET_KEY` บน EC2 และปรับ URL API ใน frontend ให้ตรงกับ HTTPS endpoint ที่ deploy แล้ว จากนั้นตรวจ `/api/health` และ `/openapi.json`
+6. ตั้งค่า RDS security group ให้รับ PostgreSQL จาก security group ของ EC2 เท่านั้น; อย่าเปิดพอร์ตฐานข้อมูลสู่สาธารณะ
 
 ## การทดสอบ
 
@@ -42,4 +44,4 @@
 - คะแนนเป็นคะแนนดิบต่อรายการ ไม่ใช่ผลประเมินที่อนุมัติ รายการ pending เก็บ score = NULL
 - ชื่อไฟล์หลักฐานเป็น metadata เท่านั้น ยังไม่ใช่ระบบอัปโหลด; ลิงก์หลักฐานบันทึกได้
 - การศึกษาหรือความเชี่ยวชาญหนึ่งบรรทัดถูกเก็บเป็นสมาชิกหนึ่งตัวของ text[]
-- ยังไม่ deploy จนกว่าจะมีช่องทางเข้าถึง EC2 ที่ได้รับอนุญาต
+- ไฟล์นี้อธิบายการตั้งค่าแอปพลิเคชันเท่านั้น ไม่ได้ deploy หรือเปลี่ยนแปลง EC2/RDS ให้โดยอัตโนมัติ

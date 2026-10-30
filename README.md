@@ -1,61 +1,35 @@
 # Faculty Research & Workload Management System (FRWS)
 
-ระบบสืบค้นและจัดการข้อมูลผลงานวิจัยและภาระงานของคณาจารย์ มหาวิทยาลัยธรรมศาสตร์ ซึ่งเชื่อมโยงข้อมูลอาจารย์จาก TU REST API เข้ากับฐานข้อมูลงานวิจัยระดับสากลผ่าน OpenAlex API พร้อมระบบจับคู่ชื่อผู้แต่ง (Author Matching Engine) และหน้าเว็บแสดงผลข้อมูลแบบตอบสนองทันที (Responsive Web Interface)
+ระบบสืบค้นผลงานวิจัยและจัดการภาระงานของคณาจารย์ มหาวิทยาลัยธรรมศาสตร์ ประกอบด้วยเว็บ frontend, FastAPI backend และ PostgreSQL บน AWS RDS โดย backend เป็นตัวกลางเชื่อมต่อฐานข้อมูล ไม่ให้ browser เชื่อมต่อ RDS โดยตรง
 
----
+## เทคโนโลยี
 
-## ✨ คุณสมบัติหลัก (Key Features)
+- Frontend: HTML, CSS และ JavaScript
+- Backend: Python, FastAPI, Uvicorn และ psycopg2
+- Database: PostgreSQL บน AWS RDS
+- Hosting เป้าหมาย: EC2 สำหรับ backend และ static frontend
 
-* **ดึงข้อมูลคณาจารย์อัตโนมัติ (Automated Faculty Synchronization):** ซิงก์ข้อมูลรายชื่อ สังกัดคณะ/ภาควิชา และอีเมลของอาจารย์ มธ. ผ่าน TU REST API
-* **ค้นหางานวิจัยสากล (OpenAlex Publication Pipeline):** ค้นหารายการผลงานวิจัย ยอดการอ้างอิง (Citations) และลิงก์บทความจริงจาก OpenAlex API โดยคัดกรองเฉพาะสังกัด Thammasat University
-* **ระบบจับคู่ผู้แต่งอัจฉริยะ (Token-Based Author Matching Engine):** ระบบวิเคราะห์และจับคู่ชื่อผู้แต่งในบทความวิจัยเข้ากับโปรไฟล์อาจารย์ในระบบ รองรับทั้งการค้นด้วยชื่อย่อ นามสกุลย่อ และการเขียนชื่อภาษาไทย/อังกฤษ
-* **แสดงผลโปรไฟล์และงานวิจัย (Faculty Profile & Publications Viewer):** หน้าเว็บสำหรับสืบค้นบทความวิจัย และดูโปรไฟล์ผลงานวิจัยรวมของอาจารย์แต่ละท่าน
+## โครงสร้างหลัก
 
----
+- `public/`: หน้าเว็บและไฟล์ frontend
+- `backend/app/`: FastAPI application, database configuration และ API routers
+- `backend/migrations/`: SQL migrations
+- `scripts/`: เครื่องมือจัดเตรียมและตรวจสอบ migration
+- `tests/`: การทดสอบ backend และ workload scoring
+- `docs/`: วิธีตั้งค่าและรายละเอียดการเชื่อม dashboard
 
-## 🛠 เทคโนโลยีที่ใช้ (Tech Stack)
+## รัน backend ในเครื่อง
 
-### **Frontend**
-* **Core:** HTML5, CSS3, JavaScript (Vanilla JS ES6+)
-* **UI & Styling:** Google Fonts (Sarabun), FontAwesome Icons
-* **Database Client:** Supabase JavaScript Client (`@supabase/supabase-js`)
+1. ติดตั้ง dependencies: `python -m pip install -r backend/requirements.txt`
+2. ตั้งค่า environment variables สำหรับ PostgreSQL และ `SECRET_KEY` ใน `backend/.env` โดยห้าม commit credentials
+3. จาก repository root รัน: `python -m uvicorn app.main:app --app-dir backend --host 127.0.0.1 --port 8000`
+4. ตรวจสถานะที่ `http://127.0.0.1:8000/api/health` และเอกสาร API ที่ `/docs`
 
-### **Data Pipeline (Backend / Automation)**
-* **Language:** Python 3.x
-* **Libraries:** `requests`, `supabase`, `python-dotenv`
-* **External APIs:** 
-  * TU REST API (ข้อมูลอาจารย์ มธ.)
-  * OpenAlex API (ข้อมูลงานวิจัยระดับสากล)
+สำหรับ EC2 ให้ตั้ง environment variables บนเครื่องเซิร์ฟเวอร์ และให้ security group ของ RDS อนุญาตการเชื่อมต่อ PostgreSQL จาก EC2 เท่านั้น ไม่ควรเปิด RDS ให้เข้าถึงจากอินเทอร์เน็ตสาธารณะ รายละเอียดการเตรียม dashboard และ migration อยู่ใน [dashboard-setup.md](./docs/dashboard-setup.md)
 
----
+## การทดสอบ
 
-## 📁 โครงสร้างโปรเจกต์ (Project Structure)
-
-```text
-CS361Project/
-├── pipeline/                      # ส่วนประมวลผลและดึงข้อมูล (Python Data Pipeline)
-│   ├── .env                       # ไฟล์เก็บ API Keys และค่า Configuration (ไม่ถูก push ขึ้น git)
-│   ├── .env.example               # ตัวอย่างไฟล์การตั้งค่า Environment Variables
-│   ├── processed_teachers.txt     # Checkpoint file บันทึกประวัติอาจารย์ที่ดึงข้อมูลเสร็จแล้ว
-│   ├── requirements.txt           # รายชื่อ Python Dependencies
-│   ├── sync_teachers.py           # สคริปต์ดึงรายชื่ออาจารย์จาก TU REST API ลง Supabase
-│   └── sync_publications.py       # สคริปต์ดึงงานวิจัยจาก OpenAlex API ลง Supabase
-│
-├── public/                        # ส่วนแสดงผลหน้าเว็บ (Frontend Web Application)
-│   ├── assets/                    # โลโก้และไฟล์รูปภาพประกอบ
-│   ├── js/
-│   │   ├── index.js               # สคริปต์หน้าหลัก (รายการงานวิจัย + รายชื่ออาจารย์)
-│   │   └── teacherScript.js       # สคริปต์หน้าโปรไฟล์อาจารย์
-│   ├── index.html                 # หน้าหลักระบบ (Publications / Faculty Members)
-│   ├── teacher.html               # หน้าแสดงรายละเอียดโปรไฟล์อาจารย์
-│   ├── style.css                  # สไตล์หลักของหน้าเว็บ
-│   └── teacherStyle.css           # สไตล์เฉพาะหน้าโปรไฟล์อาจารย์
-│
-└── README.md                      # เอกสารอธิบายโปรเจกต์
-```
-
-## Repository Query API (Issue #12)
-
-API สำหรับค้นหาและกรองภาระงาน ดึงรายละเอียดพร้อมหลักฐาน และสรุปภาระงานรายอาจารย์ตามปีการศึกษา ใช้ schema V2 ใน `database/01_v2_schema.sql`
-
-ดูวิธีรัน API, parameters, response, และวิธีทดสอบใน [API Specification](api/README.md)
+- `python tests/test_dashboard_api.py`: ทดสอบ validation และ API โดยไม่เปิดฐานข้อมูล
+- `python tests/test_dashboard_database.py`: ทดสอบกับ PostgreSQL โดยใช้ TEMP tables และ rollback
+- `node tests/workload-scoring.cjs`: ทดสอบสูตรคะแนน
+- `node scripts/export-workload-rules.cjs --check`: ตรวจความสอดคล้องของกฎคะแนน

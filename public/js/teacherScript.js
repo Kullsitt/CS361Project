@@ -268,7 +268,6 @@ function renderWorkloadCards(itemsToRender = state.rawWorkloads) {
     else {
       const termLabel = item.semester ? `${item.semester}/${item.academic_year}` : `ปี ${item.academic_year || '-'}`;
       const hoursLabel = item.workload_hours ? `${item.workload_hours} ชม./สัปดาห์` : (item.score ? `คะแนน: ${item.score}` : '');
-      const courseCode = item.course_code ? `${item.course_code}: ` : '';
       const displayTitle = item.title || item.course_code || 'ไม่มีชื่อรายการ';
 
       let subText = '';
@@ -293,7 +292,7 @@ function renderWorkloadCards(itemsToRender = state.rawWorkloads) {
             ${hoursLabel ? `<span class="badge-hours" style="background: #e3f2fd; color: #0d47a1; padding: 3px 8px; border-radius: 4px; font-size: 12px; font-weight: 500;">${hoursLabel}</span>` : ''}
           </div>
           <div class="wl-title" style="font-size: 16px; font-weight: 600;">
-            <span style="color: #111; text-decoration: none;">${courseCode}</span>
+            <span style="color: #111; text-decoration: none;">${escapeHtml(displayTitle)}</span>
           </div>
           ${subText ? `<div class="wl-subtext" style="color: #627d98; font-size: 13px; margin-top: 6px;">${subText}</div>` : ''}
         </div>
