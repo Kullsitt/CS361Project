@@ -1,93 +1,118 @@
 <!DOCTYPE html>
 <html lang="th">
+
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>ข้อมูลส่วนตัวอาจารย์ | FRWS</title>
+  <title>Teacher Profile - FRWS</title>
   <link rel="stylesheet" href="style.css">
-  <link rel="stylesheet" href="teacher-dashboard.css">
-  <link href="https://fonts.googleapis.com/css2?family=Sarabun:wght@400;500;600;700&display=swap" rel="stylesheet">
-  <script src="js/dashboard-api.js" defer></script>
-  <script src="js/teacher-dashboard.js" defer></script>
-  <!-- WORKLOAD_SCORE: สูตรคะแนนและรายการบทบาท ใช้ร่วมกับ teacher-workload.js -->
-  <script src="js/workload-scoring.js" defer></script>
-  <script src="js/teacher-workload.js" defer></script>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Sarabun:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="teacherStyle.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
 </head>
+
 <body>
+
+  <!-- Header -->
   <header class="header">
-    <div class="header-left"><img class="header-logo" src="assets/Emblem_of_Thammasat_University.svg.webp" alt="มหาวิทยาลัยธรรมศาสตร์"><p class="header-title">Faculty Research<br>& Workload Management System (FRWS)</p></div>
-    <a class="home-link" href="index.html">กลับหน้าหลัก ↗</a>
-  </header>
-  <main class="teacher-dash">
-    <div class="page-heading"><div><p class="eyebrow">MY DASHBOARD</p><h1>ข้อมูลส่วนตัวของฉัน</h1><p class="muted">ดูและจัดการข้อมูลประวัติ ความเชี่ยวชาญ และช่องทางติดต่อ</p></div><div class="heading-actions"><a class="workload-shortcut" href="#my-workloads">＋ กรอกภาระงาน</a><button id="edit" hidden>แก้ไขข้อมูลส่วนตัว</button></div></div>
-    <div id="notice" role="status" aria-live="polite" hidden></div>
-    <div id="dashboard" class="profile-layout" hidden>
-      <aside class="profile-panel">
-        <div class="profile-cover"></div><div class="profile-intro"><div class="avatar" id="avatar" aria-hidden="true">อ</div><p class="eyebrow">โปรไฟล์อาจารย์</p><h2 id="profile-name"></h2><p id="profile-name-en" class="muted"></p><span id="profile-rank" class="rank"></span><hr><p id="profile-faculty"></p><p id="profile-department" class="muted"></p><hr><p class="muted">อีเมลติดต่อ</p><p id="profile-email"></p></div>
-      </aside>
-      <section class="content-panel" aria-label="รายละเอียดข้อมูลส่วนตัว">
-        <nav class="section-nav" aria-label="ส่วนข้อมูล"><a href="#personal">ข้อมูลทั่วไป</a><a href="#academic">ข้อมูลวิชาการ</a><a href="#contact">การติดต่อ</a></nav>
-        <form id="profile-form">
-          <p id="edit-hint" class="edit-hint" hidden>แก้ไขข้อมูลที่ต้องการ แล้วกดบันทึกการเปลี่ยนแปลง ช่องที่มี * จำเป็นต้องกรอก</p>
-          <fieldset id="fields" disabled>
-            <section id="personal" class="form-section"><h2><span>01</span> ข้อมูลทั่วไป</h2><p class="muted">ชื่อและสังกัดที่แสดงในโปรไฟล์ของคุณ</p>
-              <div class="field-grid">
-                <label>คำนำหน้าชื่อ<input name="title" maxlength="100"></label><label>คำนำหน้าชื่อ (อังกฤษ)<input name="title_en" maxlength="100"></label>
-                <label>ชื่อ (ไทย) *<input name="first_name_th" required maxlength="150" autocomplete="given-name"></label><label>นามสกุล (ไทย) *<input name="last_name_th" required maxlength="150" autocomplete="family-name"></label>
-                <label>ชื่อ (อังกฤษ)<input name="first_name_en" maxlength="150"></label><label>นามสกุล (อังกฤษ)<input name="last_name_en" maxlength="150"></label>
-                <label>ตำแหน่งทางวิชาการ<input name="academic_rank" maxlength="200"></label><label>ตำแหน่งทางวิชาการ (อังกฤษ)<input name="academic_rank_en" maxlength="200"></label>
-                <label>คณะ<input name="faculty" readonly></label><label>ภาควิชา / สาขาวิชา<input name="department" readonly></label>
-              </div>
-            </section>
-            <section id="academic" class="form-section"><h2><span>02</span> ข้อมูลวิชาการ</h2><p class="muted">แนะนำความเชี่ยวชาญและประวัติการศึกษาของคุณ</p><div class="field-grid">
-              <label class="full">ความเชี่ยวชาญ<textarea name="expertise" rows="3" maxlength="5000" placeholder="เช่น วิศวกรรมซอฟต์แวร์, ปัญญาประดิษฐ์"></textarea></label>
-              <label class="full">ความสนใจในการวิจัย<textarea name="research_interests" rows="3" maxlength="5000"></textarea></label>
-              <label class="full">ประวัติการศึกษา<textarea name="education" rows="4" maxlength="5000" placeholder="ระบุวุฒิการศึกษา สถาบัน และปีที่สำเร็จการศึกษา"></textarea></label>
-              <label>Google Scholar<input name="google_scholar" type="url" maxlength="2000" placeholder="https://scholar.google.com/…"></label><label>ResearchGate<input name="research_gate" type="url" maxlength="2000" placeholder="https://www.researchgate.net/…"></label>
-            </div></section>
-            <section id="contact" class="form-section"><h2><span>03</span> ช่องทางติดต่อ</h2><p class="muted">ข้อมูลสำหรับการติดต่อทางวิชาการ</p><div class="field-grid">
-              <label>อีเมล *<input name="email" type="email" required maxlength="254" autocomplete="email"></label><label>หมายเลขโทรศัพท์<input name="phone_number" type="tel" maxlength="50" autocomplete="tel"></label><label class="full">ห้องทำงาน / ที่อยู่ติดต่อ<textarea name="office_address" rows="2" maxlength="1000"></textarea></label>
-            </div></section>
-          </fieldset>
-          <div id="actions" class="form-actions" hidden><p id="save-state" class="muted">ข้อมูลจะเปลี่ยนแปลงเมื่อกดบันทึก</p><button type="button" id="cancel" class="secondary">ยกเลิก</button><button type="submit" id="save">บันทึกการเปลี่ยนแปลง</button></div>
-        </form>
-      </section>
+    <div class="header-left">
+      <img src="assets/Emblem_of_Thammasat_University.svg.webp" alt="TU Logo" class="header-logo">
+      <h1 class="header-title">
+        Faculty Research<br>& Workload Management System (FRWS)
+      </h1>
     </div>
-    <section id="my-workloads" class="workload-panel" aria-labelledby="workload-heading">
-      <div class="workload-heading"><div><p class="eyebrow">MY WORKLOAD</p><h2 id="workload-heading">กรอกภาระงาน</h2><p class="muted">เพิ่มรายละเอียดการปฏิบัติงานและเอกสารอ้างอิงในแต่ละหมวด</p></div><span id="workload-count" class="rank">0 รายการ</span></div>
-      <div id="workload-notice" role="status" aria-live="polite" hidden></div>
-      <form id="workload-form">
-        <div class="field-grid">
-          <label>ภาคการศึกษา *<select name="semester" required><option value="1">ภาค 1</option><option value="2" selected>ภาค 2</option><option value="summer">ภาคฤดูร้อน</option></select></label>
-          <label>ปีการศึกษา (พ.ศ.) *<input name="year" type="number" min="2500" max="2700" value="2567" required></label>
-          <label>หมวดภาระงาน *<select name="category" id="workload-category" required></select></label>
-          <label>ประเภทหลัก *<select name="group" id="workload-group" required></select></label>
-          <label class="full">ประเภทย่อย *<select name="subtype" id="workload-subtype" required></select></label>
-          <label class="full">รหัสวิชา / ชื่อผลงาน / ชื่อกิจกรรม *<input name="title" required maxlength="255" placeholder="ระบุรหัสวิชา ชื่อผลงาน หรือชื่อกิจกรรม"></label>
+  </header>
+
+  <!-- Main Container -->
+  <div class="teacher-page-container">
+    <a href="index.html"
+      style="color: #800000; text-decoration: none; font-weight: 600; display: inline-block; margin-bottom: 20px;">
+      &larr; Back to Faculty Members
+    </a>
+
+    <div id="profile-actions"></div>
+    
+    <!-- ABOUT SECTION -->
+    <div id="about" class="section-title">About</div>
+    <div class="profile-card" id="teacher-profile-card">
+      <div>
+        <img id="profile_image" style="width: 150px;" alt="Profile Picture">
+      </div>
+      <div>
+        <h2 id="t-name-en" style="margin: 0 0 6px 0; font-size: 1.35rem; color: #111;">กำลังโหลดข้อมูลอาจารย์...</h2>
+        <p id="t-name-th" style="margin: 0 0 8px 0; color: #666; font-size: 1rem;"></p>
+        <p id="t-faculty" style="margin: 0; color: #444; font-size: 0.95rem; font-weight: 500;"></p>
+        <p id="t-department" style="margin: 4px 0 0 0; color: #777; font-size: 0.9rem;"></p>
+      </div>
+    </div>
+
+    <!-- EXPERTISE -->
+    <div id="expertise" class="section-title">Expertise</div>
+    <div id="teacher-expertise-list">
+      <div class="info-card" id="t-expertise" style="margin: 0 0 8px 0; color: #666; font-size: 1rem;"></div>
+    </div>
+
+    <!-- RESEARCH INTERESTS -->
+    <div id="research-interests" class="section-title">Research Interests</div>
+    <div id="teacher-research-interests-list">
+      <div class="info-card" id="t-research_interests" style="margin: 0 0 8px 0; color: #666; font-size: 1rem;"></div>
+    </div>
+
+    <!-- EDUCATION -->
+    <div id="education" class="section-title">Education</div>
+    <div id="teacher-education-list">
+      <div class="info-card" id="t-education" style="margin: 0 0 8px 0; color: #666; font-size: 1rem;"></div>
+    </div>
+
+    <!-- WORKLOADS & PUBLICATIONS SECTION -->
+    <div id="workloads-section" class="workload-main-header">
+      <div class="header-title-box">
+        <div class="red-line-bar"></div>
+        <div>
+          <h2>ภาระงานและผลงานวิชาการ</h2>
+          <p>ข้อมูลภาระงานตามแบบฟอร์มรายงานผลการปฏิบัติงาน</p>
         </div>
-        <div id="workload-details" class="field-grid"></div>
-        <label id="student-names-field" class="student-names-field" hidden>ชื่อนักศึกษาที่ร่วมงาน / อยู่ในความดูแล<textarea name="student_names" rows="3" maxlength="5000" placeholder="กรอกชื่อ–นามสกุลนักศึกษา หนึ่งชื่อต่อบรรทัด"></textarea></label>
-        <p id="role-guidance" class="muted role-guidance" aria-live="polite"></p>
-        <!-- ===== START WORKLOAD_SCORE: ช่องคะแนนอัตโนมัติ (แก้ไขไม่ได้) =====
-             หากไม่ใช้คะแนน ให้แก้ส่วน WORKLOAD_SCORE ใน teacher-workload.js ด้วย
-             JavaScript คำนวณจากบทบาทและข้อมูลจริง ไม่อ่านคะแนนจากช่องนี้ไปบันทึก
-        -->
-        <div class="score-panel">
-          <label>คะแนนที่คำนวณได้<input id="live-score" readonly value="—" aria-describedby="score-help"></label>
-          <p id="score-help" class="muted" role="status" aria-live="polite">เลือกข้อมูลให้ครบเพื่อคำนวณคะแนน</p>
-        </div>
-        <!-- ===== END WORKLOAD_SCORE ===== -->
-        <div class="field-grid">
-          <label>ลิงก์หลักฐาน<input name="evidence_url" type="url" maxlength="2000" placeholder="https://…"></label>
-          <label class="full">เลือกไฟล์หลักฐาน<input name="attachments" type="file" multiple accept=".pdf,.png,.jpg,.jpeg,.doc,.docx,.xls,.xlsx"><span class="muted">เลือกไฟล์เพื่อแสดงชื่อในรายการ ยังไม่มีการอัปโหลดไฟล์</span><span id="selected-evidence" class="muted"></span></label>
-        </div>
-        <div class="workload-actions"><button type="button" id="workload-cancel" class="secondary">ล้างข้อมูล</button><button type="submit" id="workload-save">เพิ่มรายการภาระงาน</button></div>
-      </form>
-      <div class="workload-list-heading"><h3>รายการภาระงานของฉัน</h3><label>แสดงหมวด<select id="workload-filter"><option value="all">ทุกหมวด</option></select></label></div>
-      <div id="workload-list"></div>
-      <p class="muted workload-footnote">บันทึกรายการลงระบบเมื่อกดบันทึก คะแนนยังไม่ใช่ผลประเมินที่อนุมัติ</p>
-    </section>
-    <p class="page-footer">FRWS · ระบบจัดการข้อมูลผลงานวิจัยและภาระงานอาจารย์</p>
-  </main>
+      </div>
+    </div>
+
+    <!-- Sub Navigation Tabs (หมวดหมู่ 1-5) -->
+    <div class="workload-sub-tabs">
+      <button class="sub-tab active" onclick="switchWorkloadTab('TEACHING', this)">1. งานสอน</button>
+      <button class="sub-tab" onclick="switchWorkloadTab('ADVISING', this)">2. การดูแลนักศึกษา</button>
+      <button class="sub-tab" onclick="switchWorkloadTab('RESEARCH', this)">3. งานวิจัย/วิชาการ</button>
+      <button class="sub-tab" onclick="switchWorkloadTab('ADMINISTRATIVE', this)">4. งานบริหาร</button>
+      <button class="sub-tab" onclick="switchWorkloadTab('SERVICE', this)">5. งานบริการและผลงานอื่น</button>
+    </div>
+
+    <!-- Search & Filter Box (แบบรวมกล่องเดียวกัน) -->
+    <div class="workload-search-box" style="display: flex; align-items: center; border: 1px solid #ddd; border-radius: 30px; background-color: #fff; margin-bottom: 20px; overflow: hidden; padding: 0 15px; box-shadow: inset 0 1px 3px rgba(0,0,0,0.05);">
+      <!-- กล่องพิมพ์ข้อความ (ด้านซ้าย) -->
+      <input type="text" id="search-input" placeholder="ค้นหาตามรหัสวิชา, ชื่องาน, หรือบทบาท..." style="flex: 1; border: none; padding: 12px 5px; outline: none; font-family: inherit; background: transparent; font-size: 0.95rem;">
+      <!-- เส้นคั่นและตัวกรอง Dropdown (ด้านขวา) -->
+      <div style="border-left: 1px solid #ddd; padding-left: 12px; display: flex; align-items: center;">
+        <select id="dynamic-filter-select" style="border: none; outline: none; background: transparent; font-family: inherit; color: #555; cursor: pointer; font-size: 0.95rem; min-width: 180px;">
+          <option value="all">ทั้งหมด</option>
+        </select>
+      </div>
+    </div>
+
+    <!-- Dynamic Content Container -->
+    <div id="workload-cards-container">
+      <div class="info-card" style="text-align: center; color: #666;">กำลังโหลดข้อมูลภาระงานและผลงานวิชาการ...</div>
+    </div>
+
+    <!-- CONTACT SECTION -->
+    <div id="contact" class="section-title">Contact</div>
+    <div class="info-card" style="line-height: 2;">
+      <div id="t-email"><i class="fa fa-envelope-o" style="width: 24px; color: #800000;"></i> -</div>
+      <div id="t-office_address"><i class="fa fa-building-o" style="width: 24px; color: #800000;"></i> -</div>
+      <div id="t-phone"><i class="fa fa-phone" style="width: 24px; color: #800000;"></i> -</div>
+    </div>
+  </div>
+
+  <script src="js/teacherScript.js"></script>
 </body>
+
 </html>

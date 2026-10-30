@@ -11,7 +11,6 @@
   <link href="https://fonts.googleapis.com/css2?family=Sarabun:wght@300;400;500;600;700&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="teacherStyle.css">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
-
 </head>
 
 <body>
@@ -76,12 +75,6 @@
           <p>ข้อมูลภาระงานตามแบบฟอร์มรายงานผลการปฏิบัติงาน</p>
         </div>
       </div>
-      <div class="term-filter-box">
-        <label for="term-select">ภาค/ปีการศึกษา:</label>
-        <select id="term-select">
-          <option value="all">ทั้งหมด (All Terms)</option>
-        </select>
-      </div>
     </div>
 
     <!-- Sub Navigation Tabs (หมวดหมู่ 1-5) -->
@@ -93,9 +86,16 @@
       <button class="sub-tab" onclick="switchWorkloadTab('SERVICE', this)">5. งานบริการและผลงานอื่น</button>
     </div>
 
-    <!-- Search Box -->
-    <div class="workload-search-box">
-      <input type="text" id="search-input" placeholder="ค้นหาตามรหัสวิชา, ชื่องาน, หรือบทบาท...">
+    <!-- Search & Filter Box (แบบรวมกล่องเดียวกัน) -->
+    <div class="workload-search-box" style="display: flex; align-items: center; border: 1px solid #ddd; border-radius: 30px; background-color: #fff; margin-bottom: 20px; overflow: hidden; padding: 0 15px; box-shadow: inset 0 1px 3px rgba(0,0,0,0.05);">
+      <!-- กล่องพิมพ์ข้อความ (ด้านซ้าย) -->
+      <input type="text" id="search-input" placeholder="ค้นหาตามรหัสวิชา, ชื่องาน, หรือบทบาท..." style="flex: 1; border: none; padding: 12px 5px; outline: none; font-family: inherit; background: transparent; font-size: 0.95rem;">
+      <!-- เส้นคั่นและตัวกรอง Dropdown (ด้านขวา) -->
+      <div style="border-left: 1px solid #ddd; padding-left: 12px; display: flex; align-items: center;">
+        <select id="dynamic-filter-select" style="border: none; outline: none; background: transparent; font-family: inherit; color: #555; cursor: pointer; font-size: 0.95rem; min-width: 180px;">
+          <option value="all">ทั้งหมด</option>
+        </select>
+      </div>
     </div>
 
     <!-- Dynamic Content Container -->

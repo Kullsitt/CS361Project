@@ -13,7 +13,6 @@ const state = {
 // 2. HELPER FUNCTIONS (SECURITY & DOM)
 // =========================================================================
 
-/** ป้องกัน XSS Injection */
 function escapeHtml(str) {
   if (!str) return '';
   return String(str)
@@ -24,13 +23,11 @@ function escapeHtml(str) {
     .replace(/'/g, '&#039;');
 }
 
-/** ตั้งค่าข้อความให้ DOM Element อย่างปลอดภัย */
 function setElementText(id, text) {
   const el = document.getElementById(id);
   if (el) el.innerText = text || '';
 }
 
-/** แปลงข้อมูล String/Array ให้เป็น Array เสมอ */
 function normalizeList(input) {
   if (Array.isArray(input)) return input;
   if (typeof input === 'string' && input.trim()) {
@@ -39,7 +36,6 @@ function normalizeList(input) {
   return [];
 }
 
-/** เรนเดอร์รายการแบบ Bullet List (<ul>) */
 function renderListItems(elementId, dataList, fallbackText) {
   const container = document.getElementById(elementId);
   if (!container) return;
@@ -64,7 +60,6 @@ function renderListItems(elementId, dataList, fallbackText) {
 // 3. API FETCHING LOGIC
 // =========================================================================
 
-/** 1. ดึงข้อมูลโปรไฟล์อาจารย์จาก /api/professors/{id} */
 async function loadTeacherProfileData() {
   if (!state.teacherId) {
     setElementText('t-name-en', 'ไม่พบรหัสอาจารย์ใน URL');
@@ -90,7 +85,6 @@ async function loadTeacherProfileData() {
   }
 }
 
-/** 2. ดึงข้อมูลรายการภาระงาน/งานวิจัยตามแท็บที่กด */
 async function loadCategoryWorkloads(category) {
   const container = document.getElementById('workload-cards-container');
   if (!container) return;
@@ -102,7 +96,7 @@ async function loadCategoryWorkloads(category) {
     </div>`;
 
   try {
-    // กรณีเลือกแท็บ "3. งานวิจัย/วิชาการ" (RESEARCH): ยิงตรงไปที่ /api/publications
+    // กรณีเลือกแท็บ "3. งานวิจัย/วิชาการ"
     if (category === 'RESEARCH' || category === 'ACADEMIC') {
       const resPubs = await fetch(`${API_BASE_URL}/publications?professor_id=${encodeURIComponent(state.teacherId)}`);
       
@@ -122,7 +116,7 @@ async function loadCategoryWorkloads(category) {
         state.rawWorkloads = [];
       }
     } 
-    // กรณีเลือกแท็บอื่นๆ (TEACHING, ADVISING, ADMINISTRATIVE, SERVICE): ยิงเข้า /api/workloads/by-category
+    // กรณีเลือกแท็บอื่นๆ
     else {
       const resWl = await fetch(`${API_BASE_URL}/workloads/by-category?professor_id=${encodeURIComponent(state.teacherId)}&category=${category}`);
       if (resWl.ok) {
@@ -132,7 +126,8 @@ async function loadCategoryWorkloads(category) {
       }
     }
 
-    renderWorkloadCards();
+    populateFilterDropdown(); // สร้างตัวเลือก Dropdown จากข้อมูล
+    applyFilters(); // กรองและแสดงผล
 
   } catch (error) {
     console.error("Error fetching category data:", error);
@@ -144,7 +139,7 @@ async function loadCategoryWorkloads(category) {
 }
 
 // =========================================================================
-// 4. UI RENDERERS & SEARCH LOGIC
+// 4. UI RENDERERS, FILTER, & SEARCH LOGIC
 // =========================================================================
 
 function renderTeacherProfileInfo(teacher) {
@@ -200,33 +195,78 @@ function renderTeacherProfileInfo(teacher) {
   }
 }
 
-/** กรองข้อมูลใน Memory (state.rawWorkloads) */
-function filterWorkloadsByKeyword(keyword) {
-  const cleanKeyword = (keyword || '').trim().toLowerCase();
+/** สร้างตัวเลือกใน Dropdown อัตโนมัติ */
+function populateFilterDropdown() {
+  const selectEl = document.getElementById('dynamic-filter-select');
+  if (!selectEl) return;
 
-  if (!cleanKeyword) {
-    renderWorkloadCards(state.rawWorkloads);
-    return;
+  selectEl.innerHTML = ''; 
+
+  if (state.currentCategory === 'RESEARCH' || state.currentCategory === 'ACADEMIC') {
+    selectEl.innerHTML = '<option value="all">ประเภทงาน (ทั้งหมด)</option>';
+    const uniqueTypes = [...new Set(state.rawWorkloads.map(item => item.publication_type).filter(Boolean))];
+    uniqueTypes.forEach(type => {
+      const option = document.createElement('option');
+      option.value = type;
+      option.textContent = type;
+      selectEl.appendChild(option);
+    });
+  } else {
+    selectEl.innerHTML = '<option value="all">ภาค/ปีการศึกษา (ทั้งหมด)</option>';
+    const uniqueTerms = [...new Set(state.rawWorkloads.map(item => {
+      if (item.semester && item.academic_year) return `${item.semester}/${item.academic_year}`;
+      if (item.academic_year) return `ปี ${item.academic_year}`;
+      return null;
+    }).filter(Boolean))];
+    
+    uniqueTerms.sort((a, b) => b.localeCompare(a));
+    
+    uniqueTerms.forEach(term => {
+      const option = document.createElement('option');
+      option.value = term;
+      option.textContent = term;
+      selectEl.appendChild(option);
+    });
   }
+}
+
+/** กรองข้อมูลจากทั้งช่องค้นหาและ Dropdown */
+function applyFilters() {
+  const searchKeyword = (document.getElementById('search-input')?.value || '').trim().toLowerCase();
+  const filterValue = document.getElementById('dynamic-filter-select')?.value || 'all';
 
   const filteredList = state.rawWorkloads.filter(item => {
+    // 1. ตรวจสอบ Text Search
     const title = (item.title || item.course_code || item.position_or_task_name || '').toLowerCase();
     const code = (item.course_code || '').toLowerCase();
     const source = (item.source_name || item.organization || item.advisee_name || '').toLowerCase();
     const role = (item.work_type || item.role || item.publication_type || '').toLowerCase();
     const year = String(item.academic_year || item.publication_year || '');
 
-    return title.includes(cleanKeyword) ||
-           code.includes(cleanKeyword) ||
-           source.includes(cleanKeyword) ||
-           role.includes(cleanKeyword) ||
-           year.includes(cleanKeyword);
+    const matchesSearch = !searchKeyword || 
+                          title.includes(searchKeyword) || 
+                          code.includes(searchKeyword) || 
+                          source.includes(searchKeyword) || 
+                          role.includes(searchKeyword) || 
+                          year.includes(searchKeyword);
+
+    // 2. ตรวจสอบ Dropdown
+    let matchesDropdown = true;
+    if (filterValue !== 'all') {
+      if (state.currentCategory === 'RESEARCH' || state.currentCategory === 'ACADEMIC') {
+        matchesDropdown = item.publication_type === filterValue;
+      } else {
+        const itemTerm = (item.semester && item.academic_year) ? `${item.semester}/${item.academic_year}` : (item.academic_year ? `ปี ${item.academic_year}` : null);
+        matchesDropdown = itemTerm === filterValue;
+      }
+    }
+
+    return matchesSearch && matchesDropdown;
   });
 
   renderWorkloadCards(filteredList);
 }
 
-/** แสดงผลการ์ดภาระงานและผลงานวิจัย */
 function renderWorkloadCards(itemsToRender = state.rawWorkloads) {
   const container = document.getElementById('workload-cards-container');
   if (!container) return;
@@ -243,7 +283,6 @@ function renderWorkloadCards(itemsToRender = state.rawWorkloads) {
 
   let html = '';
   items.forEach(item => {
-    // 1. การ์ดผลงานวิจัยจาก /api/publications
     if (item.isPublication) {
       const pubLink = item.official_url 
         ? `<a href="${escapeHtml(item.official_url)}" target="_blank" rel="noopener noreferrer" style="color:#0056b3; text-decoration:none;">${escapeHtml(item.title)} <i class="fa fa-external-link"></i></a>` 
@@ -264,7 +303,6 @@ function renderWorkloadCards(itemsToRender = state.rawWorkloads) {
         </div>
       `;
     } 
-    // 2. การ์ดภาระงานจาก /api/workloads/by-category
     else {
       const termLabel = item.semester ? `${item.semester}/${item.academic_year}` : `ปี ${item.academic_year || '-'}`;
       const hoursLabel = item.workload_hours ? `${item.workload_hours} ชม./สัปดาห์` : (item.score ? `คะแนน: ${item.score}` : '');
@@ -319,24 +357,28 @@ function switchWorkloadTab(category, btnEl) {
   loadCategoryWorkloads(state.currentCategory);
 }
 
-
 // =========================================================================
 // 6. INITIALIZATION
 // =========================================================================
 document.addEventListener('DOMContentLoaded', () => {
   loadTeacherProfileData();
 
-
-  // ผูก Event ช่องค้นหา (ตรวจสอบ ID ใน HTML ให้ตรงกับ search-input)
   const searchInput = document.getElementById('search-input');
+  const filterSelect = document.getElementById('dynamic-filter-select');
   let debounceTimer = null;
 
   if (searchInput) {
-    searchInput.addEventListener('input', (e) => {
+    searchInput.addEventListener('input', () => {
       clearTimeout(debounceTimer);
       debounceTimer = setTimeout(() => {
-        filterWorkloadsByKeyword(e.target.value);
+        applyFilters();
       }, 300);
+    });
+  }
+
+  if (filterSelect) {
+    filterSelect.addEventListener('change', () => {
+      applyFilters();
     });
   }
 });
