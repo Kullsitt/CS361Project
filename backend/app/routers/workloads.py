@@ -1,3 +1,5 @@
+# backend/app/routers/workloads.py
+
 from typing import Literal, Optional
 from uuid import UUID
 from fastapi import APIRouter, Depends, Query, HTTPException, status
@@ -12,278 +14,180 @@ class StatusUpdatePayload(BaseModel):
     status: Literal["APPROVED", "REJECTED"]
 
 
-# ---------------- 1. ดึงข้อมูลภาระงานแยกตามหมวดหมู่ ----------------
-@router.get("/by-category", summary="ดึงข้อมูลภาระงานแยกตามหมวดหมู่ (ไม่รวมงานวิจัย)")
-def get_workloads_by_category(
-    professor_id: UUID = Query(..., description="ID ของอาจารย์ (professor_id)"),
-    category: str = Query("TEACHING", description="TEACHING, ADVISING, ADMINISTRATIVE, SERVICE"),
-    conn = Depends(get_db)
-):
-    professor_id = str(professor_id)
-
-    cursor = conn.cursor(cursor_factory=RealDictCursor)
-    try:
-        cat = category.upper()
-
-        if cat == "TEACHING":
-            query = """
-                SELECT 
-                    tw.id::text, tw.course_code, tw.course_code AS title, tw.section,
-                    tw.credits, tw.workload_hours,
-                    ws.semester, ws.academic_year
-                FROM teaching_workloads tw
-                JOIN workload_submissions ws ON ws.id = tw.submission_id
-                WHERE ws.professor_id::text = %s
-                  AND UPPER(ws.status) = 'APPROVED'
-                  AND tw.is_selected IS TRUE
-                ORDER BY ws.academic_year DESC, ws.semester DESC;
-            """
-            params = (str(professor_id),)
-
-        elif cat == "ADVISING":
-            query = """
-                SELECT 
-                    ts.id::text, ts.course_code, 'นักศึกษา' AS advisee_name,
-                    ts.degree_level, ts.role_type AS role,
-                    ws.semester, ws.academic_year
-                FROM thesis_supervisions ts
-                JOIN workload_submissions ws ON ws.id = ts.submission_id
-                WHERE ws.professor_id::text = %s
-                  AND UPPER(ws.status) = 'APPROVED'
-                  AND ts.is_selected IS TRUE
-
-                UNION ALL
-
-                SELECT 
-                    sps.id::text, sps.course_code,
-                    CONCAT('โครงงานนักศึกษา (', sps.project_count, ' โครงงาน)') AS advisee_name,
-                    'ปริญญาตรี' AS degree_level, sps.role_type AS role,
-                    ws.semester, ws.academic_year
-                FROM student_project_supervisions sps
-                JOIN workload_submissions ws ON ws.id = sps.submission_id
-                WHERE ws.professor_id::text = %s
-                  AND UPPER(ws.status) = 'APPROVED'
-                  AND sps.is_selected IS TRUE
-            """
-            params = (str(professor_id), str(professor_id))
-
-        elif cat == "ADMINISTRATIVE":
-            query = """
-                SELECT 
-                    awi.id::text, awi.position_or_task_name AS title, awi.organization, 
-                    awi.start_date::text, awi.end_date::text,
-                    ws.semester, ws.academic_year
-                FROM administrative_work_items awi
-                JOIN workload_submissions ws ON ws.id = awi.submission_id
-                WHERE ws.professor_id::text = %s
-                  AND UPPER(ws.status) = 'APPROVED'
-                  AND awi.is_selected IS TRUE;
-            """
-            params = (str(professor_id),)
-
-        elif cat in ["SERVICE", "EXTRA"]:
-            query = """
-                SELECT 
-                    swi.id::text, swi.title, swi.role_type AS role, swi.organization, 
-                    swi.service_date::text,
-                    ws.semester, ws.academic_year
-                FROM service_work_items swi
-                JOIN workload_submissions ws ON ws.id = swi.submission_id
-                WHERE ws.professor_id::text = %s
-                  AND UPPER(ws.status) = 'APPROVED'
-                  AND swi.is_selected IS TRUE
-
-                UNION ALL
-
-                SELECT 
-                    esi.id::text, esi.title, 'Extra Score' AS role, esi.description AS organization, 
-                    NULL AS service_date,
-                    ws.semester, ws.academic_year
-                FROM extra_score_items esi
-                JOIN workload_submissions ws ON ws.id = esi.submission_id
-                WHERE ws.professor_id::text = %s
-                  AND UPPER(ws.status) = 'APPROVED'
-                  AND esi.is_selected IS TRUE;
-            """
-            params = (str(professor_id), str(professor_id))
-
-        else:
-            return []
-
-        cursor.execute(query, params)
-        return cursor.fetchall()
-
-    except Exception as e:
-        raise HTTPException(
-            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
-            detail=f"Database Query Error: {str(e)}"
-        )
-    finally:
-        cursor.close()
-
-
-# ---------------- 2. Officer Dashboard (คำนวณสรุปรายอาจารย์) ----------------
-@router.get("/officer/dashboard", summary="ดึงข้อมูลสรุปภาระงานอาจารย์ทั้งหมดสำหรับ Officer")
-def get_officer_dashboard(
-    academic_year: Optional[int] = Query(None),
-    semester: Optional[int] = Query(None),
-    status_filter: Optional[str] = Query(None, alias="status"),
-    search: Optional[str] = Query(None),
-    current_user: dict = Depends(require_roles({"officer", "reviewer", "manager", "admin"})),
-    conn = Depends(get_db)
-):
-    cursor = conn.cursor(cursor_factory=RealDictCursor)
-    try:
-        query = """
-            SELECT 
-                p.id::text AS id,
-                CONCAT(COALESCE(p.title, ''), p.first_name_th, ' ', p.last_name_th) AS name,
-                COALESCE(p.academic_rank, 'อาจารย์') AS position,
-                ws.id::text AS submission_id,
-                COALESCE(ws.academic_year, 2567) AS academic_year,
-                COALESCE(ws.semester, 2) AS semester,
-                COALESCE(ws.status, 'PENDING') AS status,
-                
-                -- คำนวณหน่วยกิตสอนรวม
-                COALESCE((SELECT SUM(credits) FROM teaching_workloads WHERE submission_id = ws.id AND is_selected IS TRUE), 0) AS credits,
-                
-                -- หมวด 1: งานสอน (เพดาน 900)
-                COALESCE((SELECT SUM(score) FROM teaching_workloads WHERE submission_id = ws.id AND is_selected IS TRUE), 0)
-                + COALESCE((SELECT SUM(score) FROM thesis_supervisions WHERE submission_id = ws.id AND is_selected IS TRUE), 0)
-                + COALESCE((SELECT SUM(score) FROM student_project_supervisions WHERE submission_id = ws.id AND is_selected IS TRUE), 0) AS m1_actual,
-                LEAST(
-                    COALESCE((SELECT SUM(score) FROM teaching_workloads WHERE submission_id = ws.id AND is_selected IS TRUE), 0)
-                    + COALESCE((SELECT SUM(score) FROM thesis_supervisions WHERE submission_id = ws.id AND is_selected IS TRUE), 0)
-                    + COALESCE((SELECT SUM(score) FROM student_project_supervisions WHERE submission_id = ws.id AND is_selected IS TRUE), 0),
-                    900.0
-                ) AS m1_calc,
-                
-                -- หมวด 2: งานวิชาการ (เพดาน 900)
-                COALESCE((SELECT SUM(score) FROM academic_work_items WHERE submission_id = ws.id), 0) 
-                + COALESCE((SELECT SUM(calculated_score) FROM professor_publications WHERE professor_id = p.id), 0) AS m2_actual,
-                LEAST(
-                    COALESCE((SELECT SUM(score) FROM academic_work_items WHERE submission_id = ws.id), 0) 
-                    + COALESCE((SELECT SUM(calculated_score) FROM professor_publications WHERE professor_id = p.id), 0), 900.0
-                ) AS m2_calc,
-                
-                -- หมวด 3: งานบริหาร (เพดาน 400)
-                COALESCE((SELECT SUM(score) FROM administrative_work_items WHERE submission_id = ws.id), 0) AS m3_actual,
-                LEAST(COALESCE((SELECT SUM(score) FROM administrative_work_items WHERE submission_id = ws.id), 0), 400.0) AS m3_calc,
-                
-                -- หมวด 4: งานบริการ (เพดาน 300)
-                COALESCE((SELECT SUM(score) FROM service_work_items WHERE submission_id = ws.id), 0) AS m4_actual,
-                LEAST(COALESCE((SELECT SUM(score) FROM service_work_items WHERE submission_id = ws.id), 0), 300.0) AS m4_calc,
-                
-                -- หมวด 5: คะแนนพิเศษ (เพดาน 100)
-                COALESCE((SELECT SUM(score) FROM extra_score_items WHERE submission_id = ws.id), 0) AS m5_actual,
-                LEAST(COALESCE((SELECT SUM(score) FROM extra_score_items WHERE submission_id = ws.id), 0), 100.0) AS m5_calc
-            FROM professors p
-            LEFT JOIN workload_submissions ws ON ws.professor_id = p.id
-            WHERE 1=1
-        """
-        params = []
-
-        if academic_year:
-            query += " AND (ws.academic_year = %s OR ws.academic_year IS NULL)"
-            params.append(academic_year)
-        if semester:
-            query += " AND (ws.semester = %s OR ws.semester IS NULL)"
-            params.append(semester)
-        if status_filter and status_filter != "ALL":
-            query += " AND ws.status = %s"
-            params.append(status_filter)
-        if search:
-            query += " AND (p.first_name_th ILIKE %s OR p.last_name_th ILIKE %s)"
-            search_pattern = f"%{search}%"
-            params.extend([search_pattern, search_pattern])
-
-        query += " ORDER BY p.first_name_th ASC;"
-
-        cursor.execute(query, params)
-        return cursor.fetchall()
-
-    except Exception as e:
-        raise HTTPException(
-            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
-            detail=f"Database Query Error: {str(e)}"
-        )
-    finally:
-        cursor.close()
-
-
-# ---------------- 3. ตรวจสอบรายละเอียดภาระงานอาจารย์ ----------------
-@router.get("/officer/inspect/{professor_id}", summary="ดึงรายละเอียดภาระงานรายวิชาเฉพาะอาจารย์")
+# ---------------- 3. ตรวจสอบรายละเอียดภาระงานอาจารย์ (V4 Inspect) ----------------
+@router.get("/officer/inspect/{professor_id}", summary="ดึงรายละเอียดภาระงานอาจารย์ทุกหมวดตามปี/ภาคการศึกษา")
 def inspect_professor_workload(
     professor_id: UUID,
-    current_user: dict = Depends(require_roles({"officer", "reviewer", "admin"})),
+    academic_year: Optional[int] = Query(None),
+    semester: Optional[int] = Query(None),
+    current_user: dict = Depends(require_roles({"officer", "reviewer", "admin", "manager"})),
     conn=Depends(get_db),
 ):
     cursor = conn.cursor(cursor_factory=RealDictCursor)
     try:
-        teaching_query = """
-            SELECT tw.course_code AS code, tw.course_code AS name, tw.section,
-                   tw.credits, tw.workload_hours AS hours, tw.score
-            FROM teaching_workloads tw
-            JOIN workload_submissions ws ON ws.id = tw.submission_id
-            WHERE ws.professor_id::text = %s;
+        prof_id_str = str(professor_id)
+
+        # 1. ค้นหา submission_id
+        sub_query = """
+            SELECT id::text, status, academic_year, semester
+            FROM workload_submissions
+            WHERE professor_id::text = %s
         """
-        cursor.execute(teaching_query, (str(professor_id),))
-        teaching = cursor.fetchall()
-
-        return {"teaching": teaching}
-    except Exception as e:
-        raise HTTPException(
-            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
-            detail=f"Database Error: {str(e)}"
-        )
-    finally:
-        cursor.close()
-
-
-# ---------------- 4. อัปเดตสถานะการอนุมัติภาระงาน ----------------
-@router.patch("/submissions/{submission_id}/status", summary="อัปเดตสถานะการอนุมัติภาระงาน")
-def update_submission_status(
-    submission_id: UUID,
-    payload: StatusUpdatePayload,
-    current_user: dict = Depends(require_roles({"officer", "reviewer", "admin"})),
-    conn=Depends(get_db),
-):
-    cursor = conn.cursor(cursor_factory=RealDictCursor)
-    try:
-        cursor.execute(
-            "SELECT id::text, status FROM workload_submissions WHERE id = %s FOR UPDATE;",
-            (str(submission_id),),
-        )
+        params = [prof_id_str]
+        if academic_year:
+            sub_query += " AND (academic_year = %s OR academic_year IS NULL)"
+            params.append(academic_year)
+        if semester:
+            sub_query += " AND (semester = %s OR semester IS NULL)"
+            params.append(semester)
+            
+        sub_query += " ORDER BY academic_year DESC NULLS LAST, semester DESC NULLS LAST LIMIT 1;"
+        
+        cursor.execute(sub_query, tuple(params))
         submission = cursor.fetchone()
-        if not submission:
-            raise HTTPException(status_code=404, detail="ไม่พบข้อมูลการยื่นภาระงาน")
-        current_status = str(submission["status"] or "").upper()
-        allowed_from = (
-            ("PENDING", "DRAFT", "REJECTED")
-            if payload.status == "APPROVED"
-            else ("PENDING", "DRAFT")
-        )
-        if current_status not in allowed_from:
-            raise HTTPException(status_code=409, detail="สถานะภาระงานนี้ไม่สามารถเปลี่ยนได้")
 
-        update_query = """
-            UPDATE workload_submissions 
-            SET status = %s, updated_at = NOW()
-            WHERE id = %s
-            RETURNING id::text, status;
-        """
-        cursor.execute(update_query, (payload.status, str(submission_id)))
-        updated = cursor.fetchone()
-        conn.commit()
-        return {"message": "อัปเดตสถานะสำเร็จ", "data": updated}
-    except HTTPException:
-        conn.rollback()
-        raise
+        sub_id = submission["id"] if submission else None
+
+        teaching, projects, thesis = [], [], []
+        academic, admin, service, extra = [], [], []
+
+        if sub_id:
+            # หมวด 1: วิชาบรรยาย/ปฏิบัติการ
+            cursor.execute("""
+                SELECT 
+                    COALESCE(course_code, '') AS course_code,
+                    COALESCE(section, 1) AS section,
+                    COALESCE(credits, 0) AS credits,
+                    COALESCE(workload_hours, 0) AS hours,
+                    COALESCE(student_count, 0) AS student_count,
+                    COALESCE(contribution_percent, 100) AS share,
+                    COALESCE(score, 0) AS score,
+                    evidence_url
+                FROM teaching_workloads
+                WHERE submission_id::text = %s;
+            """, (str(sub_id),))
+            teaching = cursor.fetchall() or []
+
+            # หมวด 1 ย่อย: โครงงานนักศึกษา/สหกิจ
+            cursor.execute("""
+                SELECT 
+                    COALESCE(workload_title, '') AS workload_title,
+                    COALESCE(course_code, '') AS course_code,
+                    COALESCE(role_type, 'อาจารย์ที่ปรึกษา') AS role,
+                    COALESCE(project_count, 1) AS quantity,
+                    COALESCE(contribution_percent, 100) AS share,
+                    COALESCE(score, 0) AS score,
+                    student_names, evidence_url
+                FROM student_project_supervisions
+                WHERE submission_id::text = %s;
+            """, (str(sub_id),))
+            projects = cursor.fetchall() or []
+
+            # หมวด 1 ย่อย: วิทยานิพนธ์/สารนิพนธ์
+            cursor.execute("""
+                SELECT 
+                    COALESCE(workload_title, '') AS workload_title,
+                    COALESCE(course_code, '') AS course_code,
+                    COALESCE(role_type, 'ที่ปรึกษาหลัก') AS role,
+                    COALESCE(registered_credit, 0) AS credits,
+                    COALESCE(contribution_percent, 100) AS share,
+                    COALESCE(score, 0) AS score,
+                    student_name, evidence_url
+                FROM thesis_supervisions
+                WHERE submission_id::text = %s;
+            """, (str(sub_id),))
+            thesis = cursor.fetchall() or []
+
+            # หมวด 2: งานวิชาการและงานวิจัย
+            cursor.execute("""
+                SELECT 
+                    COALESCE(title, 'ผลงานวิชาการ/วิจัย') AS title,
+                    COALESCE(work_type, workload_subtype, 'บทความวิจัย') AS subtype,
+                    COALESCE(role_type, 'ผู้เขียน/ผู้ร่วมวิจัย') AS role,
+                    COALESCE(source_name, '') AS source,
+                    COALESCE(contribution_percent, 100) AS share,
+                    COALESCE(score, 0) AS score,
+                    evidence_url
+                FROM academic_work_items
+                WHERE submission_id::text = %s;
+            """, (str(sub_id),))
+            academic = cursor.fetchall() or []
+
+            # หมวด 3: งานบริหาร
+            cursor.execute("""
+                SELECT 
+                    COALESCE(position_or_task_name, 'งานบริหาร') AS title,
+                    COALESCE(role_type, 'ผู้บริหาร/ผู้ประสานงาน') AS role,
+                    course_code,
+                    COALESCE(item_count, 1) AS quantity,
+                    COALESCE(score, 0) AS score,
+                    evidence_url
+                FROM administrative_work_items
+                WHERE submission_id::text = %s;
+            """, (str(sub_id),))
+            admin = cursor.fetchall() or []
+
+            # หมวด 4: งานบริการวิชาการ
+            cursor.execute("""
+                SELECT 
+                    COALESCE(title, 'งานบริการวิชาการ') AS title,
+                    COALESCE(role_type, 'กรรมการ/วิทยากร') AS role,
+                    COALESCE(organization, '') AS organization,
+                    COALESCE(item_count, 1) AS quantity,
+                    COALESCE(contribution_percent, 100) AS share,
+                    COALESCE(score, 0) AS score,
+                    evidence_url
+                FROM service_work_items
+                WHERE submission_id::text = %s;
+            """, (str(sub_id),))
+            service = cursor.fetchall() or []
+
+            # หมวด 5: คะแนนพิเศษ
+            cursor.execute("""
+                SELECT 
+                    COALESCE(title, 'คะแนนพิเศษ') AS title,
+                    description,
+                    COALESCE(score, 0) AS score,
+                    evidence_url
+                FROM extra_score_items
+                WHERE submission_id::text = %s;
+            """, (str(sub_id),))
+            extra = cursor.fetchall() or []
+
+        # ดึงเพิ่มเติมจาก professor_publications (หมวด 2)
+        try:
+            cursor.execute("""
+                SELECT 
+                    COALESCE(title, 'ผลงานตีพิมพ์') AS title,
+                    'บทความวิชาการ/วิจัย' AS subtype,
+                    'ผู้เขียน' AS role,
+                    COALESCE(journal_name, '') AS source,
+                    100 AS share,
+                    COALESCE(calculated_score, score, 0) AS score,
+                    paper_url AS evidence_url
+                FROM professor_publications
+                WHERE professor_id::text = %s;
+            """, (prof_id_str,))
+            pubs = cursor.fetchall() or []
+            if pubs:
+                academic.extend(pubs)
+        except Exception:
+            pass
+
+        return {
+            "submission": submission,
+            "teaching": teaching,
+            "projects": projects,
+            "thesis": thesis,
+            "academic": academic,
+            "admin": admin,
+            "service": service,
+            "extra": extra
+        }
     except Exception as e:
-        conn.rollback()
         raise HTTPException(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
-            detail="ไม่สามารถอัปเดตสถานะภาระงานได้ กรุณาลองใหม่"
-        ) from e
+            detail=f"Database Query Error: {str(e)}"
+        )
     finally:
         cursor.close()
