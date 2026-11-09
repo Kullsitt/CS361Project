@@ -22,5 +22,6 @@ for (const [category, [, subtypes]] of Object.entries(categories)) {
 const output = path.join(__dirname, '../backend/app/workload_rules.json');
 const json = JSON.stringify(catalog, null, 2) + '\n';
 if (process.argv.includes('--check')) {
-  if (fs.readFileSync(output, 'utf8') !== json) throw new Error('Backend catalog is stale; run scripts/export-workload-rules.cjs');
+  const existing = fs.readFileSync(output, 'utf8').replace(/\r\n/g, '\n');
+  if (existing !== json) throw new Error('Backend catalog is stale; run scripts/export-workload-rules.cjs');
 } else fs.writeFileSync(output, json);

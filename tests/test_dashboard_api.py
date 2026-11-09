@@ -81,6 +81,7 @@ class DashboardTests(unittest.TestCase):
         owner_id = '00000000-0000-0000-0000-000000000001'
         cursor = Mock()
         cursor.fetchall.return_value = []
+        cursor.fetchone.return_value = None
         conn = Mock()
         conn.cursor.return_value = cursor
 
