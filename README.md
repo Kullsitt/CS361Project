@@ -33,3 +33,13 @@
 - `python tests/test_dashboard_database.py`: ทดสอบกับ PostgreSQL โดยใช้ TEMP tables และ rollback
 - `node tests/workload-scoring.cjs`: ทดสอบสูตรคะแนน
 - `node scripts/export-workload-rules.cjs --check`: ตรวจความสอดคล้องของกฎคะแนน
+
+## Continuous Integration
+
+GitHub Actions workflow ที่ `.github/workflows/ci.yml` จะรันทดสอบ Python API,
+ตรวจ syntax และรันทดสอบ workload scoring/rule catalog เมื่อ push ไป `main`,
+เปิด pull request เข้า `main` หรือสั่งรันด้วยตนเอง โดย workflow นี้ยังไม่ deploy
+ไป EC2 และไม่เชื่อมต่อฐานข้อมูลหรือใช้ AWS credentials
+
+การทดสอบ PostgreSQL (`python tests/test_dashboard_database.py`) ยังรันแยกในเครื่อง
+หรือสภาพแวดล้อม staging ที่ได้รับอนุญาต เนื่องจากต้องใช้ค่าการเชื่อมต่อฐานข้อมูลจริง
