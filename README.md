@@ -34,12 +34,15 @@
 - `node tests/workload-scoring.cjs`: ทดสอบสูตรคะแนน
 - `node scripts/export-workload-rules.cjs --check`: ตรวจความสอดคล้องของกฎคะแนน
 
-## Continuous Integration
+## Continuous Integration and Deployment
 
 GitHub Actions workflow ที่ `.github/workflows/ci.yml` จะรันทดสอบ Python API,
 ตรวจ syntax และรันทดสอบ workload scoring/rule catalog เมื่อ push ไป `main`,
-เปิด pull request เข้า `main` หรือสั่งรันด้วยตนเอง โดย workflow นี้ยังไม่ deploy
-ไป EC2 และไม่เชื่อมต่อฐานข้อมูลหรือใช้ AWS credentials
+เปิด pull request เข้า `main` หรือสั่งรันด้วยตนเอง EC2 จะตรวจสอบ `main`
+เป็นระยะผ่าน GitHub API สาธารณะ และ deploy เฉพาะ commit ที่ CI ผ่านแล้ว
+การเชื่อมต่อเริ่มจาก EC2 ออกไปหา GitHub จึงไม่ต้องสร้าง AWS OIDC role,
+เก็บ AWS access keys ใน GitHub หรือเปิด SSH ให้ GitHub Actions
 
+Pull request จะรันทดสอบเท่านั้น ไม่ deploy; CI ไม่เชื่อมต่อฐานข้อมูล
 การทดสอบ PostgreSQL (`python tests/test_dashboard_database.py`) ยังรันแยกในเครื่อง
 หรือสภาพแวดล้อม staging ที่ได้รับอนุญาต เนื่องจากต้องใช้ค่าการเชื่อมต่อฐานข้อมูลจริง

@@ -1,0 +1,9 @@
+[Unit]
+Description=Deploy CI-passed FRWS backend from GitHub
+Wants=network-online.target
+After=network-online.target
+
+[Service]
+Type=oneshot
+ExecStart=/usr/bin/python3 /usr/local/libexec/frws-deploy.py
+TimeoutStartSec=10min

@@ -1,0 +1,11 @@
+[Unit]
+Description=Check for CI-passed FRWS backend updates
+
+[Timer]
+OnBootSec=2min
+OnUnitActiveSec=5min
+RandomizedDelaySec=30s
+Unit=frws-deploy.service
+
+[Install]
+WantedBy=timers.target
