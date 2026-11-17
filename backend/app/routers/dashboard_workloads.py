@@ -88,6 +88,29 @@ def list_workloads(user=Depends(get_current_user), conn=Depends(get_db)):
                     item['editable'] = item['editable'] and str(row['submission_status'] or 'PENDING').upper() in ('DRAFT', 'PENDING')
                     item['deletable'] = str(row['submission_status'] or 'PENDING').upper() in ('DRAFT', 'PENDING')
                     result.append(item)
+            try:
+                cur.execute('''SELECT i.*, s.academic_year, s.semester, s.status AS submission_status
+                    FROM extra_score_items i JOIN workload_submissions s ON s.id = i.submission_id
+                    WHERE s.professor_id::text = %s ORDER BY s.academic_year DESC, s.semester DESC, i.created_at DESC''', (user['id'],))
+                for row in cur.fetchall():
+                    item = {
+                        'id': f"extra_score_items:{row['id']}",
+                        'year': row['academic_year'],
+                        'semester': 'summer' if str(row['semester']) == '3' else str(row['semester']),
+                        'category': 'special',
+                        'subtype': row.get('workload_subtype') or 'คะแนนพิเศษ / ผลงานเพิ่มเติม',
+                        'title': row.get('title') or 'คะแนนพิเศษ',
+                        'role': row.get('role_type') or 'ประเภทผลงาน / เหตุผลประกอบ',
+                        'score': float(row['score']) if row.get('score') is not None else 0.0,
+                        'score_status': 'calculated' if row.get('score') is not None else 'pending',
+                        'evidence_url': row.get('evidence_url'),
+                        'role_note': row.get('description'),
+                        'editable': str(row['submission_status'] or 'PENDING').upper() in ('DRAFT', 'PENDING'),
+                        'deletable': str(row['submission_status'] or 'PENDING').upper() in ('DRAFT', 'PENDING'),
+                    }
+                    result.append(item)
+            except Exception:
+                pass
         return result
     except Exception:
         log.exception('Could not list workloads')

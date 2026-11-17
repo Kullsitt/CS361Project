@@ -98,23 +98,48 @@ async function loadCategoryWorkloads(category) {
   try {
     // กรณีเลือกแท็บ "3. งานวิจัย/วิชาการ"
     if (category === 'RESEARCH' || category === 'ACADEMIC') {
-      const resPubs = await fetch(`${API_BASE_URL}/publications?professor_id=${encodeURIComponent(state.teacherId)}`);
-      
-      if (resPubs.ok) {
-        const pubsData = await resPubs.json();
-        state.rawWorkloads = (pubsData.data || pubsData || []).map(pub => ({
-          id: pub.id,
-          isPublication: true,
-          title: pub.title || "Untitled Paper",
-          academic_year: pub.publication_year || pub.year || "งานวิจัย",
-          publication_type: pub.work_type || pub.type || "Journal Article",
-          source_name: pub.source_name || pub.journal_name || "",
-          role: pub.role || "Author",
-          official_url: pub.official_url || pub.doi_url || pub.url
-        }));
-      } else {
-        state.rawWorkloads = [];
+      let items = [];
+      try {
+        const resPubs = await fetch(`${API_BASE_URL}/publications?professor_id=${encodeURIComponent(state.teacherId)}`);
+        if (resPubs.ok) {
+          const pubsData = await resPubs.json();
+          const pubList = (pubsData.data || pubsData || []).map(pub => ({
+            id: pub.id,
+            isPublication: true,
+            title: pub.title || "Untitled Paper",
+            academic_year: pub.publication_year || pub.year || "งานวิจัย",
+            publication_type: pub.work_type || pub.type || "Journal Article",
+            source_name: pub.source_name || pub.journal_name || "",
+            role: pub.role || "Author",
+            official_url: pub.official_url || pub.doi_url || pub.url
+          }));
+          items.push(...pubList);
+        }
+      } catch (ePub) {
+        console.warn("Could not fetch publications:", ePub);
       }
+
+      try {
+        const resWl = await fetch(`${API_BASE_URL}/workloads/by-category?professor_id=${encodeURIComponent(state.teacherId)}&category=RESEARCH`);
+        if (resWl.ok) {
+          const wlData = await resWl.json();
+          const wlList = (Array.isArray(wlData) ? wlData : []).map(item => ({
+            id: item.id || item.title,
+            isPublication: false,
+            title: item.title || "ผลงานวิชาการ",
+            academic_year: item.academic_year || "งานวิจัย",
+            publication_type: item.work_type || "งานวิชาการ",
+            source_name: item.organization || item.source_name || "",
+            role: item.role || "ผู้วิจัย",
+            official_url: item.evidence_url || ""
+          }));
+          items.push(...wlList);
+        }
+      } catch (eWl) {
+        console.warn("Could not fetch academic workloads:", eWl);
+      }
+
+      state.rawWorkloads = items;
     } 
     // กรณีเลือกแท็บอื่นๆ
     else {

@@ -1,6 +1,8 @@
 // public/js/dashboard.js
 
 let globalLecturersData = [];
+let currentInspectedLecturer = null;
+let currentInspectedDetails = {};
 
 function getApiBaseUrl() {
     if (typeof API_BASE_URL !== 'undefined') return API_BASE_URL;
@@ -31,10 +33,12 @@ function canInspectWorkloads() {
 
 document.addEventListener('DOMContentLoaded', () => {
     const termFilter = document.getElementById('term-filter');
+    const trackFilter = document.getElementById('track-filter');
     const statusFilter = document.getElementById('status-filter');
     const searchInput = document.getElementById('search-lecturer');
 
     if (termFilter) termFilter.addEventListener('change', filterData);
+    if (trackFilter) trackFilter.addEventListener('change', filterData);
     if (statusFilter) statusFilter.addEventListener('change', filterData);
     if (searchInput) searchInput.addEventListener('input', filterData);
 
@@ -42,11 +46,17 @@ document.addEventListener('DOMContentLoaded', () => {
 });
 
 async function loadDashboardData() {
+    const termVal = document.getElementById('term-filter')?.value || '2-2567';
     const statusVal = document.getElementById('status-filter')?.value || 'ALL';
     const searchVal = document.getElementById('search-lecturer')?.value || '';
 
     const params = new URLSearchParams();
     if (searchVal) params.append('search', searchVal.trim());
+    if (termVal && termVal !== 'ALL') {
+        const [semester, year] = termVal.split('-');
+        if (year) params.append('academic_year', year);
+        if (semester) params.append('semester', semester);
+    }
 
     const baseUrl = getApiBaseUrl();
     const token = localStorage.getItem('token') || localStorage.getItem('access_token');
@@ -68,6 +78,20 @@ async function loadDashboardData() {
             rawList = resData;
         } else if (resData && Array.isArray(resData.submissions)) {
             rawList = resData.submissions;
+        }
+
+        // กรองปี/ภาคการศึกษาบน Frontend เพิ่มเติมกรณี API ส่งมาหลายรอบ
+        if (termVal && termVal !== 'ALL') {
+            const [filterSem, filterYr] = termVal.split('-');
+            const hasMatchingTerm = rawList.some(item => 
+                item.academic_year && String(item.academic_year) === String(filterYr) &&
+                item.semester && String(item.semester) === String(filterSem)
+            );
+            if (hasMatchingTerm) {
+                rawList = rawList.filter(item => 
+                    !item.academic_year || (String(item.academic_year) === String(filterYr) && String(item.semester) === String(filterSem))
+                );
+            }
         }
 
         globalLecturersData = rawList;
@@ -189,8 +213,14 @@ async function openInspectModal(profId) {
     const lecturer = globalLecturersData.find(l => (l.id === profId || l.submission_id === profId || l.professor_id === profId));
     if (!lecturer) return;
 
+    currentInspectedLecturer = lecturer;
+    currentInspectedDetails = {};
+
     const termVal = document.getElementById('term-filter')?.value || '2-2567';
-    const [semester, year] = termVal.split('-');
+    const [filterSem, filterYr] = termVal.split('-');
+    const semester = lecturer.semester || filterSem;
+    const year = lecturer.academic_year || filterYr;
+    const subId = lecturer.submission_id || '';
 
     const name = lecturer.name || `${lecturer.title || ''}${lecturer.first_name_th || ''} ${lecturer.last_name_th || ''}`.trim() || 'ไม่ระบุชื่อ';
     const position = lecturer.position || lecturer.academic_rank || 'อาจารย์';
@@ -203,11 +233,16 @@ async function openInspectModal(profId) {
 
     let html = `
       <div style="background:#f8fafc; padding:16px; border-radius:8px; margin-bottom:20px; border:1px solid #cbd5e1;">
-        <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:8px;">
+        <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:8px; flex-wrap:wrap; gap:8px;">
           <p style="margin:0;"><b>ตำแหน่ง:</b> ${position} | <b>สาขาวิชา:</b> วิทยาการคอมพิวเตอร์</p>
-          <span class="badge-status ${isPass ? 'status-pass' : 'status-fail'}">
-            ${isPass ? 'ผ่านเกณฑ์ (≥ 650 คะแนน)' : 'ต่ำกว่าเกณฑ์ (< 650 คะแนน)'}
-          </span>
+          <div style="display:flex; align-items:center; gap:8px;">
+            <span class="badge-status ${isPass ? 'status-pass' : 'status-fail'}">
+              ${isPass ? 'ผ่านเกณฑ์ (≥ 650 คะแนน)' : 'ต่ำกว่าเกณฑ์ (< 650 คะแนน)'}
+            </span>
+            <button class="btn-export-teacher" onclick="exportTeacherCSV()" style="background:#15803d; color:white; border:none; padding:6px 14px; border-radius:6px; font-weight:600; cursor:pointer; font-size:13px; display:inline-flex; align-items:center; gap:6px; box-shadow:0 1px 3px rgba(0,0,0,0.1);">
+              <i class="fa fa-file-excel-o"></i> ดาวน์โหลดภาระงาน (CSV)
+            </button>
+          </div>
         </div>
         <p style="margin:0; font-size:15px;">
           <b>สรุปคะแนนคำนวณสุทธิ:</b> <span style="font-size:20px; font-weight:700; color:#8C1D24;">${totalCalc.toFixed(1)} / 2,000 คะแนน</span> 
@@ -242,11 +277,13 @@ async function openInspectModal(profId) {
     const headers = { 'Content-Type': 'application/json' };
     if (token) headers['Authorization'] = `Bearer ${token}`;
 
+    const inspectUrl = `${baseUrl}/workloads/officer/inspect/${profId}?academic_year=${year}&semester=${semester}${subId ? `&submission_id=${subId}` : ''}`;
     try {
-        const res = await fetch(`${baseUrl}/workloads/officer/inspect/${profId}?academic_year=${year}&semester=${semester}`, { headers });
+        const res = await fetch(inspectUrl, { headers });
         let data = {};
         if (res.ok) {
             data = await res.json();
+            currentInspectedDetails = data;
         }
 
         // --- หมวด 1: งานสอน ---
@@ -274,7 +311,7 @@ async function openInspectModal(profId) {
                 html += `
                   <tr>
                     <td><b>${item.course_code || ''}</b> ${item.section ? `(Sec ${item.section})` : ''}</td>
-                    <td>ผู้สอนวิชาบรรยาย/ปฏิบัติการ</td>
+                    <td>${item.role_type || 'ผู้สอนวิชาบรรยาย/ปฏิบัติการ'}</td>
                     <td>${item.credits || 0} นก. (${item.hours || 0} ชม.)</td>
                     <td>${item.share || 100}%</td>
                     <td style="text-align:right;">${Number(item.score || 0).toFixed(1)}</td>
@@ -517,18 +554,23 @@ async function openInspectModal(profId) {
     }
 
     const submissionId = lecturer.submission_id;
-    if (submissionId) {
-        html += `
-          <div style="margin-top:24px; padding-top:16px; border-top:1px solid #e2e8f0; display:flex; gap:12px; justify-content:flex-end;">
-            <button style="background:#b91c1c; color:white; border:none; padding:10px 20px; border-radius:6px; font-weight:700; cursor:pointer;" onclick="changeSubmissionStatus('${submissionId}', 'REJECTED')">
+    html += `
+      <div style="margin-top:24px; padding-top:16px; border-top:1px solid #e2e8f0; display:flex; gap:12px; justify-content:space-between; align-items:center; flex-wrap:wrap;">
+        <button style="background:#0284c7; color:white; border:none; padding:10px 18px; border-radius:6px; font-weight:700; cursor:pointer; display:inline-flex; align-items:center; gap:6px; font-size:14px; box-shadow:0 1px 3px rgba(0,0,0,0.1);" onclick="exportTeacherCSV()">
+          <i class="fa fa-download"></i> ดาวน์โหลดภาระงานอาจารย์ (CSV)
+        </button>
+        <div style="display:flex; gap:12px;">
+          ${submissionId ? `
+            <button style="background:#b91c1c; color:white; border:none; padding:10px 20px; border-radius:6px; font-weight:700; cursor:pointer; display:inline-flex; align-items:center; gap:6px;" onclick="changeSubmissionStatus('${submissionId}', 'REJECTED')">
               <i class="fa fa-reply"></i> ส่งกลับแก้ไข
             </button>
-            <button style="background:#15803d; color:white; border:none; padding:10px 20px; border-radius:6px; font-weight:700; cursor:pointer;" onclick="changeSubmissionStatus('${submissionId}', 'APPROVED')">
+            <button style="background:#15803d; color:white; border:none; padding:10px 20px; border-radius:6px; font-weight:700; cursor:pointer; display:inline-flex; align-items:center; gap:6px;" onclick="changeSubmissionStatus('${submissionId}', 'APPROVED')">
               <i class="fa fa-check"></i> อนุมัติแบบฟอร์มภาระงาน
             </button>
-          </div>
-        `;
-    }
+          ` : ''}
+        </div>
+      </div>
+    `;
 
     document.getElementById("modal-content").innerHTML = html;
     document.getElementById("inspectModal").style.display = "flex";
@@ -564,6 +606,195 @@ function closeModal() {
     document.getElementById("inspectModal").style.display = "none";
 }
 
+function downloadCsvBlob(csvContent, filename) {
+    const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+    const link = document.createElement('a');
+    const url = URL.createObjectURL(blob);
+    link.setAttribute('href', url);
+    link.setAttribute('download', filename);
+    link.style.visibility = 'hidden';
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+    URL.revokeObjectURL(url);
+}
+
+function exportTeacherCSV() {
+    const lecturer = currentInspectedLecturer;
+    if (!lecturer) {
+        alert("ไม่พบข้อมูลอาจารย์สำหรับส่งออก CSV");
+        return;
+    }
+
+    const details = currentInspectedDetails || {};
+    const name = lecturer.name || `${lecturer.title || ''}${lecturer.first_name_th || ''} ${lecturer.last_name_th || ''}`.trim() || 'อาจารย์';
+    const position = lecturer.position || lecturer.academic_rank || 'อาจารย์';
+    const termVal = document.getElementById('term-filter')?.value || '2-2567';
+    const [filterSem, filterYr] = termVal.split('-');
+    const semester = lecturer.semester || filterSem;
+    const year = lecturer.academic_year || filterYr;
+
+    const totalActual = Number(lecturer.m1_actual || 0) + Number(lecturer.m2_actual || 0) + Number(lecturer.m3_actual || 0) + Number(lecturer.m4_actual || 0) + Number(lecturer.m5_actual || 0);
+    const totalCalc = getTotalCalculatedScore(lecturer);
+    const isPass = isScorePassing(lecturer);
+    const passStatusText = isPass ? "ผ่านเกณฑ์ (>= 650 คะแนน)" : "ต่ำกว่าเกณฑ์ (< 650 คะแนน)";
+
+    let approvalStatus = "รอตรวจ";
+    const reviewStatus = String(lecturer.status || '').toUpperCase();
+    if (reviewStatus === 'APPROVED') approvalStatus = "อนุมัติแล้ว";
+    else if (reviewStatus === 'REJECTED') approvalStatus = "ส่งกลับแก้ไข";
+
+    const escapeCsv = (val) => {
+        if (val === null || val === undefined) return '""';
+        const str = String(val).replace(/"/g, '""');
+        return `"${str}"`;
+    };
+
+    let csv = "\uFEFF"; // UTF-8 BOM for Microsoft Excel compatibility
+
+    // 1. ข้อมูลส่วนหัว
+    csv += "แบบฟอร์มสรุปภาระงานอาจารย์ (FRWS)\n";
+    csv += `ชื่อ-สกุล,${escapeCsv(name)}\n`;
+    csv += `ตำแหน่ง,${escapeCsv(position)}\n`;
+    csv += `สาขาวิชา,"วิทยาการคอมพิวเตอร์"\n`;
+    csv += `ภาคการศึกษา,${escapeCsv(`${semester}/${year}`)}\n`;
+    csv += `รวมคะแนนจริง,${totalActual.toFixed(2)}\n`;
+    csv += `รวมคะแนนคำนวณสุทธิ,${totalCalc.toFixed(2)}\n`;
+    csv += `เกณฑ์ขั้นต่ำในการเลื่อนเงินเดือน,650.00\n`;
+    csv += `ผลการประเมิน,${escapeCsv(passStatusText)}\n`;
+    csv += `สถานะการอนุมัติ,${escapeCsv(approvalStatus)}\n\n`;
+
+    // 2. สรุปคะแนน 5 หมวด (Executive Summary)
+    csv += "สรุปคะแนน 5 หมวด (Executive Summary)\n";
+    csv += "หมวดภาระงาน,คะแนนที่ได้จริง,คะแนนที่นำมาคำนวณ,เพดานคะแนน\n";
+    csv += `หมวด 1: งานสอน,${Number(lecturer.m1_actual || 0).toFixed(2)},${Number(lecturer.m1_calc || 0).toFixed(2)},900\n`;
+    csv += `หมวด 2: งานวิชาการและงานวิจัย,${Number(lecturer.m2_actual || 0).toFixed(2)},${Number(lecturer.m2_calc || 0).toFixed(2)},900\n`;
+    csv += `หมวด 3: งานบริหาร,${Number(lecturer.m3_actual || 0).toFixed(2)},${Number(lecturer.m3_calc || 0).toFixed(2)},400\n`;
+    csv += `หมวด 4: งานบริการวิชาการ,${Number(lecturer.m4_actual || 0).toFixed(2)},${Number(lecturer.m4_calc || 0).toFixed(2)},300\n`;
+    csv += `หมวด 5: คะแนนพิเศษ,${Number(lecturer.m5_actual || 0).toFixed(2)},${Number(lecturer.m5_calc || 0).toFixed(2)},100\n\n`;
+
+    // 3. รายละเอียดภาระงานรายวิชา / กิจกรรม
+    csv += "รายละเอียดภาระงานรายวิชา / กิจกรรม\n";
+    csv += "หมวด,รหัส-ชื่อรายการภาระงาน,บทบาท / หน้าที่,หน่วยกิต / ชม. / จำนวน,สัดส่วน (%),คะแนน,หลักฐาน\n";
+
+    let hasItems = false;
+
+    // หมวด 1: งานสอน
+    (details.teaching || []).forEach(item => {
+        hasItems = true;
+        const code = `${item.course_code || ''} ${item.section ? `(Sec ${item.section})` : ''}`.trim();
+        const role = item.role_type || 'ผู้สอนวิชาบรรยาย/ปฏิบัติการ';
+        const qty = `${item.credits || 0} นก. (${item.hours || 0} ชม.)`;
+        csv += `หมวด 1: งานสอน,${escapeCsv(code)},${escapeCsv(role)},${escapeCsv(qty)},${item.share || 100}%,${Number(item.score || 0).toFixed(2)},${escapeCsv(item.evidence_url || '—')}\n`;
+    });
+    (details.projects || []).forEach(item => {
+        hasItems = true;
+        const title = `${item.course_code || ''} ${item.workload_title || ''}`.trim();
+        const role = item.role || 'อาจารย์ที่ปรึกษาโครงงาน';
+        const qty = `${item.quantity || 1} เรื่อง`;
+        csv += `หมวด 1: โครงงานนักศึกษา,${escapeCsv(title)},${escapeCsv(role)},${escapeCsv(qty)},${item.share || 100}%,${Number(item.score || 0).toFixed(2)},${escapeCsv(item.evidence_url || '—')}\n`;
+    });
+    (details.thesis || []).forEach(item => {
+        hasItems = true;
+        const title = `${item.course_code || ''} ${item.workload_title || ''} ${item.student_name ? `(${item.student_name})` : ''}`.trim();
+        const role = item.role || 'ที่ปรึกษาวิทยานิพนธ์หลัก';
+        const qty = `${item.credits || 0} นก.`;
+        csv += `หมวด 1: วิทยานิพนธ์,${escapeCsv(title)},${escapeCsv(role)},${escapeCsv(qty)},${item.share || 100}%,${Number(item.score || 0).toFixed(2)},${escapeCsv(item.evidence_url || '—')}\n`;
+    });
+    if (!hasItems && Number(lecturer.m1_actual || 0) > 0) {
+        csv += `หมวด 1: งานสอน,ภาระงานสอนตามรายงาน,ผู้สอน / ที่ปรึกษา,—,100%,${Number(lecturer.m1_actual || 0).toFixed(2)},—\n`;
+    }
+
+    // หมวด 2: งานวิชาการและงานวิจัย
+    let hasM2 = false;
+    (details.academic || []).forEach(item => {
+        hasM2 = true;
+        const title = item.title || 'ผลงานวิชาการ/วิจัย';
+        const role = `${item.subtype || item.role || 'บทความวิจัย'} ${item.source ? `(${item.source})` : ''}`.trim();
+        csv += `หมวด 2: งานวิชาการและงานวิจัย,${escapeCsv(title)},${escapeCsv(role)},1 เรื่อง,${item.share || 100}%,${Number(item.score || 0).toFixed(2)},${escapeCsv(item.evidence_url || '—')}\n`;
+    });
+    if (!hasM2 && Number(lecturer.m2_actual || 0) > 0) {
+        csv += `หมวด 2: งานวิชาการและงานวิจัย,ผลงานวิชาการ / งานวิจัย,บทความวิชาการ / ผลงานตีพิมพ์,1 เรื่อง,100%,${Number(lecturer.m2_actual || 0).toFixed(2)},—\n`;
+    }
+
+    // หมวด 3: งานบริหาร
+    let hasM3 = false;
+    (details.admin || []).forEach(item => {
+        hasM3 = true;
+        const title = item.title || 'งานบริหาร';
+        const role = `${item.role || 'ผู้บริหาร/ผู้ประสานงาน'} ${item.course_code ? `(${item.course_code})` : ''}`.trim();
+        csv += `หมวด 3: งานบริหาร,${escapeCsv(title)},${escapeCsv(role)},${item.quantity || 1} งาน,100%,${Number(item.score || 0).toFixed(2)},${escapeCsv(item.evidence_url || '—')}\n`;
+    });
+    if (!hasM3 && Number(lecturer.m3_actual || 0) > 0) {
+        csv += `หมวด 3: งานบริหาร,งานบริหารสาขา / คณะ,ผู้บริหาร / ผู้ประสานงาน,1 งาน,100%,${Number(lecturer.m3_actual || 0).toFixed(2)},—\n`;
+    }
+
+    // หมวด 4: งานบริการวิชาการ
+    let hasM4 = false;
+    (details.service || []).forEach(item => {
+        hasM4 = true;
+        const title = item.title || 'งานบริการวิชาการ';
+        const role = `${item.role || ''} ${item.organization ? `(${item.organization})` : ''}`.trim();
+        csv += `หมวด 4: งานบริการวิชาการ,${escapeCsv(title)},${escapeCsv(role)},${item.quantity || 1} งาน,${item.share || 100}%,${Number(item.score || 0).toFixed(2)},${escapeCsv(item.evidence_url || '—')}\n`;
+    });
+    if (!hasM4 && Number(lecturer.m4_actual || 0) > 0) {
+        csv += `หมวด 4: งานบริการวิชาการ,งานบริการวิชาการ / คณะกรรมการ,กรรมการ / วิทยากร,1 งาน,100%,${Number(lecturer.m4_actual || 0).toFixed(2)},—\n`;
+    }
+
+    // หมวด 5: คะแนนพิเศษ
+    let hasM5 = false;
+    (details.extra || []).forEach(item => {
+        hasM5 = true;
+        const title = item.title || 'คะแนนพิเศษ';
+        const desc = item.description || 'คะแนนพิเศษประจำรอบการประเมิน';
+        csv += `หมวด 5: คะแนนพิเศษ,${escapeCsv(title)},${escapeCsv(desc)},1 รายการ,100%,${Number(item.score || 0).toFixed(2)},${escapeCsv(item.evidence_url || '—')}\n`;
+    });
+    if (!hasM5 && Number(lecturer.m5_actual || 0) > 0) {
+        csv += `หมวด 5: คะแนนพิเศษ,คะแนนพิเศษ,คะแนนพิเศษประจำรอบการประเมิน,1 รายการ,100%,${Number(lecturer.m5_actual || 0).toFixed(2)},—\n`;
+    }
+
+    const cleanFileName = `ภาระงาน_${name.replace(/[\/\\?%*:|"<>]/g, '_')}_${semester}_${year}.csv`;
+    downloadCsvBlob(csv, cleanFileName);
+}
+
 function exportCSV() {
-    alert("ระบบกำลังส่งออกไฟล์รายงาน CSV สรุปคะแนนภาระงานอาจารย์...");
+    if (!globalLecturersData || globalLecturersData.length === 0) {
+        alert("ไม่มีข้อมูลอาจารย์สำหรับส่งออก CSV");
+        return;
+    }
+
+    const termVal = document.getElementById('term-filter')?.value || '2-2567';
+    let csv = "\uFEFF"; // UTF-8 BOM
+    csv += "รายงานสรุปคะแนนภาระงานอาจารย์ (สาขาวิชาวิทยาการคอมพิวเตอร์)\n";
+    csv += `รอบการประเมิน,${termVal}\n\n`;
+    csv += "ชื่อ-สกุล,ตำแหน่ง,โครงการที่สอน,หน่วยกิตสอน,หมวด 1 (สอน) คำนวณ,หมวด 1 จริง,หมวด 2 (วิชาการ) คำนวณ,หมวด 2 จริง,หมวด 3 (บริหาร) คำนวณ,หมวด 3 จริง,หมวด 4 (บริการ) คำนวณ,หมวด 4 จริง,หมวด 5 (พิเศษ) คำนวณ,รวมคะแนนจริง,รวมคะแนนคำนวณ (Max 2000),ผลประเมิน,สถานะอนุมัติ\n";
+
+    const escapeCsv = (val) => {
+        if (val === null || val === undefined) return '""';
+        const str = String(val).replace(/"/g, '""');
+        return `"${str}"`;
+    };
+
+    globalLecturersData.forEach(item => {
+        const name = item.name || `${item.title || ''}${item.first_name_th || ''} ${item.last_name_th || ''}`.trim() || 'ไม่ระบุชื่อ';
+        const position = item.position || item.academic_rank || 'อาจารย์';
+        const credits = Number(item.credits || 0).toFixed(1);
+        const m1Calc = Number(item.m1_calc || 0).toFixed(1);
+        const m1Act = Number(item.m1_actual || 0).toFixed(1);
+        const m2Calc = Number(item.m2_calc || 0).toFixed(1);
+        const m2Act = Number(item.m2_actual || 0).toFixed(1);
+        const m3Calc = Number(item.m3_calc || 0).toFixed(1);
+        const m3Act = Number(item.m3_actual || 0).toFixed(1);
+        const m4Calc = Number(item.m4_calc || 0).toFixed(1);
+        const m4Act = Number(item.m4_actual || 0).toFixed(1);
+        const m5Calc = Number(item.m5_calc || 0).toFixed(1);
+        const totalAct = (Number(item.m1_actual || 0) + Number(item.m2_actual || 0) + Number(item.m3_actual || 0) + Number(item.m4_actual || 0) + Number(item.m5_actual || 0)).toFixed(1);
+        const totalCalc = getTotalCalculatedScore(item).toFixed(1);
+        const passText = isScorePassing(item) ? "ผ่านเกณฑ์" : "ต่ำกว่าเกณฑ์";
+        const statusText = String(item.status || '').toUpperCase() === 'APPROVED' ? "อนุมัติแล้ว" : (String(item.status || '').toUpperCase() === 'REJECTED' ? "ส่งกลับแก้ไข" : "รอตรวจ");
+
+        csv += `${escapeCsv(name)},${escapeCsv(position)},"ภาคปกติ",${credits},${m1Calc},${m1Act},${m2Calc},${m2Act},${m3Calc},${m3Act},${m4Calc},${m4Act},${m5Calc},${totalAct},${totalCalc},${escapeCsv(passText)},${escapeCsv(statusText)}\n`;
+    });
+
+    downloadCsvBlob(csv, `สรุปภาระงานอาจารย์_${termVal}.csv`);
 }

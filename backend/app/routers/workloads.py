@@ -24,6 +24,8 @@ def get_officer_dashboard(
     current_user: dict,
     conn,
     search: Optional[str] = None,
+    academic_year: Optional[int] = None,
+    semester: Optional[int] = None,
 ):
     """Return one row per submission with selected raw scores grouped by category."""
     cursor = conn.cursor(cursor_factory=RealDictCursor)
@@ -64,10 +66,18 @@ def get_officer_dashboard(
             COALESCE((
                 SELECT SUM(score) FROM academic_work_items
                 WHERE submission_id = ws.id AND is_selected IS TRUE
+            ), 0) +
+            COALESCE((
+                SELECT SUM(COALESCE(calculated_score, score, 0)) FROM professor_publications
+                WHERE professor_id = ws.professor_id
             ), 0) AS m2_actual,
             COALESCE((
                 SELECT SUM(score) FROM academic_work_items
                 WHERE submission_id = ws.id AND is_selected IS TRUE
+            ), 0) +
+            COALESCE((
+                SELECT SUM(COALESCE(calculated_score, score, 0)) FROM professor_publications
+                WHERE professor_id = ws.professor_id
             ), 0) AS m2_calc,
             COALESCE((
                 SELECT SUM(score) FROM administrative_work_items
@@ -96,17 +106,27 @@ def get_officer_dashboard(
             COALESCE((
                 SELECT SUM(credits) FROM teaching_workloads
                 WHERE submission_id = ws.id AND is_selected IS TRUE
+            ), 0) +
+            COALESCE((
+                SELECT SUM(registered_credit) FROM thesis_supervisions
+                WHERE submission_id = ws.id AND is_selected IS TRUE
             ), 0) AS credits
         FROM workload_submissions ws
         JOIN professors p ON p.id = ws.professor_id
     """
     params = []
+    where_clauses = []
     if search:
-        query += """
-            WHERE CONCAT_WS(' ', p.title, p.first_name_th, p.last_name_th)
-                ILIKE %s
-        """
+        where_clauses.append("CONCAT_WS(' ', p.title, p.first_name_th, p.last_name_th) ILIKE %s")
         params.append(f"%{search.strip()}%")
+    if academic_year:
+        where_clauses.append("(ws.academic_year = %s OR ws.academic_year IS NULL)")
+        params.append(academic_year)
+    if semester:
+        where_clauses.append("(ws.semester = %s OR ws.semester IS NULL)")
+        params.append(semester)
+    if where_clauses:
+        query += " WHERE " + " AND ".join(where_clauses)
     query += " ORDER BY ws.academic_year DESC NULLS LAST, ws.semester DESC NULLS LAST, p.last_name_th"
 
     try:
@@ -125,10 +145,18 @@ def get_officer_dashboard(
 @router.get("/officer/dashboard", summary="สรุปภาระงานสำหรับเจ้าหน้าที่")
 def officer_dashboard(
     search: Optional[str] = Query(None, max_length=100),
+    academic_year: Optional[int] = Query(None),
+    semester: Optional[int] = Query(None),
     current_user: dict = Depends(require_roles(OFFICER_ROLES)),
     conn=Depends(get_db),
 ):
-    return get_officer_dashboard(current_user=current_user, conn=conn, search=search)
+    return get_officer_dashboard(
+        current_user=current_user,
+        conn=conn,
+        search=search,
+        academic_year=academic_year,
+        semester=semester,
+    )
 
 
 def update_submission_status(
@@ -211,7 +239,7 @@ def patch_submission_status(
 @router.get("/by-category", summary="ดึงภาระงานที่อนุมัติแล้วสำหรับโปรไฟล์สาธารณะ")
 def get_public_workloads_by_category(
     professor_id: UUID,
-    category: Literal["TEACHING", "ADVISING", "ADMINISTRATIVE", "SERVICE"] = Query(...),
+    category: Literal["TEACHING", "ADVISING", "ADMINISTRATIVE", "SERVICE", "RESEARCH", "ACADEMIC"] = Query(...),
     conn=Depends(get_db),
 ):
     queries = {
@@ -229,7 +257,7 @@ def get_public_workloads_by_category(
             FROM teaching_workloads tw
             JOIN workload_submissions ws ON ws.id = tw.submission_id
             WHERE ws.professor_id::text = %s
-                AND tw.is_selected IS TRUE
+                AND (tw.is_selected IS TRUE OR tw.is_selected IS NULL)
                 AND UPPER(ws.status) = 'APPROVED'
         """,
         "ADVISING": """
@@ -244,7 +272,7 @@ def get_public_workloads_by_category(
             FROM thesis_supervisions ts
             JOIN workload_submissions ws ON ws.id = ts.submission_id
             WHERE ws.professor_id::text = %s
-                AND ts.is_selected IS TRUE
+                AND (ts.is_selected IS TRUE OR ts.is_selected IS NULL)
                 AND UPPER(ws.status) = 'APPROVED'
             UNION ALL
             SELECT
@@ -258,7 +286,7 @@ def get_public_workloads_by_category(
             FROM student_project_supervisions sps
             JOIN workload_submissions ws ON ws.id = sps.submission_id
             WHERE ws.professor_id::text = %s
-                AND sps.is_selected IS TRUE
+                AND (sps.is_selected IS TRUE OR sps.is_selected IS NULL)
                 AND UPPER(ws.status) = 'APPROVED'
         """,
         "ADMINISTRATIVE": """
@@ -273,7 +301,7 @@ def get_public_workloads_by_category(
             FROM administrative_work_items ai
             JOIN workload_submissions ws ON ws.id = ai.submission_id
             WHERE ws.professor_id::text = %s
-                AND ai.is_selected IS TRUE
+                AND (ai.is_selected IS TRUE OR ai.is_selected IS NULL)
                 AND UPPER(ws.status) = 'APPROVED'
         """,
         "SERVICE": """
@@ -287,13 +315,54 @@ def get_public_workloads_by_category(
             FROM service_work_items si
             JOIN workload_submissions ws ON ws.id = si.submission_id
             WHERE ws.professor_id::text = %s
-                AND si.is_selected IS TRUE
+                AND (si.is_selected IS TRUE OR si.is_selected IS NULL)
+                AND UPPER(ws.status) = 'APPROVED'
+            UNION ALL
+            SELECT
+                COALESCE(esi.title, 'คะแนนพิเศษ') AS title,
+                'คะแนนพิเศษ' AS work_type,
+                'คะแนนพิเศษ' AS role,
+                esi.description AS organization,
+                ws.academic_year,
+                ws.semester
+            FROM extra_score_items esi
+            JOIN workload_submissions ws ON ws.id = esi.submission_id
+            WHERE ws.professor_id::text = %s
+                AND (esi.is_selected IS TRUE OR esi.is_selected IS NULL)
+                AND UPPER(ws.status) = 'APPROVED'
+        """,
+        "RESEARCH": """
+            SELECT
+                COALESCE(ai.title, '') AS title,
+                COALESCE(ai.work_type, ai.workload_subtype, 'งานวิจัย') AS work_type,
+                COALESCE(ai.role_type, 'ผู้เขียน/ผู้วิจัย') AS role,
+                ai.source_name AS organization,
+                ws.academic_year,
+                ws.semester
+            FROM academic_work_items ai
+            JOIN workload_submissions ws ON ws.id = ai.submission_id
+            WHERE ws.professor_id::text = %s
+                AND (ai.is_selected IS TRUE OR ai.is_selected IS NULL)
+                AND UPPER(ws.status) = 'APPROVED'
+        """,
+        "ACADEMIC": """
+            SELECT
+                COALESCE(ai.title, '') AS title,
+                COALESCE(ai.work_type, ai.workload_subtype, 'งานวิจัย') AS work_type,
+                COALESCE(ai.role_type, 'ผู้เขียน/ผู้วิจัย') AS role,
+                ai.source_name AS organization,
+                ws.academic_year,
+                ws.semester
+            FROM academic_work_items ai
+            JOIN workload_submissions ws ON ws.id = ai.submission_id
+            WHERE ws.professor_id::text = %s
+                AND (ai.is_selected IS TRUE OR ai.is_selected IS NULL)
                 AND UPPER(ws.status) = 'APPROVED'
         """,
     }
     query = queries[category]
-    params = (str(professor_id),) * (2 if category == "ADVISING" else 1)
-    if category == "ADVISING":
+    params = (str(professor_id),) * (2 if category in ("ADVISING", "SERVICE") else 1)
+    if category in ("ADVISING", "SERVICE"):
         query = f"SELECT * FROM ({query}) public_items"
     query += " ORDER BY academic_year DESC NULLS LAST, semester DESC NULLS LAST, title"
 
@@ -317,33 +386,54 @@ def inspect_professor_workload(
     professor_id: UUID,
     academic_year: Optional[int] = Query(None),
     semester: Optional[int] = Query(None),
+    submission_id: Optional[UUID] = Query(None),
     current_user: dict = Depends(require_roles(REVIEW_ROLES)),
     conn=Depends(get_db),
 ):
     cursor = conn.cursor(cursor_factory=RealDictCursor)
     try:
         prof_id_str = str(professor_id)
+        submission = None
 
         # 1. ค้นหา submission_id
-        sub_query = """
-            SELECT id::text, status, academic_year, semester
-            FROM workload_submissions
-            WHERE professor_id::text = %s
-        """
-        params = [prof_id_str]
-        if academic_year:
-            sub_query += " AND (academic_year = %s OR academic_year IS NULL)"
-            params.append(academic_year)
-        if semester:
-            sub_query += " AND (semester = %s OR semester IS NULL)"
-            params.append(semester)
-            
-        sub_query += " ORDER BY academic_year DESC NULLS LAST, semester DESC NULLS LAST LIMIT 1;"
-        
-        cursor.execute(sub_query, tuple(params))
-        submission = cursor.fetchone()
+        if submission_id:
+            cursor.execute("""
+                SELECT id::text, status, academic_year, semester, professor_id::text
+                FROM workload_submissions
+                WHERE id::text = %s
+            """, (str(submission_id),))
+            submission = cursor.fetchone()
+
+        if not submission:
+            sub_query = """
+                SELECT id::text, status, academic_year, semester, professor_id::text
+                FROM workload_submissions
+                WHERE (professor_id::text = %s OR id::text = %s)
+            """
+            params = [prof_id_str, prof_id_str]
+            if academic_year:
+                sub_query += " AND (academic_year = %s OR academic_year IS NULL)"
+                params.append(academic_year)
+            if semester:
+                sub_query += " AND (semester = %s OR semester IS NULL)"
+                params.append(semester)
+                
+            sub_query += " ORDER BY academic_year DESC NULLS LAST, semester DESC NULLS LAST LIMIT 1;"
+            cursor.execute(sub_query, tuple(params))
+            submission = cursor.fetchone()
+
+        # Fallback: if not found with year/semester, fetch the most recent submission for this professor
+        if not submission:
+            cursor.execute("""
+                SELECT id::text, status, academic_year, semester, professor_id::text
+                FROM workload_submissions
+                WHERE (professor_id::text = %s OR id::text = %s)
+                ORDER BY academic_year DESC NULLS LAST, semester DESC NULLS LAST LIMIT 1;
+            """, (prof_id_str, prof_id_str))
+            submission = cursor.fetchone()
 
         sub_id = submission["id"] if submission else None
+        target_prof_id = str(submission["professor_id"]) if (submission and submission.get("professor_id")) else prof_id_str
 
         teaching, projects, thesis = [], [], []
         academic, admin, service, extra = [], [], [], []
@@ -359,6 +449,7 @@ def inspect_professor_workload(
                     COALESCE(student_count, 0) AS student_count,
                     COALESCE(contribution_percent, 100) AS share,
                     COALESCE(score, 0) AS score,
+                    role_type,
                     evidence_url
                 FROM teaching_workloads
                 WHERE submission_id::text = %s;
@@ -464,7 +555,7 @@ def inspect_professor_workload(
                     paper_url AS evidence_url
                 FROM professor_publications
                 WHERE professor_id::text = %s;
-            """, (prof_id_str,))
+            """, (target_prof_id,))
             pubs = cursor.fetchall() or []
             if pubs:
                 academic.extend(pubs)
