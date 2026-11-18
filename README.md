@@ -46,3 +46,4 @@ GitHub Actions workflow ที่ `.github/workflows/ci.yml` จะรันท�
 Pull request จะรันทดสอบเท่านั้น ไม่ deploy; CI ไม่เชื่อมต่อฐานข้อมูล
 การทดสอบ PostgreSQL (`python tests/test_dashboard_database.py`) ยังรันแยกในเครื่อง
 หรือสภาพแวดล้อม staging ที่ได้รับอนุญาต เนื่องจากต้องใช้ค่าการเชื่อมต่อฐานข้อมูลจริง
+URL : http://cs361-project.s3-website-us-east-1.amazonaws.com
